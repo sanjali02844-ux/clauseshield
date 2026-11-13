@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ClauseShield helps tenants review rental clauses and prepare clear, evidence-based responses.">
+  <title>ClauseShield | Tenant Support, Made Clear</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home"><span class="brand-mark">C</span><span>ClauseShield</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <nav id="mainNav">
+      <a href="#home">Home</a><a href="#audit">Audit</a><a href="#calculator">Calculator</a>
+      <a href="#wear">Wear &amp; Tear</a><a href="#about">About</a>
+      <a class="nav-cta" href="#audit">Audit my lease</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero section" id="home">
+      <div class="hero-copy">
+        <p class="eyebrow">AI-ASSISTED TENANT SUPPORT · INDIA</p>
+        <h1>Don't let confusing rental clauses leave you <span>out of pocket.</span></h1>
+        <p class="lead">Review a lease or move-out message, understand what may need a closer look, and prepare a clear response in minutes.</p>
+        <div class="actions"><a class="btn primary" href="#audit">Audit my lease</a><button class="btn secondary" id="tryDemo">Try a demo scenario</button></div>
+        <p class="fine">Free demo · No lawyer-client relationship · Informational tool, not legal advice</p>
+      </div>
+      <div class="hero-preview">
+        <div class="preview-top"><span class="dot"></span><span>sample_lease.pdf</span><span class="risk-pill">Risk 72/100</span></div>
+        <div class="document-line"></div><div class="document-line short"></div>
+        <div class="clause-box"><strong>CLAUSE 9</strong><p>Tenant shall pay one month's rent as painting charges on vacating.</p><span class="flag">⚑ Review this clause</span></div>
+        <div class="document-line"></div><div class="document-line medium"></div>
+        <div class="preview-note">A fixed charge may deserve review. Check the agreement, evidence and applicable state rules.</div>
+      </div>
+    </section>
+
+    <section class="stats section compact">
+      <div><strong>01</strong><span>Review a rental clause</span></div><div><strong>02</strong><span>Understand possible concerns</span></div>
+      <div><strong>03</strong><span>Prepare a response</span></div><div><strong>04</strong><span>Keep your records organised</span></div>
+    </section>
+
+    <section class="section" id="audit">
+      <div class="section-heading"><p class="eyebrow">STEP 1 · TELL US WHAT HAPPENED</p><h2>Start with your rental concern</h2><p>Choose a sample situation or paste the relevant wording. You can edit the details before generating a draft.</p></div>
+      <div class="audit-layout">
+        <div class="panel">
+          <label for="scenario">Choose a demo scenario</label>
+          <select id="scenario">
+            <option value="">Select a situation…</option>
+            <option value="painting">One-month painting deduction</option>
+            <option value="lockin">Early move-out / lock-in penalty</option>
+            <option value="deposit">Large advance security deposit</option>
+          </select>
+          <label for="messageInput">Or paste your landlord's message / lease clause</label>
+          <textarea id="messageInput" rows="6" placeholder="Example: Landlord says one month's rent will be deducted for painting when I move out."></textarea>
+          <div class="form-grid">
+            <div><label for="city">City / state</label><input id="city" type="text" placeholder="e.g. Pune, Maharashtra"></div>
+            <div><label for="rent">Monthly rent (₹)</label><input id="rent" type="number" min="0" placeholder="18000"></div>
+            <div><label for="deposit">Security deposit (₹)</label><input id="deposit" type="number" min="0" placeholder="50000"></div>
+            <div><label for="deduction">Amount in dispute (₹)</label><input id="deduction" type="number" min="0" placeholder="25000"></div>
+          </div>
+          <button class="btn primary full" id="runAudit">Review my situation</button>
+          <p class="fine">The demo uses illustrative rules and sample logic. It does not determine whether a deduction is lawful.</p>
+        </div>
+        <aside class="panel demo-panel">
+          <p class="eyebrow">QUICK START</p><h3>Try a sample case</h3>
+          <button class="scenario-card" data-case="painting"><b>🎨 Painting deduction</b><span>Landlord proposes a fixed painting charge.</span></button>
+          <button class="scenario-card" data-case="lockin"><b>🔒 Lock-in penalty</b><span>Landlord says the full deposit will be kept.</span></button>
+          <button class="scenario-card" data-case="deposit"><b>💰 Advance deposit</b><span>Agreement asks for a large advance deposit.</span></button>
+          <div class="note">Tip: Remove personal details such as phone numbers, addresses and account information before pasting a message.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section results-section" id="results" hidden>
+      <div class="section-heading"><p class="eyebrow">STEP 2 · YOUR REVIEW</p><h2>Here's what to look at</h2></div>
+      <div class="result-grid">
+        <div class="panel verdict-panel"><span class="status" id="riskLabel">NEEDS REVIEW</span><h3 id="verdictTitle">This clause may need a closer look.</h3><p id="verdictReason"></p><div class="money" id="moneyValue">₹0</div><small>Amount entered for review — not a guaranteed recovery</small></div>
+        <div class="panel"><h3>Suggested next steps</h3><ul id="nextSteps"><li>Keep a copy of your agreement.</li><li>Ask for an itemised explanation and supporting bills.</li><li>Compare the wording with applicable state rules.</li></ul><div class="risk-meter"><div id="riskBar"></div></div><small>Illustrative concern indicator: <b id="riskScore">—</b>/100</small></div>
+      </div>
+      <div class="panel legal-panel"><button class="disclosure" id="legalToggle" aria-expanded="false">＋ Want to see the legal references?</button><div id="legalDetails" hidden><p>Potentially relevant sources to verify for your state and facts:</p><ul><li>Model Tenancy Act, 2021 (a model framework; state adoption and local law matter).</li><li>Indian Contract Act, 1872, including Section 74 where applicable to stipulated compensation.</li><li>Consumer Protection Act, 2019, where the facts and legal requirements bring the dispute within its scope.</li></ul><p class="fine">These references are starting points for research, not a conclusion that a particular deduction is illegal. Have a qualified lawyer review high-value or urgent disputes.</p></div></div>
+      <div class="section-heading left"><p class="eyebrow">STEP 3 · PREPARE A RESPONSE</p><h2>Make your next message clear</h2></div>
+      <div class="panel">
+        <div class="tabs"><button class="tab active" data-tab="whatsapp">WhatsApp message</button><button class="tab" data-tab="formal">Formal letter</button></div>
+        <div id="whatsappPane"><div class="form-grid"><div><label for="landlordName">Landlord's name (optional)</label><input id="landlordName" placeholder="Landlord name"></div><div><label for="deadline">Reply timeline (days)</label><input id="deadline" type="number" min="1" value="7"></div></div><label for="whatsappText">Editable message</label><textarea id="whatsappText" rows="7"></textarea><div class="actions"><button class="btn primary" id="copyMessage">Copy text</button><a class="btn secondary" id="whatsappLink" target="_blank" rel="noopener">Open WhatsApp</a></div></div>
+        <div id="formalPane" hidden><label for="formalText">Editable formal letter</label><textarea id="formalText" rows="12"></textarea><div class="actions"><button class="btn primary" id="printLetter">Print / Save as PDF</button><button class="btn secondary" id="copyLetter">Copy letter</button></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="calculator">
+      <div class="section-heading"><p class="eyebrow">DISPUTE CALCULATOR</p><h2>Understand the numbers</h2><p>Enter your deposit and the deductions listed by your landlord. This calculator organises amounts; it cannot decide legal liability.</p></div>
+      <div class="calc-layout">
+        <div class="panel">
+          <label for="calcDeposit">Deposit paid (₹)</label><input id="calcDeposit" type="number" min="0" value="50000">
+          <div id="deductionRows">
+            <div class="deduction-row"><input aria-label="Deduction description" value="Painting charge"><input aria-label="Deduction amount" type="number" min="0" value="18000"></div>
+            <div class="deduction-row"><input aria-label="Deduction description" value="Cleaning charge"><input aria-label="Deduction amount" type="number" min="0" value="3500"></div>
+          </div>
+          <button class="btn secondary" id="addDeduction">+ Add deduction</button>
+          <button class="btn primary full" id="calculate">Calculate amounts</button>
+        </div>
+        <div class="panel calc-result"><p class="eyebrow">YOUR SUMMARY</p><div class="calc-number" id="totalDeductions">₹21,500</div><span>Total deductions entered</span><hr><div class="calc-number green" id="balance">₹28,500</div><span>Deposit balance before any other adjustments</span><p class="fine">This is arithmetic only. Whether each deduction is justified depends on the agreement, evidence and applicable law.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="wear">
+      <div class="section-heading"><p class="eyebrow">EVIDENCE ORGANIZER</p><h2>Normal wear or possible damage?</h2><p>Use this illustrative guide to organise observations before discussing a deduction.</p></div>
+      <div class="wear-grid">
+        <article class="wear-card"><span class="wear-icon">✓</span><h3>Often ordinary wear</h3><ul><li>Minor nail or screw holes</li><li>Faded paint from ordinary use</li><li>Light floor scuffs</li><li>Loose handles from regular use</li></ul></article>
+        <article class="wear-card"><span class="wear-icon caution">!</span><h3>May need evidence</h3><ul><li>Large holes or broken walls</li><li>Cracked tiles or broken fixtures</li><li>Burns or significant stains</li><li>Missing inventory items</li></ul></article>
+      </div>
+      <div class="panel upload-panel"><h3>Keep your evidence together</h3><p>Choose inspection photos to preview them locally in this browser. They are not uploaded to a server.</p><input id="photoUpload" type="file" accept="image/*" multiple><div class="photo-preview" id="photoPreview"></div></div>
+    </section>
+
+    <section class="section about-section" id="about">
+      <div class="section-heading"><p class="eyebrow">ABOUT CLAUSESHIELD</p><h2>Make rental information easier to understand.</h2><p>ClauseShield is a student prototype designed to help tenants organise rental concerns, understand questions to ask, and prepare clearer communications.</p></div>
+      <div class="about-grid"><div><h3>What it aims to do</h3><p>Reduce information gaps by turning dense rental wording into plain-language prompts and practical next steps.</p></div><div><h3>Who it is for</h3><p>Students, first-time renters, working professionals and other tenants who want to keep their rental records organised.</p></div><div><h3>Responsible use</h3><p>Legal outcomes depend on the agreement, evidence, state rules and individual facts. Seek professional advice for legal decisions.</p></div></div>
+      <p class="footer-note">ClauseShield · Team 404 Founders · GNDEC · HackNauts 2.0</p>
+    </section>
+  </main>
+  <footer><span>© 2026 ClauseShield Prototype</span><span>Informational tool only — not legal advice.</span></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>

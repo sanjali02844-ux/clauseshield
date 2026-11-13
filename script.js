@@ -1,0 +1,46 @@
+const $ = id => document.getElementById(id);
+const cases = {
+  painting: {message:"My landlord says one month's rent will be deducted from my security deposit for painting when I move out.", rent:18000, deposit:50000, deduction:25000, title:"A fixed painting charge deserves a closer review.", reason:"Ask whether the charge reflects documented damage beyond ordinary use, and request an itemised explanation and supporting bills. The agreement and applicable state rules matter.", risk:72, steps:["Check the exact painting and maintenance wording in your agreement.","Request dated move-in and move-out photos, an itemised bill and proof of actual damage.","Keep the deposit receipt and all written conversations.","Check the tenancy rules applicable in your state."]},
+  lockin: {message:"My landlord says the entire security deposit will be kept because I am moving out before the lock-in period ends.", rent:20000, deposit:45000, deduction:45000, title:"The lock-in and forfeiture wording needs careful review.", reason:"A full-deposit forfeiture is not automatically justified just because a clause says so. Review the lock-in terms, notice, actual loss and applicable contract and state law before accepting the deduction.", risk:82, steps:["Read the lock-in, notice and early-termination clauses together.","Ask the landlord to explain the amount claimed and how it was calculated.","Keep proof of notice, rent payments and handover condition.","Seek legal advice before accepting a large forfeiture."]},
+  deposit: {message:"The landlord is asking for ten months of rent as an advance security deposit.", rent:25000, deposit:250000, deduction:0, title:"Check the deposit amount against the rules that apply locally.", reason:"Security-deposit limits and tenancy requirements can depend on the state and the law in force. The Model Tenancy Act is a model framework and does not automatically apply everywhere.", risk:65, steps:["Identify the state and city where the property is located.","Check whether the state has adopted tenancy legislation and what it says about deposits.","Ask for the deposit amount and refund terms in writing.","Do not rely on a general online statement without checking local law."]}
+};
+let currentCase = null;
+function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400)}
+function formatINR(value){return '₹'+Number(value||0).toLocaleString('en-IN',{maximumFractionDigits:0})}
+function loadCase(key){const c=cases[key];if(!c)return;currentCase=key;$('scenario').value=key;$('messageInput').value=c.message;$('rent').value=c.rent;$('deposit').value=c.deposit;$('deduction').value=c.deduction;$('audit').scrollIntoView({behavior:'smooth'});toast('Demo scenario loaded')}
+document.querySelectorAll('[data-case]').forEach(b=>b.addEventListener('click',()=>loadCase(b.dataset.case)));
+$('scenario').addEventListener('change',e=>{if(e.target.value)loadCase(e.target.value)});
+$('tryDemo').addEventListener('click',()=>loadCase('painting'));
+$('menuToggle').addEventListener('click',()=>$('mainNav').classList.toggle('open'));
+document.querySelectorAll('#mainNav a').forEach(a=>a.addEventListener('click',()=>$('mainNav').classList.remove('open')));
+$('runAudit').addEventListener('click',()=>{
+  const msg=$('messageInput').value.trim();if(!msg){toast('Choose a scenario or paste a message first.');return}
+  const c=cases[currentCase]||null;const amount=Number($('deduction').value)||0;
+  const title=c?c.title:'Your wording may need a closer review.';
+  const reason=c?c.reason:'This prototype cannot interpret legal wording reliably. Identify the exact clause, check the agreement and local rules, and request an itemised explanation with supporting evidence.';
+  const score=c?c.risk:50;const steps=c?c.steps:["Save the complete agreement and the message you received.","Ask for the specific clause and an itemised calculation.","Collect payment receipts, inspection photos and handover records.","Verify the applicable state rules or consult a qualified lawyer."];
+  $('riskLabel').textContent=score>=75?'HIGHER CONCERN · REVIEW':score>=60?'NEEDS REVIEW':'INFORMATION CHECK';
+  $('verdictTitle').textContent=title;$('verdictReason').textContent=reason;$('moneyValue').textContent=formatINR(amount);
+  $('riskScore').textContent=score;$('riskBar').style.width=score+'%';$('riskBar').style.background=score>=75?'#c65b50':score>=60?'#c18b36':'#279b73';
+  $('nextSteps').innerHTML=steps.map(s=>'<li>'+escapeHTML(s)+'</li>').join('');
+  const city=$('city').value||'[City / State]';const deadline=Math.max(1,Number($('deadline').value)||7);
+  const name=$('landlordName').value.trim()||'';
+  const greeting=name?'Hi '+name+',':'Hello,';
+  const draft=`${greeting}\n\nI am writing about the proposed deduction from my security deposit relating to: "${msg}". Could you please share the relevant agreement clause, an itemised calculation and supporting bills or evidence of any damage beyond ordinary wear and tear? I would appreciate resolving this amicably. Please respond within ${deadline} days and confirm the expected refund, if any.\n\nProperty location: ${city}\nThank you.`;
+  $('whatsappText').value=draft;
+  $('formalText').value=`Date: [Insert date]\nTo,\n[Landlord's name]\n[Address]\n\nSubject: Request for explanation and settlement of security-deposit deductions\n\n${greeting}\n\nI am writing regarding the security deposit paid for the rented property at ${city}. The issue raised is: "${msg}".\n\nPlease provide the relevant agreement clause, an itemised statement of deductions, and copies of supporting invoices, inspection records or other evidence relied upon. I request that any undisputed balance be refunded and that we resolve the matter amicably.\n\nPlease provide your written response within ${deadline} days of receiving this letter.\n\nThis letter is a request for clarification and does not waive any rights or remedies available under applicable law.\n\nSincerely,\n[Your name]\n[Contact details]`;
+  $('results').hidden=false;$('results').scrollIntoView({behavior:'smooth'});
+});
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('legalToggle').addEventListener('click',()=>{const d=$('legalDetails');d.hidden=!d.hidden;$('legalToggle').setAttribute('aria-expanded',String(!d.hidden));$('legalToggle').textContent=(d.hidden?'＋':'−')+' Want to see the legal references?'});
+document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===tab));$('whatsappPane').hidden=tab.dataset.tab!=='whatsapp';$('formalPane').hidden=tab.dataset.tab!=='formal'}));
+async function copyText(value){try{await navigator.clipboard.writeText(value);toast('Copied to clipboard')}catch(e){toast('Copy is unavailable here. Select the text and copy it manually.')}}
+$('copyMessage').addEventListener('click',()=>copyText($('whatsappText').value));
+$('copyLetter').addEventListener('click',()=>copyText($('formalText').value));
+$('whatsappLink').addEventListener('click',e=>{const text=$('whatsappText').value;if(!text){e.preventDefault();toast('Generate a message first.');return}e.currentTarget.href='https://wa.me/?text='+encodeURIComponent(text)});
+$('printLetter').addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='formal'));$('whatsappPane').hidden=true;$('formalPane').hidden=false;window.print()});
+$('addDeduction').addEventListener('click',()=>{const row=document.createElement('div');row.className='deduction-row';row.innerHTML='<input aria-label="Deduction description" placeholder="Deduction name"><input aria-label="Deduction amount" type="number" min="0" value="0">';$('deductionRows').appendChild(row)});
+function calculate(){const deposit=Math.max(0,Number($('calcDeposit').value)||0);let total=0;document.querySelectorAll('.deduction-row input[type=number]').forEach(i=>total+=Math.max(0,Number(i.value)||0));$('totalDeductions').textContent=formatINR(total);$('balance').textContent=formatINR(Math.max(0,deposit-total));if(total>deposit)toast('Entered deductions exceed the deposit amount.')}
+$('calculate').addEventListener('click',calculate);$('deductionRows').addEventListener('input',calculate);$('calcDeposit').addEventListener('input',calculate);
+$('photoUpload').addEventListener('change',e=>{const holder=$('photoPreview');holder.innerHTML='';[...e.target.files].forEach(file=>{if(!file.type.startsWith('image/'))return;const img=document.createElement('img');img.alt='Selected inspection photo';img.src=URL.createObjectURL(file);holder.appendChild(img)})});
+calculate();
