@@ -37,6 +37,16 @@ document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>
 async function copyText(value){try{await navigator.clipboard.writeText(value);toast('Copied to clipboard')}catch(e){toast('Copy is unavailable here. Select the text and copy it manually.')}}
 $('copyMessage').addEventListener('click',()=>copyText($('whatsappText').value));
 $('copyLetter').addEventListener('click',()=>copyText($('formalText').value));
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => {
+            t.classList.toggle('active', t === tab);
+        });
+
+        $('whatsappPane').hidden = tab.dataset.tab !== 'whatsapp';
+        $('formalPane').hidden = tab.dataset.tab !== 'formal';
+    });
+});
 $('whatsappLink').addEventListener('click',e=>{const text=$('whatsappText').value;if(!text){e.preventDefault();toast('Generate a message first.');return}e.currentTarget.href='https://wa.me/?text='+encodeURIComponent(text)});
 $('$('printLetter').addEventListener('click', () => {     const letter = $('formalText').value;      if (!letter.trim()) {         alert('Please generate the formal letter first.');         return;     }      const printWindow = window.open('', '_blank');      if (!printWindow) {         alert('Please allow pop-ups to print the letter.');         return;     }      const safeLetter = letter.replace(/[&<>"']/g, char => ({         '&': '&amp;',         '<': '&lt;',         '>': '&gt;',         '"': '&quot;',         "'": '&#39;'     })[char]);      printWindow.document.write(`         <!DOCTYPE html>         <html>         <head>             <title>Formal Letter</title>             <style>                 body {                     font-family: Arial, sans-serif;                     padding: 40px;                     font-size: 12pt;                     line-height: 1.6;                 }                 pre {                     white-space: pre-wrap;                     font-family: Arial, sans-serif;                 }             </style>         </head>         <body>             <pre>${safeLetter}</pre>         </body>         </html>     `);      printWindow.document.close();     printWindow.focus();      setTimeout(() => printWindow.print(), 500); });').addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='formal'));$('whatsappPane').hidden=true;$('formalPane').hidden=false;window.print()});
 $('addDeduction').addEventListener('click',()=>{const row=document.createElement('div');row.className='deduction-row';row.innerHTML='<input aria-label="Deduction description" placeholder="Deduction name"><input aria-label="Deduction amount" type="number" min="0" value="0">';$('deductionRows').appendChild(row)});
