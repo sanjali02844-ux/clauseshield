@@ -508,8 +508,18 @@
   // ------------------------------------------------------------------------------
   // SUPABASE CLIENT INITIALISATION / DUAL ADAPTER
   // ------------------------------------------------------------------------------
+  const DEFAULT_CONFIG = {
+    url: 'https://tupyazcflbdqrxzjfobv.supabase.co',
+    anonKey: 'sb_publishable_MVpr7gmAvQxdJvENMaxeuA_LKC3RP3J'
+  };
+
   let supabaseInstance = null;
-  const config = getStorage(STORAGE_KEYS.CONFIG, { url: '', anonKey: '' });
+  let storedConfig = getStorage(STORAGE_KEYS.CONFIG, DEFAULT_CONFIG);
+  if (!storedConfig || !storedConfig.url || !storedConfig.anonKey) {
+    storedConfig = DEFAULT_CONFIG;
+    setStorage(STORAGE_KEYS.CONFIG, DEFAULT_CONFIG);
+  }
+  const config = storedConfig;
 
   if (window.supabase && config.url && config.anonKey) {
     try {

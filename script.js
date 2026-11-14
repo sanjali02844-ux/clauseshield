@@ -2019,6 +2019,19 @@ function initAuthModal() {
     });
   }
 
+  // Toggle Password Visibility
+  const toggleLoginPassBtn = $('toggleLoginPassword');
+  if (toggleLoginPassBtn) {
+    toggleLoginPassBtn.addEventListener('click', () => {
+      const passInp = $('loginPassword');
+      if (passInp) {
+        const isPass = passInp.getAttribute('type') === 'password';
+        passInp.setAttribute('type', isPass ? 'text' : 'password');
+        toggleLoginPassBtn.textContent = isPass ? '🙈' : '👁️';
+      }
+    });
+  }
+
   // Quick 1-Click Demo Login Buttons
   document.querySelectorAll('.demo-login-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {

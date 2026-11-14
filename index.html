@@ -1176,22 +1176,37 @@
 
   <!-- 1. AUTHENTICATION MODAL -->
   <div class="cs-modal-backdrop" id="authModal">
-    <div class="cs-modal">
-      <div class="modal-header">
-        <div>
-          <h3 id="authModalTitle" style="margin:0 0 4px;">Welcome to ClauseShield</h3>
-          <p id="authModalSubtitle" style="font-size:.85rem;color:var(--muted);margin:0;">Access tenant legal assistance, free lawyer advice, and complaint tracking.</p>
+    <div class="cs-modal auth-modal-dialog">
+      <div class="modal-header auth-modal-header">
+        <div class="auth-header-brand">
+          <span class="auth-brand-badge">CS</span>
+          <div>
+            <h3 id="authModalTitle">Sign In to ClauseShield</h3>
+            <p id="authModalSubtitle">Access tenant legal assistance, free lawyer advice, and complaint tracking.</p>
+          </div>
         </div>
         <button type="button" class="modal-close-btn" data-close="authModal" aria-label="Close dialog">×</button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body auth-modal-body">
         <!-- Quick Demo Login Bar -->
         <div class="quick-demo-banner">
-          <span style="font-size:.8rem;font-weight:700;color:var(--navy);">⚡ Instant 1-Click Demo Logins:</span>
+          <div class="quick-demo-header">
+            <span class="quick-demo-label">⚡ Instant 1-Click Demo Logins</span>
+            <span class="quick-demo-badge">Dev Access</span>
+          </div>
           <div class="quick-demo-buttons">
-            <button type="button" class="btn secondary demo-login-btn" data-email="tenant@example.com" data-pass="password123">👤 Tenant Demo (Arjun)</button>
-            <button type="button" class="btn secondary demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123">⚖️ Free Lawyer Demo (Adv. Rajesh)</button>
-            <button type="button" class="btn secondary demo-login-btn" data-email="admin@clauseshield.com" data-pass="password123">🛡️ Admin Demo</button>
+            <button type="button" class="demo-login-btn" data-email="tenant@example.com" data-pass="password123" title="Log in as Arjun (Tenant)">
+              <span>👤</span>
+              <span><strong>Tenant Demo</strong> <small>(Arjun)</small></span>
+            </button>
+            <button type="button" class="demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123" title="Log in as Adv. Rajesh (Free Lawyer)">
+              <span>⚖️</span>
+              <span><strong>Free Lawyer</strong> <small>(Adv. Rajesh)</small></span>
+            </button>
+            <button type="button" class="demo-login-btn" data-email="admin@clauseshield.com" data-pass="password123" title="Log in as Admin">
+              <span>🛡️</span>
+              <span><strong>Admin Demo</strong></span>
+            </button>
           </div>
         </div>
 
@@ -1203,28 +1218,45 @@
 
         <!-- Sign In Form Pane -->
         <div id="authSignInPane">
-          <form id="signInForm">
-            <label for="loginEmail">Email Address *</label>
-            <input type="email" id="loginEmail" placeholder="your.name@example.com" required autocomplete="email">
+          <form id="signInForm" class="auth-form">
+            <div class="form-group">
+              <label for="loginEmail">Email Address <span class="req-star">*</span></label>
+              <div class="input-field-wrapper">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="loginEmail" placeholder="your.name@example.com" required autocomplete="email">
+              </div>
+            </div>
 
-            <label for="loginPassword">Password *</label>
-            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            <div class="form-group">
+              <div class="form-label-row">
+                <label for="loginPassword">Password <span class="req-star">*</span></label>
+                <span class="label-hint">Default: <code>password123</code></span>
+              </div>
+              <div class="input-field-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                <button type="button" class="toggle-password-btn" id="toggleLoginPassword" aria-label="Toggle password visibility" tabindex="-1">👁️</button>
+              </div>
+            </div>
 
             <div id="signInErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
 
-            <button type="submit" class="btn primary full" id="signInSubmitBtn">Sign In</button>
+            <button type="submit" class="btn primary full auth-submit-btn" id="signInSubmitBtn">
+              <span>Sign In</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
 
-            <div style="text-align:center;margin-top:16px;font-size:.85rem;color:var(--muted);">
+            <div class="auth-switch-note">
               Don't have an account yet? 
-              <a href="javascript:void(0)" id="switchRegisterLink" style="color:var(--blue);font-weight:700;text-decoration:none;">Create New Account here &rarr;</a>
+              <a href="javascript:void(0)" id="switchRegisterLink">Create New Account here &rarr;</a>
             </div>
           </form>
         </div>
 
         <!-- Create Account Form Pane -->
         <div id="authSignUpPane" style="display:none;">
-          <div style="margin-bottom:16px;">
-            <label style="font-size:.84rem;font-weight:700;color:var(--navy);display:block;margin-bottom:8px;">Choose Account Type *</label>
+          <div style="margin-bottom:18px;">
+            <label style="font-size:.84rem;font-weight:700;color:var(--navy);display:block;margin-bottom:8px;">Choose Account Type <span class="req-star">*</span></label>
             <div class="auth-role-cards">
               <label class="auth-role-card active" id="roleCardTenant">
                 <input type="radio" name="signupRole" value="tenant" checked style="display:none;">
@@ -1242,47 +1274,81 @@
           </div>
 
           <!-- Tenant Registration Form -->
-          <form id="tenantRegisterForm">
-            <label for="tenantFullName">Full Name *</label>
-            <input type="text" id="tenantFullName" placeholder="e.g. Arjun Mehra" required autocomplete="name">
+          <form id="tenantRegisterForm" class="auth-form">
+            <div class="form-group">
+              <label for="tenantFullName">Full Name <span class="req-star">*</span></label>
+              <div class="input-field-wrapper">
+                <span class="input-icon">👤</span>
+                <input type="text" id="tenantFullName" placeholder="e.g. Arjun Mehra" required autocomplete="name">
+              </div>
+            </div>
 
-            <label for="tenantRegEmail">Email Address *</label>
-            <input type="email" id="tenantRegEmail" placeholder="arjun.mehra@example.com" required autocomplete="email">
+            <div class="form-group">
+              <label for="tenantRegEmail">Email Address <span class="req-star">*</span></label>
+              <div class="input-field-wrapper">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="tenantRegEmail" placeholder="arjun.mehra@example.com" required autocomplete="email">
+              </div>
+            </div>
 
-            <label for="tenantRegPassword">Password *</label>
-            <input type="password" id="tenantRegPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+            <div class="form-group">
+              <label for="tenantRegPassword">Password <span class="req-star">*</span></label>
+              <div class="input-field-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="tenantRegPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+              </div>
+            </div>
 
-            <label for="tenantRegPhone">Phone Number <small style="font-weight:normal;color:var(--muted);">(Optional)</small></label>
-            <input type="tel" id="tenantRegPhone" placeholder="+91 98765 43210">
+            <div class="form-group">
+              <label for="tenantRegPhone">Phone Number <small style="font-weight:normal;color:var(--muted);">(Optional)</small></label>
+              <div class="input-field-wrapper">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="tenantRegPhone" placeholder="+91 98765 43210">
+              </div>
+            </div>
 
             <div id="tenantRegErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
 
-            <button type="submit" class="btn primary full" id="tenantRegisterSubmitBtn">Create Tenant Account &amp; Log In</button>
+            <button type="submit" class="btn primary full auth-submit-btn" id="tenantRegisterSubmitBtn">
+              <span>Create Tenant Account &amp; Log In</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
           </form>
 
           <!-- Lawyer Registration Form -->
-          <form id="lawyerRegisterForm" style="display:none;">
-            <label for="lawyerFullName">Advocate Full Name *</label>
-            <input type="text" id="lawyerFullName" placeholder="e.g. Adv. Rohit Deshmukh" required autocomplete="name">
-
-            <div class="form-grid">
-              <div>
-                <label for="lawyerRegEmail">Email Address *</label>
-                <input type="email" id="lawyerRegEmail" placeholder="adv.rohit@lawchambers.in" required autocomplete="email">
-              </div>
-              <div>
-                <label for="lawyerRegPassword">Password *</label>
-                <input type="password" id="lawyerRegPassword" placeholder="Create password" required autocomplete="new-password">
+          <form id="lawyerRegisterForm" class="auth-form" style="display:none;">
+            <div class="form-group">
+              <label for="lawyerFullName">Advocate Full Name <span class="req-star">*</span></label>
+              <div class="input-field-wrapper">
+                <span class="input-icon">⚖️</span>
+                <input type="text" id="lawyerFullName" placeholder="e.g. Adv. Rohit Deshmukh" required autocomplete="name">
               </div>
             </div>
 
             <div class="form-grid">
-              <div>
-                <label for="lawyerBarNumber">Bar Council Enrolment No. *</label>
+              <div class="form-group">
+                <label for="lawyerRegEmail">Email Address <span class="req-star">*</span></label>
+                <div class="input-field-wrapper">
+                  <span class="input-icon">✉️</span>
+                  <input type="email" id="lawyerRegEmail" placeholder="adv.rohit@lawchambers.in" required autocomplete="email">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="lawyerRegPassword">Password <span class="req-star">*</span></label>
+                <div class="input-field-wrapper">
+                  <span class="input-icon">🔒</span>
+                  <input type="password" id="lawyerRegPassword" placeholder="Create password" required autocomplete="new-password">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="lawyerBarNumber">Bar Council Enrolment No. <span class="req-star">*</span></label>
                 <input type="text" id="lawyerBarNumber" placeholder="e.g. MAH/5821/2020" value="MAH/5821/2020" required>
               </div>
-              <div>
-                <label for="lawyerStateBar">State Bar Council *</label>
+              <div class="form-group">
+                <label for="lawyerStateBar">State Bar Council <span class="req-star">*</span></label>
                 <select id="lawyerStateBar" required>
                   <option value="Bar Council of Maharashtra & Goa">Bar Council of Maharashtra &amp; Goa</option>
                   <option value="Karnataka State Bar Council">Karnataka State Bar Council</option>
@@ -1296,8 +1362,8 @@
             </div>
 
             <div class="form-grid">
-              <div>
-                <label for="lawyerSpecialty">Legal Specialisation *</label>
+              <div class="form-group">
+                <label for="lawyerSpecialty">Legal Specialisation <span class="req-star">*</span></label>
                 <select id="lawyerSpecialty" required>
                   <option value="Tenancy Disputes & Deposit Recovery">Tenancy Disputes &amp; Deposit Recovery</option>
                   <option value="Rental Agreements & Eviction Defense">Rental Agreements &amp; Eviction Defense</option>
@@ -1306,8 +1372,8 @@
                   <option value="Civil & Consumer Tenancy Law">Civil &amp; Consumer Tenancy Law</option>
                 </select>
               </div>
-              <div>
-                <label for="lawyerFee">Consultation Mode *</label>
+              <div class="form-group">
+                <label for="lawyerFee">Consultation Mode <span class="req-star">*</span></label>
                 <select id="lawyerFee">
                   <option value="0" selected>Pro Bono / Free Legal Aid (₹0)</option>
                   <option value="500">Standard Consultation (₹500)</option>
@@ -1317,12 +1383,15 @@
 
             <div id="lawyerRegErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
 
-            <button type="submit" class="btn primary full" id="lawyerRegisterSubmitBtn">Create Advocate Account &amp; Access Board</button>
+            <button type="submit" class="btn primary full auth-submit-btn" id="lawyerRegisterSubmitBtn">
+              <span>Create Advocate Account &amp; Access Board</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
           </form>
 
-          <div style="text-align:center;margin-top:16px;font-size:.85rem;color:var(--muted);">
+          <div class="auth-switch-note">
             Already have an account? 
-            <a href="javascript:void(0)" id="switchSignInLink" style="color:var(--blue);font-weight:700;text-decoration:none;">Sign In here &rarr;</a>
+            <a href="javascript:void(0)" id="switchSignInLink">Sign In here &rarr;</a>
           </div>
         </div>
       </div>
