@@ -6,6 +6,12 @@
   <meta name="description" content="ClauseShield helps tenants review rental clauses and prepare clear, evidence-based responses.">
   <title>ClauseShield | Tenant Support, Made Clear</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
 </head>
 <body>
   <header class="site-header">
@@ -45,20 +51,79 @@
       <div class="section-heading"><p class="eyebrow">STEP 1 · TELL US WHAT HAPPENED</p><h2>Start with your rental concern</h2><p>Choose a sample situation or paste the relevant wording. You can edit the details before generating a draft.</p></div>
       <div class="audit-layout">
         <div class="panel">
-          <label for="scenario">Choose a demo scenario</label>
-          <select id="scenario">
-            <option value="">Select a situation…</option>
-            <option value="painting">One-month painting deduction</option>
-            <option value="lockin">Early move-out / lock-in penalty</option>
-            <option value="deposit">Large advance security deposit</option>
-          </select>
-          <label for="messageInput">Or paste your landlord's message / lease clause</label>
-          <textarea id="messageInput" rows="6" placeholder="Example: Landlord says one month's rent will be deducted for painting when I move out."></textarea>
+          <div class="ai-status-bar">
+            <div class="status-indicator">
+              <span class="status-pulse" id="backendPulse"></span>
+              <span id="backendStatusText">Engine: Ready (Smart Rule Mode)</span>
+            </div>
+            <button type="button" class="api-settings-btn" id="apiSettingsToggle" aria-expanded="false" title="Backend connection settings">⚙️ Backend</button>
+          </div>
+          <div id="apiSettingsPanel" class="api-settings-panel" hidden>
+            <label for="backendUrlInput">FastAPI Backend URL</label>
+            <div class="api-input-group">
+              <input id="backendUrlInput" type="url" placeholder="http://localhost:8000" value="http://localhost:8000">
+              <button type="button" class="btn secondary" id="testApiBtn">Connect</button>
+            </div>
+            <small class="fine">ClauseShield works 100% in-browser offline via our rule engine, and automatically enhances with live Gemini 1.5 Flash when your backend is running.</small>
+          </div>
+
+          <div class="input-mode-tabs">
+            <button type="button" class="mode-tab active" data-mode="text">✏️ Text / Clause</button>
+            <button type="button" class="mode-tab" data-mode="file">📄 Upload Lease (PDF)</button>
+          </div>
+
+          <div id="fileUploadContainer" class="upload-dropzone" hidden>
+            <input type="file" id="leaseFileInput" accept=".pdf,.txt" class="dropzone-input" aria-label="Upload rental lease">
+            <div class="dropzone-content" id="dropzonePrompt">
+              <span class="dropzone-icon">📁</span>
+              <div>
+                <strong>Drop your Lease Agreement PDF here</strong>
+                <p>or click to browse from your device</p>
+              </div>
+            </div>
+            <div id="fileUploadStatus" class="upload-status" hidden>
+              <span class="status-icon">✓</span>
+              <div class="status-meta">
+                <strong id="fileNameDisplay" class="file-name">lease.pdf</strong>
+                <span id="filePageDisplay" class="file-pages">Extracted</span>
+              </div>
+              <button type="button" id="removeFileBtn" class="remove-file-btn" title="Remove file">×</button>
+            </div>
+          </div>
+
+          <div id="textInputContainer">
+            <label for="scenario">Choose a demo scenario</label>
+            <select id="scenario">
+              <option value="">Select a situation…</option>
+              <option value="painting">One-month painting deduction</option>
+              <option value="lockin">Early move-out / lock-in penalty</option>
+              <option value="deposit">Large advance security deposit</option>
+            </select>
+            <label for="messageInput">Or paste your landlord's message / lease clause</label>
+            <textarea id="messageInput" rows="5" placeholder="Example: Landlord says one month's rent will be deducted for painting when I move out."></textarea>
+          </div>
+
           <div class="form-grid">
-            <div><label for="city">City / state</label><input id="city" type="text" placeholder="e.g. Pune, Maharashtra"></div>
+            <div>
+              <label for="stateSelect">State / Jurisdiction</label>
+              <select id="stateSelect">
+                <option value="All-India">All-India (Model Tenancy Act)</option>
+                <option value="Karnataka">Karnataka (Bengaluru)</option>
+                <option value="Maharashtra" selected>Maharashtra (Pune / Mumbai)</option>
+                <option value="Delhi">Delhi NCR (Delhi / Gurgaon / Noida)</option>
+                <option value="Tamil Nadu">Tamil Nadu (Chennai)</option>
+                <option value="Telangana">Telangana (Hyderabad)</option>
+                <option value="West Bengal">West Bengal (Kolkata)</option>
+                <option value="Other">Other States</option>
+              </select>
+            </div>
+            <div>
+              <label for="city">City / Area</label>
+              <input id="city" type="text" placeholder="e.g. Pune, Maharashtra" value="Pune, Maharashtra">
+            </div>
             <div><label for="rent">Monthly rent (₹)</label><input id="rent" type="number" min="0" placeholder="18000"></div>
             <div><label for="deposit">Security deposit (₹)</label><input id="deposit" type="number" min="0" placeholder="50000"></div>
-            <div><label for="deduction">Amount in dispute (₹)</label><input id="deduction" type="number" min="0" placeholder="25000"></div>
+            <div class="full-grid-span"><label for="deduction">Amount in dispute (₹)</label><input id="deduction" type="number" min="0" placeholder="25000"></div>
           </div>
           <button class="btn primary full" id="runAudit">Review my situation</button>
           <p class="fine">The demo uses illustrative rules and sample logic. It does not determine whether a deduction is lawful.</p>
@@ -75,6 +140,14 @@
 
     <section class="section results-section" id="results" hidden>
       <div class="section-heading"><p class="eyebrow">STEP 2 · YOUR REVIEW</p><h2>Here's what to look at</h2></div>
+      <div class="audit-meta-bar">
+        <span class="engine-pill" id="enginePill">⚡ Verified by ClauseShield Rule Engine</span>
+        <span class="state-pill" id="statePill">Jurisdiction: Maharashtra</span>
+      </div>
+      <div id="stateAlertCard" class="state-alert-card" hidden>
+        <strong>📍 State Legal Context:</strong>
+        <p id="stateAlertText"></p>
+      </div>
       <div class="result-grid">
         <div class="panel verdict-panel"><span class="status" id="riskLabel">NEEDS REVIEW</span><h3 id="verdictTitle">This clause may need a closer look.</h3><p id="verdictReason"></p><div class="money" id="moneyValue">₹0</div><small>Amount entered for review — not a guaranteed recovery</small></div>
         <div class="panel"><h3>Suggested next steps</h3><ul id="nextSteps"><li>Keep a copy of your agreement.</li><li>Ask for an itemised explanation and supporting bills.</li><li>Compare the wording with applicable state rules.</li></ul><div class="risk-meter"><div id="riskBar"></div></div><small>Illustrative concern indicator: <b id="riskScore">—</b>/100</small></div>
