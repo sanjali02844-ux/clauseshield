@@ -106,10 +106,34 @@ STATE_CONTEXTS = {
 # Verified Indian Statutory Reference Bank
 VERIFIED_LAWS_KNOWLEDGE_BASE = [
     {
+        "keywords": ["expired", "expire", "lapse", "not renewed", "unrenewed", "holding over"],
+        "act_name": "Transfer of Property Act, 1882",
+        "section": "Section 111(a) & Section 116 (Determination of Lease & Holding Over)",
+        "summary": "When a lease period expires by efflux of time, its covenants (including lock-in restrictions and penalties) lapse automatically. Continuing occupancy with rent payment becomes a month-to-month tenancy without lock-in liability.",
+        "tag": "Statutory Protection",
+        "query": "Transfer of Property Act 1882 Section 111 Section 116 holding over expiry of lease"
+    },
+    {
+        "keywords": ["notice", "15 days", "month to month", "vacate notice", "relocating", "job transfer"],
+        "act_name": "Transfer of Property Act, 1882",
+        "section": "Section 106 (Notice to Terminate Month-to-Month Tenancy)",
+        "summary": "Following lease expiry or for monthly residential tenancies, a 15-day written notice expiring with the tenancy month is legally sufficient to vacate without incurring any lock-in forfeiture.",
+        "tag": "Notice Standards",
+        "query": "Transfer of Property Act 1882 Section 106 notice to quit month to month"
+    },
+    {
+        "keywords": ["lock-in", "lockin", "premature", "early exit", "forfeit", "forfeiture", "break lease", "penalty"],
+        "act_name": "Supreme Court Precedent & Contract Law",
+        "section": "Section 74 ICA & Kailash Nath Associates v. DDA (2015)",
+        "summary": "Liquidated damages cannot be punitive. A landlord cannot automatically seize deposits or levy early exit penalties unless they demonstrate actual, unmitigated financial vacancy loss despite reasonable efforts to re-let.",
+        "tag": "Judicial Precedent",
+        "query": "Kailash Nath Associates vs DDA Section 74 liquidated damages forfeiture"
+    },
+    {
         "keywords": ["paint", "whitewash", "colour", "repainting", "wear", "tear"],
         "act_name": "Indian Contract Act, 1872",
-        "section": "Section 74 (Penalty vs Liquidated Damages)",
-        "summary": "Stipulating an automatic deduction (like 1 month's rent) for painting without proving actual damage beyond normal atmospheric wear and tear is deemed an unenforceable penalty. Deduction must reflect actual, itemized contractor invoices.",
+        "section": "Section 74 (Fair Wear & Tear vs Deductions)",
+        "summary": "Stipulating an automatic deduction (like 1 month's rent) for painting without proving actual damage beyond normal atmospheric wear and tear is an unenforceable penalty. Deductions must reflect actual, itemized contractor invoices.",
         "tag": "Contract Doctrine",
         "query": "Indian Contract Act 1872 Section 74 penalty wear and tear"
     },
@@ -120,14 +144,6 @@ VERIFIED_LAWS_KNOWLEDGE_BASE = [
         "summary": "Recommends that security deposits for residential premises shall not exceed two months' rent. The deposit must be refunded to the tenant within 30 days of handing over vacant possession, after valid agreed deductions.",
         "tag": "Statutory Cap",
         "query": "Model Tenancy Act 2021 Section 11 security deposit refund"
-    },
-    {
-        "keywords": ["lock-in", "lockin", "premature", "early exit", "forfeit", "forfeiture"],
-        "act_name": "Supreme Court of India Landmark Doctrine",
-        "section": "Maula Bux v. Union of India / Kailash Nath Associates v. DDA",
-        "summary": "The Supreme Court ruled that a party cannot forfeit a deposit merely because a contract has a forfeiture clause. The landlord must prove they suffered actual, unmitigated financial loss (such as vacant un-rented months despite reasonable diligence).",
-        "tag": "Judicial Precedent",
-        "query": "Kailash Nath Associates vs DDA Section 74 liquidated damages forfeiture"
     },
     {
         "keywords": ["maintenance", "repair", "structural", "seepage", "plumbing", "electrical"],
@@ -184,43 +200,54 @@ def make_kanoon_url(query: str) -> str:
     return f"https://indiankanoon.org/search/?formInput={encoded}"
 
 def find_relevant_laws(text: str, state: str = "All-India") -> List[LegalReferenceItem]:
-    """Finds matching verified Indian statutory references and case laws based on text content."""
+    """Finds matching verified Indian statutory references and case laws tailored precisely to the issue."""
     lower_text = text.lower()
-    selected_laws = []
+    scored_laws = []
     seen_acts = set()
 
     for item in VERIFIED_LAWS_KNOWLEDGE_BASE:
         match_count = sum(1 for kw in item["keywords"] if kw in lower_text)
         if match_count > 0:
-            key = f"{item['act_name']}-{item['section']}"
-            if key not in seen_acts:
-                seen_acts.add(key)
-                selected_laws.append(LegalReferenceItem(
-                    act_name=item["act_name"],
-                    section=item["section"],
-                    summary=item["summary"],
-                    tag=item["tag"],
-                    source_url=make_kanoon_url(item["query"])
-                ))
+            scored_laws.append((match_count, item))
 
-    # Add State specific act if available and not yet included
-    if state == "Maharashtra" and "Maharashtra Rent Control Act" not in seen_acts:
+    # Sort by relevance keyword score (highest relevance first)
+    scored_laws.sort(key=lambda x: x[0], reverse=True)
+
+    selected_laws = []
+    for _, item in scored_laws:
+        key = f"{item['act_name']}-{item['section']}"
+        if key not in seen_acts:
+            seen_acts.add(key)
+            selected_laws.append(LegalReferenceItem(
+                act_name=item["act_name"],
+                section=item["section"],
+                summary=item["summary"],
+                tag=item["tag"],
+                source_url=make_kanoon_url(item["query"])
+            ))
+
+    # Add State specific act ONLY if the topic is specifically relevant
+    is_utility_issue = any(w in lower_text for w in ["electric", "water", "utility", "disconnect", "cut off"])
+    is_registration_issue = any(w in lower_text for w in ["register", "stamp", "registration", "unregistered"])
+    is_deposit_issue = any(w in lower_text for w in ["deposit", "advance", "10 month", "caution"])
+
+    if state == "Maharashtra" and is_utility_issue and "Maharashtra Rent Control Act" not in seen_acts:
         selected_laws.append(LegalReferenceItem(
             act_name="Maharashtra Rent Control Act, 1999",
-            section="Section 29 & Section 55",
-            summary="Requires registration of Leave & License agreements and makes it an offense for a landlord to disconnect water or electricity supply without just cause.",
+            section="Section 29 (Cutting off or withholding essential supply)",
+            summary="Makes it an offense punishable with fine or imprisonment for a landlord to cut off water or electricity supply without just cause.",
             tag="State Act",
-            source_url=make_kanoon_url("Maharashtra Rent Control Act 1999 Section 29 Section 55")
+            source_url=make_kanoon_url("Maharashtra Rent Control Act 1999 Section 29 essential supply")
         ))
-    elif state == "Karnataka" and "Karnataka Tenancy Framework" not in seen_acts:
+    elif state == "Maharashtra" and is_registration_issue and "Maharashtra Rent Control Act" not in seen_acts:
         selected_laws.append(LegalReferenceItem(
-            act_name="Karnataka Rent Guidelines & MTA Adoption",
-            section="Doctrine on Disproportionate Security Deposits",
-            summary="Challenges customary 10-month rental deposits and unilateral move-out deductions as conflicting with equitable contract principles and Model Tenancy Act benchmarks.",
-            tag="State Practice",
-            source_url=make_kanoon_url("Karnataka high court tenant security deposit refund ordinary wear")
+            act_name="Maharashtra Rent Control Act, 1999",
+            section="Section 55 (Tenancy Agreement Registration)",
+            summary="Requires Leave & License agreements to be registered in writing; the responsibility of registration lies primarily on the landlord.",
+            tag="State Act",
+            source_url=make_kanoon_url("Maharashtra Rent Control Act 1999 Section 55 registration")
         ))
-    elif state == "Delhi" and "Delhi Rent Control Act" not in seen_acts:
+    elif state == "Delhi" and is_utility_issue and "Delhi Rent Control Act" not in seen_acts:
         selected_laws.append(LegalReferenceItem(
             act_name="Delhi Rent Control Act, 1958",
             section="Section 45 (Cutting off or withholding essential supply)",
@@ -228,8 +255,16 @@ def find_relevant_laws(text: str, state: str = "All-India") -> List[LegalReferen
             tag="State Act",
             source_url=make_kanoon_url("Delhi Rent Control Act 1958 Section 45 essential supply")
         ))
+    elif state == "Karnataka" and is_deposit_issue and "Karnataka Tenancy Framework" not in seen_acts:
+        selected_laws.append(LegalReferenceItem(
+            act_name="Karnataka Rent Guidelines & MTA Adoption",
+            section="Doctrine on Disproportionate Security Deposits",
+            summary="Challenges customary 10-month rental deposits and unilateral move-out deductions as conflicting with equitable contract principles.",
+            tag="State Practice",
+            source_url=make_kanoon_url("Karnataka high court tenant security deposit refund ordinary wear")
+        ))
 
-    # Always ensure baseline Model Tenancy Act & Contract Act are present if nothing matched
+    # Fallback to general provisions only if completely unmatched
     if not selected_laws:
         selected_laws.append(LegalReferenceItem(
             act_name="Indian Contract Act, 1872",
@@ -246,7 +281,8 @@ def find_relevant_laws(text: str, state: str = "All-India") -> List[LegalReferen
             source_url=make_kanoon_url("Model Tenancy Act 2021 Government of India")
         ))
 
-    return selected_laws[:6]
+    # Keep only the top 2-3 most precise laws so the output is sharp and focused
+    return selected_laws[:3]
 
 # -------------------------------------------------------------
 # Document Text Extraction
@@ -340,6 +376,7 @@ def analyze_agreement_content(
     city: str = "",
     monthly_rent: float = 0,
     security_deposit: float = 0,
+    amount_in_dispute: float = 0,
     landlord_name: str = "",
     reply_days: int = 7,
     is_scanned: bool = False
@@ -433,17 +470,29 @@ def analyze_agreement_content(
         ))
 
     # 3. Lock-in Period & Early Exit Penalty Clause
-    lockin_sent = find_best_sentence(r'(?:lock-in|lockin|early termination|break.*lease|forfeit.*deposit|before expiry)')
+    lockin_sent = find_best_sentence(r'(?:lock-in|lockin|early termination|break.*lease|forfeit.*deposit|before expiry|exit penalty)')
     if lockin_sent:
-        clauses.append(ClauseFinding(
-            clause_name="Lock-in Period & Forfeiture Clause",
-            original_text=lockin_sent,
-            concern_level="High",
-            simple_explanation="Penalizes the tenant for vacating before a specified initial period, often stipulating forfeiture of the entire deposit.",
-            why_needs_attention="The Supreme Court of India (Kailash Nath Associates v. DDA, 2015) held that damages cannot be punitive. A landlord cannot automatically seize an entire security deposit unless they demonstrate actual, unmitigated financial vacancy loss despite reasonable efforts to re-let.",
-            suggested_action="Negotiate an early exit clause providing a reasonable 1-month notice period or the option to introduce a replacement tenant.",
-            legal_reference="Indian Contract Act, 1872 – Section 74 & Supreme Court Precedents on Mitigation of Loss"
-        ))
+        is_expired = bool(re.search(r'(?:expired|lapse|not renewed|unrenewed|efflux)', text, re.I))
+        if is_expired:
+            clauses.append(ClauseFinding(
+                clause_name="Expired Agreement & Early Exit Penalty Demand",
+                original_text=lockin_sent,
+                concern_level="High",
+                simple_explanation="The landlord is demanding an early exit or lock-in penalty on an agreement that has already expired by efflux of time and was not renewed.",
+                why_needs_attention="Under Section 111(a) of the Transfer of Property Act, 1882, a lease determines automatically upon expiry of its term. When an agreement expires, its lock-in covenants expire with it. Continuing occupancy creates a periodic month-to-month tenancy under Section 116, terminable with 15 days notice (Section 106). A landlord cannot legally enforce an expired lock-in penalty.",
+                suggested_action="Inform the landlord in writing that the lease expired, extinguishing prior lock-in covenants. Provide 15 days written notice and request full deposit return without penalty.",
+                legal_reference="Transfer of Property Act, 1882 – Section 111(a) & Section 116 (Determination of Lease & Holding Over)"
+            ))
+        else:
+            clauses.append(ClauseFinding(
+                clause_name="Lock-in Period & Forfeiture Clause",
+                original_text=lockin_sent,
+                concern_level="High",
+                simple_explanation="Penalizes the tenant for vacating before a specified initial period, often stipulating forfeiture of the entire deposit.",
+                why_needs_attention="The Supreme Court of India (Kailash Nath Associates v. DDA, 2015) held that damages cannot be punitive. A landlord cannot automatically seize an entire security deposit unless they demonstrate actual, unmitigated financial vacancy loss despite reasonable efforts to re-let.",
+                suggested_action="Negotiate an early exit clause providing a reasonable 1-month notice period or the option to introduce a replacement tenant.",
+                legal_reference="Indian Contract Act, 1872 – Section 74 & Supreme Court Precedents on Mitigation of Loss"
+            ))
 
     # 4. Repairs & Routine Maintenance Clause
     maint_sent = find_best_sentence(r'(?:maintenance|repairs?|structural repairs?|fixtures|leakage|seepage|electrical fittings)')
@@ -540,16 +589,29 @@ def analyze_agreement_content(
 
     # Generate customized WhatsApp draft referencing the actual identified clauses
     clause_summaries = ", ".join(c.clause_name for c in clauses[:2])
-    dispute_display = f"₹{security_deposit:,.0f}" if security_deposit > 0 else "the security deposit"
-    whatsapp_draft = (
-        f"{greeting}\n\n"
-        f"I am writing regarding the rental agreement and handover for our premises at {loc}. "
-        f"I have reviewed the agreement terms regarding {clause_summaries}. "
-        f"To ensure a smooth and transparent handover, could you please share an itemised accounting along with supporting bills "
-        f"for any proposed deductions beyond standard fair wear and tear?\n\n"
-        f"I would like to settle {dispute_display} amicably. Please let me know your thoughts within {reply_days} days so we can confirm the remaining refund.\n\n"
-        f"Thank you,\n[Your Name]"
-    )
+    dispute_display = f"₹{amount_in_dispute:,.0f}" if amount_in_dispute > 0 else (f"₹{security_deposit:,.0f}" if security_deposit > 0 else "the security deposit")
+    is_expired_case = bool(re.search(r'(?:expired|lapse|not renewed|unrenewed)', text, re.I))
+
+    if is_expired_case and any("Expired" in c.clause_name for c in clauses):
+        whatsapp_draft = (
+            f"{greeting}\n\n"
+            f"I am writing regarding the handover and security deposit refund for our rented flat at {loc}. "
+            f"Regarding the early exit penalty demanded: our 11-month agreement has already expired by efflux of time and was not formally renewed. "
+            f"Under Section 111(a) and Section 116 of the Transfer of Property Act, 1882, any prior lock-in period lapsed upon lease expiry, "
+            f"and continuing occupancy operates on a month-to-month basis terminable by 15 days notice (Section 106).\n\n"
+            f"I am providing written notice to vacate. Please confirm the complete refund of {dispute_display} within {reply_days} days so we can conclude the handover smoothly.\n\n"
+            f"Thank you,\n[Your Name]"
+        )
+    else:
+        whatsapp_draft = (
+            f"{greeting}\n\n"
+            f"I am writing regarding the rental agreement and handover for our premises at {loc}. "
+            f"I have reviewed the agreement terms regarding {clause_summaries}. "
+            f"To ensure a smooth and transparent handover, could you please share an itemised accounting along with supporting bills "
+            f"for any proposed deductions beyond standard fair wear and tear?\n\n"
+            f"I would like to settle {dispute_display} amicably. Please let me know your thoughts within {reply_days} days so we can confirm the remaining refund.\n\n"
+            f"Thank you,\n[Your Name]"
+        )
 
     # Generate customized Formal Legal Letter referencing the actual quotes
     quoted_clauses_block = ""
@@ -723,6 +785,7 @@ async def analyze_agreement(
     city: str = Form(""),
     monthly_rent: float = Form(0),
     security_deposit: float = Form(0),
+    amount_in_dispute: float = Form(0),
     landlord_name: str = Form(""),
     reply_days: int = Form(7)
 ):
@@ -793,6 +856,7 @@ async def analyze_agreement(
         city=city,
         monthly_rent=monthly_rent,
         security_deposit=security_deposit,
+        amount_in_dispute=amount_in_dispute,
         landlord_name=landlord_name,
         reply_days=reply_days,
         is_scanned=is_scanned
@@ -838,6 +902,7 @@ async def audit_clause(
         city=city,
         monthly_rent=monthly_rent,
         security_deposit=security_deposit,
+        amount_in_dispute=amount_in_dispute,
         landlord_name=landlord_name,
         reply_days=reply_days
     )

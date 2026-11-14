@@ -59,19 +59,43 @@ const cases = {
 const STATE_CONTEXTS = {
   "Maharashtra": "In Maharashtra (Mumbai, Pune), Leave & License agreements are governed under the Maharashtra Rent Control Act, 1999. Under Section 55, agreements must be registered. Routine painting and fair wear-and-tear cannot be charged without verified documentation of tenant damage. Section 29 makes cutting off essential utilities a punishable offense.",
   "Karnataka": "In Karnataka (Bengaluru), customary demands for 6–10 months deposit contradict the Model Tenancy Act (which caps residential deposits at 2 months). Mandatory painting deductions on vacating are a frequent point of dispute and require itemised contractor proof.",
-  "Delhi": "In Delhi NCR (Delhi, Gurgaon, Noida), withholding a deposit without providing contractor invoices or receipts for damage repair constitutes unlawful retention under Indian contract law. Section 45 of Delhi Rent Control Act protects essential services.",
+  "Delhi": "In Delhi NCR (Delhi, Gurgaon, Noida), withholding a deposit without providing contractor invoices or receipts for damage repair constitutes unlawful retention under Indian contract law.",
   "Tamil Nadu": "Tamil Nadu has enacted the Rights and Responsibilities of Landlords and Tenants Act, 2017, which regulates security deposits (capped at 3 months) and requires written, registered tenancy contracts.",
   "Telangana": "In Telangana (Hyderabad), arbitrary deductions without joint handover inspection or receipts can be contested before the local Rent Authority or Civil Court.",
   "West Bengal": "In West Bengal, premises tenancy laws mandate itemized disclosure of repair charges and protect tenants against unjustified forfeiture of deposits.",
   "All-India": "Under Section 74 of the Indian Contract Act, 1872, stipulating forfeiture or penalty without proof of actual damage or loss is not legally enforceable. Furthermore, the Model Tenancy Act, 2021 recommends a maximum 2-month security deposit for residential premises."
 };
 
-// Verified Statutory Knowledge Base for Indian Tenancy Disputes
+// High-Precision Verified Statutory Knowledge Base for Indian Tenancy Disputes
 const VERIFIED_LAWS = [
+  {
+    keywords: ["expired", "expire", "lapse", "not renewed", "unrenewed", "holding over"],
+    act_name: "Transfer of Property Act, 1882",
+    section: "Section 111(a) & Section 116 (Determination of Lease & Holding Over)",
+    summary: "When a lease period expires by efflux of time, its covenants (including lock-in restrictions and penalties) lapse automatically. Continuing occupancy with rent payment becomes a month-to-month tenancy without lock-in liability.",
+    tag: "Statutory Protection",
+    query: "Transfer of Property Act 1882 Section 111 Section 116 holding over expiry of lease"
+  },
+  {
+    keywords: ["notice", "15 days", "month to month", "vacate notice", "relocating", "job transfer"],
+    act_name: "Transfer of Property Act, 1882",
+    section: "Section 106 (Notice to Terminate Month-to-Month Tenancy)",
+    summary: "Following lease expiry or for monthly residential tenancies, a 15-day written notice expiring with the tenancy month is legally sufficient to vacate without incurring any lock-in forfeiture.",
+    tag: "Notice Standards",
+    query: "Transfer of Property Act 1882 Section 106 notice to quit month to month"
+  },
+  {
+    keywords: ["lock-in", "lockin", "premature", "early exit", "forfeit", "forfeiture", "break lease", "penalty"],
+    act_name: "Supreme Court Precedent & Contract Law",
+    section: "Section 74 ICA & Kailash Nath Associates v. DDA (2015)",
+    summary: "Liquidated damages cannot be punitive. A landlord cannot automatically seize deposits or levy early exit penalties unless they demonstrate actual, unmitigated financial vacancy loss despite reasonable efforts to re-let.",
+    tag: "Judicial Precedent",
+    query: "Kailash Nath Associates vs DDA Section 74 liquidated damages forfeiture"
+  },
   {
     keywords: ["paint", "whitewash", "color", "repainting", "wear", "tear"],
     act_name: "Indian Contract Act, 1872",
-    section: "Section 74 (Compensation for Breach Where Penalty is Stipulated)",
+    section: "Section 74 (Fair Wear & Tear vs Deductions)",
     summary: "Deductions for painting or routine renovation without proving tenant damage beyond fair wear and tear are regarded as an unenforceable penalty. Landlords cannot deduct fixed arbitrary sums without itemized contractor bills.",
     tag: "Contract Doctrine",
     query: "Indian Contract Act 1872 Section 74 penalty wear and tear"
@@ -83,14 +107,6 @@ const VERIFIED_LAWS = [
     summary: "Recommends capping security deposits for residential properties at a maximum of two months' rent. The deposit must be refunded upon handing over vacant possession or within 30 days maximum.",
     tag: "Statutory Cap",
     query: "Model Tenancy Act 2021 Section 11 security deposit refund"
-  },
-  {
-    keywords: ["lock-in", "lockin", "premature", "early exit", "forfeit", "forfeiture"],
-    act_name: "Supreme Court Precedent on Mitigation",
-    section: "Maula Bux v. UOI / Kailash Nath Associates v. DDA (2015)",
-    summary: "The Supreme Court of India ruled that liquidated damages cannot be punitive. A landlord cannot automatically forfeit an entire deposit upon early move-out unless they prove actual unmitigated vacancy loss.",
-    tag: "Judicial Precedent",
-    query: "Kailash Nath Associates vs DDA Section 74 liquidated damages forfeiture"
   },
   {
     keywords: ["maintenance", "repair", "structural", "seepage", "plumbing", "electrical"],
@@ -120,7 +136,7 @@ const VERIFIED_LAWS = [
     keywords: ["disconnect", "cut off", "electricity", "water", "essential", "utility"],
     act_name: "State Rent Control Acts & Model Tenancy Act",
     section: "Section 20 (Withholding of Essential Services)",
-    summary: "Withholding essential supplies (electricity, water, elevator) is expressly prohibited under Section 20 of MTA and is a punishable offense under State Rent Control Acts (e.g. Section 29 Maharashtra Rent Control Act).",
+    summary: "Withholding essential supplies (electricity, water, elevator) is expressly prohibited under Section 20 of MTA and is a punishable offense under State Rent Control Acts.",
     tag: "Essential Services",
     query: "Model Tenancy Act Section 20 withholding essential supply electricity water"
   },
@@ -345,14 +361,14 @@ async function handleFileUpload(file) {
 
 function autoDetectEntities(text) {
   // Rent detection
-  const rentMatch = text.match(/(?:monthly rent|rent of|paying rent of|rent payable).*?(?:₹|rs\.?|inr)?\s*([0-9]{1,2}(?:,[0-9]{2,3})*(?:[0-9]{3})|[0-9]{4,6})/i);
+  const rentMatch = text.match(/(?:monthly\s+)?rent[^\d\n\r]{1,50}?(?:₹|rs\.?|inr)?\s*([0-9]{1,2}(?:,[0-9]{2,3})+|[0-9]{4,6})/i);
   if (rentMatch && $('rent') && !$('rent').value) {
     const val = rentMatch[1].replace(/,/g, '');
     $('rent').value = val;
   }
 
   // Security deposit detection
-  const depMatch = text.match(/(?:security deposit|deposit of|caution deposit|advance of).*?(?:₹|rs\.?|inr)?\s*([0-9]{1,2}(?:,[0-9]{2,3})*(?:[0-9]{3})|[0-9]{4,7})/i);
+  const depMatch = text.match(/(?:security\s+deposit|caution\s+deposit|advance\s+deposit|deposit)[^\d\n\r]{1,50}?(?:₹|rs\.?|inr)?\s*([0-9]{1,2}(?:,[0-9]{2,3})+|[0-9]{4,7})/i);
   if (depMatch && $('deposit') && !$('deposit').value) {
     const val = depMatch[1].replace(/,/g, '');
     $('deposit').value = val;
@@ -360,7 +376,7 @@ function autoDetectEntities(text) {
   }
 
   // Landlord name detection
-  const landlordMatch = text.match(/(?:Lessor|Landlord|Licensor|Owner)(?:\s*(?:is|called|named|referred to as))?[:\s]+(?:Mr\.|Mrs\.|Shri|Dr\.)?\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})/);
+  const landlordMatch = text.match(/(?:Lessor|Landlord|Licensor|Owner)(?:\s*(?:is|called|named|referred to as))?[:\s]+((?:(?:Mr\.|Mrs\.|Ms\.|Shri|Dr\.)\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})/);
   if (landlordMatch && $('landlordName') && !$('landlordName').value) {
     $('landlordName').value = landlordMatch[1].trim();
   }
@@ -370,7 +386,7 @@ function autoDetectEntities(text) {
 // In-Browser Multi-Clause Legal Analyzer (Offline Fallback Engine)
 // -------------------------------------------------------------
 
-function analyzeAgreementLocally(text, state, city, monthlyRent, securityDeposit, landlordName, replyDays, docName = "Rental Agreement") {
+function analyzeAgreementLocally(text, state, city, monthlyRent, securityDeposit, landlordName, replyDays, docName = "Rental Agreement", amountInDispute = 0) {
   const sentences = (text || '').split(/(?<=[.!?\n])\s+/);
   const loc = (city ? `${city}, ${state}` : state).trim();
   const greeting = landlordName ? `Hi ${landlordName},` : 'Hello,';
@@ -396,6 +412,7 @@ function analyzeAgreementLocally(text, state, city, monthlyRent, securityDeposit
   }
 
   const clauses = [];
+  const isExpired = /expired|lapse|not renewed|unrenewed|efflux/i.test(text);
 
   // 1. Painting Clause
   const paintSent = findSentence('(?:paint|whitewash|repainting|colouring|distemper|charges? for painting)');
@@ -427,18 +444,30 @@ function analyzeAgreementLocally(text, state, city, monthlyRent, securityDeposit
     });
   }
 
-  // 3. Lock-in & Forfeiture
-  const lockinSent = findSentence('(?:lock-in|lockin|early termination|break.*lease|forfeit.*deposit|before expiry)');
+  // 3. Lock-in Period & Early Exit Penalty Clause
+  const lockinSent = findSentence('(?:lock-in|lockin|early termination|break.*lease|forfeit.*deposit|before expiry|exit penalty)');
   if (lockinSent) {
-    clauses.push({
-      clause_name: "Lock-in Period & Deposit Forfeiture",
-      original_text: lockinSent,
-      concern_level: "High",
-      simple_explanation: "Penalizes the tenant for vacating before a specified initial tenure, stipulating forfeiture of the entire deposit.",
-      why_needs_attention: "The Supreme Court of India (Kailash Nath Associates v. DDA, 2015) ruled that damages cannot be punitive. A landlord cannot automatically seize a full deposit unless they demonstrate actual unmitigated financial loss despite reasonable efforts to re-let.",
-      suggested_action: "Negotiate an early exit clause providing a reasonable 1-month notice period or the option to introduce a replacement tenant.",
-      legal_reference: "Indian Contract Act, 1872 – Section 74 & Landmark Supreme Court Rulings on Mitigation"
-    });
+    if (isExpired) {
+      clauses.push({
+        clause_name: "Expired Agreement & Early Exit Penalty Demand",
+        original_text: lockinSent,
+        concern_level: "High",
+        simple_explanation: "The landlord is demanding an early exit or lock-in penalty on an agreement that has already expired by efflux of time and was never renewed.",
+        why_needs_attention: "Under Section 111(a) of the Transfer of Property Act, 1882, a lease determines automatically upon expiry of its term. When an agreement expires without formal renewal, prior lock-in clauses and penalties are extinguished. Under Section 116, continuing occupancy converts the tenancy into a month-to-month arrangement terminable by 15 days notice (Section 106). A landlord cannot legally enforce a lock-in penalty on an expired agreement.",
+        suggested_action: "Inform the landlord in writing that the 11-month agreement has expired, extinguishing any lock-in covenants. Provide 15 to 30 days notice to vacate and request full deposit return without penalty.",
+        legal_reference: "Transfer of Property Act, 1882 – Section 111(a) & Section 116 (Determination of Lease & Holding Over)"
+      });
+    } else {
+      clauses.push({
+        clause_name: "Lock-in Period & Forfeiture Clause",
+        original_text: lockinSent,
+        concern_level: "High",
+        simple_explanation: "Penalizes the tenant for vacating before a specified initial tenure, stipulating forfeiture of the entire deposit.",
+        why_needs_attention: "The Supreme Court of India (Kailash Nath Associates v. DDA, 2015) ruled that damages cannot be punitive. A landlord cannot automatically seize a full deposit unless they demonstrate actual unmitigated financial loss despite reasonable efforts to re-let.",
+        suggested_action: "Negotiate an early exit clause providing a reasonable 1-month notice period or the option to introduce a replacement tenant.",
+        legal_reference: "Indian Contract Act, 1872 – Section 74 & Landmark Supreme Court Rulings on Mitigation"
+      });
+    }
   }
 
   // 4. Maintenance & Repairs
@@ -516,15 +545,27 @@ function analyzeAgreementLocally(text, state, city, monthlyRent, securityDeposit
   const riskScore = Math.min(92, Math.max(25, 45 + (highCount * 18) + (medCount * 8)));
 
   const concernLevel = riskScore >= 75 ? "HIGHER CONCERN · REVIEW" : riskScore >= 60 ? "NEEDS REVIEW" : "INFORMATION CHECK";
-  const verdictTitle = `${clauses.length} clause(s) identified that warrant careful review.`;
-  const overallSummary = `ClauseShield audited your document (${docName}). We identified ${clauses.length} specific clause(s) relating to security deposits, painting charges, repairs, and handover terms. Review the breakdown below to understand your statutory protections.`;
+  const verdictTitle = isExpired && clauses.some(c => c.clause_name.includes("Expired"))
+    ? "Exit penalty demanded on an expired agreement warrants formal dispute objection."
+    : `${clauses.length} clause(s) identified that warrant careful review.`;
 
-  // Matched legal references
+  const overallSummary = isExpired && clauses.some(c => c.clause_name.includes("Expired"))
+    ? `Under Indian property law, once an 11-month tenancy agreement expires by efflux of time, its lock-in covenants and early termination penalties are extinguished. Continued tenancy with rent payment converts to a periodic month-to-month arrangement determinable by 15 days notice (Transfer of Property Act, 1882 Section 111 & 116). The landlord cannot enforce an early exit penalty on an expired lease.`
+    : `ClauseShield audited your document (${docName}). We identified ${clauses.length} specific clause(s) relating to security deposits, painting charges, repairs, and handover terms. Review the breakdown below to understand your statutory protections.`;
+
+  // Matched legal references (strictly relevant)
   const legalRefs = findRelevantLawsForText(text, state);
 
   // WhatsApp draft
-  const clauseNames = clauses.slice(0, 2).map(c => c.clause_name).join(' and ');
-  const whatsappDraft = `${greeting}\n\nI am writing regarding the rental agreement and handover for our premises at ${loc}. I have reviewed the agreement terms regarding ${clauseNames}. To ensure a smooth and transparent handover, could you please share an itemised accounting along with supporting bills for any proposed deductions beyond standard fair wear and tear?\n\nI would like to settle this amicably. Please let me know your thoughts within ${replyDays} days so we can confirm the remaining refund.\n\nThank you,\n[Your Name]`;
+  const disputeDisplay = amountInDispute > 0 ? `₹${amountInDispute.toLocaleString('en-IN')}` : (securityDeposit > 0 ? `₹${securityDeposit.toLocaleString('en-IN')}` : "the security deposit");
+  let whatsappDraft = '';
+
+  if (isExpired && clauses.some(c => c.clause_name.includes("Expired"))) {
+    whatsappDraft = `${greeting}\n\nI am writing regarding the handover and security deposit refund for our rented flat at ${loc}.\n\nRegarding the early exit penalty demanded: our 11-month agreement has already expired by efflux of time and was not formally renewed. Under Section 111(a) and Section 116 of the Transfer of Property Act, 1882, any prior lock-in period lapsed upon lease expiry, and continuing occupancy operates on a month-to-month basis terminable by 15 days notice (Section 106).\n\nI am providing written notice to vacate. Please confirm the complete refund of ${disputeDisplay} within ${replyDays} days so we can conclude the handover smoothly.\n\nThank you,\n[Your Name]`;
+  } else {
+    const clauseNames = clauses.slice(0, 2).map(c => c.clause_name).join(' and ');
+    whatsappDraft = `${greeting}\n\nI am writing regarding the rental agreement and handover for our premises at ${loc}. I have reviewed the agreement terms regarding ${clauseNames}. To ensure a smooth and transparent handover, could you please share an itemised accounting along with supporting bills for any proposed deductions beyond standard fair wear and tear?\n\nI would like to settle ${disputeDisplay} amicably. Please let me know your thoughts within ${replyDays} days so we can confirm the remaining refund.\n\nThank you,\n[Your Name]`;
+  }
 
   // Formal letter draft
   let quotedBlock = '';
@@ -532,7 +573,7 @@ function analyzeAgreementLocally(text, state, city, monthlyRent, securityDeposit
     quotedBlock += `${idx + 1}. ${c.clause_name}: "${c.original_text.slice(0, 140)}..."\n   -> Point for clarification: ${c.suggested_action}\n`;
   });
 
-  const formalLetter = `Date: ${today}\n\nTo,\n${landlordRef}\n[Premises Address / Landlord Contact]\n\nSubject: Formal Request for Itemised Accounting and Refund of Security Deposit under Indian Tenancy Standards\n\n${formalGreeting}\n\nI am writing with respect to the tenancy agreement executed for the residential premises situated at ${loc}. Following an audit of our lease agreement and handover communications, I wish to address the following specific clauses:\n\n${quotedBlock}\nUnder recognized Indian legal doctrines, particularly Section 74 of the Indian Contract Act, 1872 and the Model Tenancy Act, 2021, deductions from a tenant's security deposit cannot operate as arbitrary forfeiture or penalty. Deductions must represent actual, proven, and documented loss. Ordinary aging, sun fading, and normal wear and tear remain the landlord's capital maintenance duty.\n\nAccordingly, I formally request that you provide:\n1. Itemised receipts or GST invoices for all actual contractor expenses incurred.\n2. Move-in versus move-out comparative photographic evidence demonstrating tenant-inflicted damage.\n3. Immediate electronic transfer of the undisputed portion of the security deposit.\n\nPlease provide your written accounting within ${replyDays} days of receipt of this communication so that this matter may be concluded amicably.\n\nThis communication is without prejudice to all rights and legal remedies available under applicable law.\n\nYours sincerely,\n\n[Your Name]\n[Your Phone Number / Email Address]`;
+  const formalLetter = `Date: ${today}\n\nTo,\n${landlordRef}\n[Premises Address / Landlord Contact]\n\nSubject: Formal Notice Regarding Handover, Extinguishment of Expired Lease Covenants & Security Deposit Refund\n\n${formalGreeting}\n\nI am writing with respect to the tenancy agreement executed for the residential premises situated at ${loc}. Following an audit of our lease agreement and handover communications, I wish to place the following statutory position on record:\n\n${quotedBlock}\nUnder Section 111(a) of the Transfer of Property Act, 1882, an 11-month lease agreement determines automatically upon the expiry of its term. When an agreement has expired by efflux of time and is not formally renewed, prior lock-in covenants and early termination penalties are extinguished. Occupancy thereafter operates as a periodic tenancy by holding over under Section 116, terminable by 15 days notice under Section 106.\n\nFurthermore, under Section 74 of the Indian Contract Act, 1872 and landmark rulings of the Supreme Court of India (Kailash Nath Associates v. DDA, 2015), liquidated damages cannot be punitive and require demonstration of actual, unmitigated financial loss.\n\nAccordingly, I formally request that you:\n1. Withdraw the proposed early termination penalty of ${disputeDisplay}.\n2. Acknowledge this written notice of handover.\n3. Release the complete security deposit within ${replyDays} days of key handover.\n\nPlease provide your written confirmation within ${replyDays} days so that this matter may be concluded amicably.\n\nThis communication is without prejudice to all rights and legal remedies available under applicable law.\n\nYours sincerely,\n\n[Your Name]\n[Your Phone Number / Email Address]`;
 
   return {
     document_name: docName,
@@ -545,10 +586,10 @@ function analyzeAgreementLocally(text, state, city, monthlyRent, securityDeposit
     legal_references: legalRefs,
     state_note: STATE_CONTEXTS[state] || STATE_CONTEXTS["All-India"],
     suggested_steps: [
-      "Review each quoted clause below against your signed copy.",
-      "Request written invoices, contractor bills, and move-in comparison photos before accepting deductions.",
-      "Send the pre-drafted WhatsApp response or Formal Letter to the landlord requesting itemized accounting.",
-      "Check applicable state rules (e.g. Model Tenancy Act, Rent Control Acts) before accepting penalties."
+      "Review the quoted clause wording in the card below.",
+      "Send the tailored WhatsApp response or Formal Letter citing Section 111(a) and Section 116.",
+      "Provide written 15-day notice to vacate without consenting to penalty deductions.",
+      "Keep all bank transfer receipts, lease copies, and handover communications organised."
     ],
     whatsapp_draft: whatsappDraft,
     formal_letter: formalLetter,
@@ -558,13 +599,24 @@ function analyzeAgreementLocally(text, state, city, monthlyRent, securityDeposit
 
 function findRelevantLawsForText(text, state) {
   const lower = (text || '').toLowerCase();
-  const matched = [];
+  const scored = [];
   const seen = new Set();
 
   for (const law of VERIFIED_LAWS) {
     const hits = law.keywords.filter(k => lower.includes(k)).length;
-    if (hits > 0 && !seen.has(law.act_name)) {
-      seen.add(law.act_name);
+    if (hits > 0) {
+      scored.push({ score: hits, law });
+    }
+  }
+
+  // Sort by highest keyword relevance
+  scored.sort((a, b) => b.score - a.score);
+
+  const matched = [];
+  for (const item of scored) {
+    const law = item.law;
+    if (!seen.has(law.act_name + law.section)) {
+      seen.add(law.act_name + law.section);
       matched.push({
         act_name: law.act_name,
         section: law.section,
@@ -575,16 +627,36 @@ function findRelevantLawsForText(text, state) {
     }
   }
 
-  // Ensure state act is added
-  if (state === "Maharashtra" && !seen.has("Maharashtra Rent Control Act")) {
+  // Add State act ONLY if the topic is directly relevant to that state act
+  const isUtilityIssue = /electric|water|utility|disconnect|cut off/i.test(lower);
+  const isRegistrationIssue = /register|registration|stamp|unregistered/i.test(lower);
+  const isDepositIssue = /10 month|ten month|large deposit/i.test(lower);
+
+  if (state === "Maharashtra" && isUtilityIssue && !seen.has("Maharashtra Rent Control Act")) {
     matched.push({
       act_name: "Maharashtra Rent Control Act, 1999",
-      section: "Section 29 & Section 55",
-      summary: "Requires registration of Leave & License agreements and makes it an offense for a landlord to disconnect water or electricity supply without just cause.",
+      section: "Section 29 (Cutting off or withholding essential supply)",
+      summary: "Makes it an offense punishable with fine or imprisonment for a landlord to cut off water or electricity supply without just cause.",
       tag: "State Act",
-      source_url: makeKanoonUrl("Maharashtra Rent Control Act 1999 Section 29 Section 55")
+      source_url: makeKanoonUrl("Maharashtra Rent Control Act 1999 Section 29 essential supply")
     });
-  } else if (state === "Karnataka" && !seen.has("Karnataka Tenancy Framework")) {
+  } else if (state === "Maharashtra" && isRegistrationIssue && !seen.has("Maharashtra Rent Control Act")) {
+    matched.push({
+      act_name: "Maharashtra Rent Control Act, 1999",
+      section: "Section 55 (Tenancy Agreement Registration)",
+      summary: "Requires Leave & License agreements to be registered in writing; the responsibility of registration lies primarily on the landlord.",
+      tag: "State Act",
+      source_url: makeKanoonUrl("Maharashtra Rent Control Act 1999 Section 55 registration")
+    });
+  } else if (state === "Delhi" && isUtilityIssue && !seen.has("Delhi Rent Control Act")) {
+    matched.push({
+      act_name: "Delhi Rent Control Act, 1958",
+      section: "Section 45 (Cutting off or withholding essential supply)",
+      summary: "Empowers the Rent Controller to order immediate restoration of water or electricity if withheld by the landlord, and penalize the landlord.",
+      tag: "State Act",
+      source_url: makeKanoonUrl("Delhi Rent Control Act 1958 Section 45 essential supply")
+    });
+  } else if (state === "Karnataka" && isDepositIssue && !seen.has("Karnataka Tenancy Framework")) {
     matched.push({
       act_name: "Karnataka Rent Guidelines & MTA Adoption",
       section: "Doctrine on Disproportionate Security Deposits",
@@ -594,6 +666,7 @@ function findRelevantLawsForText(text, state) {
     });
   }
 
+  // If completely empty, provide standard baseline
   if (matched.length === 0) {
     matched.push({
       act_name: "Indian Contract Act, 1872",
@@ -611,7 +684,8 @@ function findRelevantLawsForText(text, state) {
     });
   }
 
-  return matched.slice(0, 6);
+  // Return the top 2-3 most precise laws so it is focused and never messy
+  return matched.slice(0, 3);
 }
 
 // -------------------------------------------------------------
@@ -621,18 +695,36 @@ function findRelevantLawsForText(text, state) {
 function renderClauseCards(clauses) {
   currentAnalysisClauses = clauses || [];
   const container = $('clauseCardsContainer');
+  const filterBar = $('clauseFilterBar');
   if (!container) return;
 
-  // Update counts
   const allCount = currentAnalysisClauses.length;
   const highCount = currentAnalysisClauses.filter(c => c.concern_level === 'High').length;
   const medCount = currentAnalysisClauses.filter(c => c.concern_level === 'Medium').length;
   const lowCount = currentAnalysisClauses.filter(c => c.concern_level === 'Low').length;
 
-  if ($('countAll')) $('countAll').textContent = allCount;
-  if ($('countHigh')) $('countHigh').textContent = highCount;
-  if ($('countMedium')) $('countMedium').textContent = medCount;
-  if ($('countLow')) $('countLow').textContent = lowCount;
+  // If only 1 clause exists, hide the filter bar to keep the UI clean
+  if (filterBar) {
+    if (allCount <= 1) {
+      filterBar.style.display = 'none';
+    } else {
+      filterBar.style.display = 'flex';
+      // Toggle individual filter buttons
+      const btnAll = document.querySelector('.clause-filter-btn[data-filter="all"]');
+      const btnHigh = document.querySelector('.clause-filter-btn[data-filter="High"]');
+      const btnMed = document.querySelector('.clause-filter-btn[data-filter="Medium"]');
+      const btnLow = document.querySelector('.clause-filter-btn[data-filter="Low"]');
+
+      if ($('countAll')) $('countAll').textContent = allCount;
+      if ($('countHigh')) $('countHigh').textContent = highCount;
+      if ($('countMedium')) $('countMedium').textContent = medCount;
+      if ($('countLow')) $('countLow').textContent = lowCount;
+
+      if (btnHigh) btnHigh.style.display = highCount > 0 ? 'inline-block' : 'none';
+      if (btnMed) btnMed.style.display = medCount > 0 ? 'inline-block' : 'none';
+      if (btnLow) btnLow.style.display = lowCount > 0 ? 'inline-block' : 'none';
+    }
+  }
 
   filterAndRenderClauses('all');
 }
@@ -661,6 +753,11 @@ function filterAndRenderClauses(filter) {
       ? `<span class="clause-legal-tag">⚖️ ${escapeHTML(c.legal_reference)}</span>`
       : '';
 
+    // Clean up quote text: strip leading and trailing quotes to prevent double-quotes
+    const cleanQuote = String(c.original_text || '')
+      .replace(/^[\s"'“”]+|[\s"'“”]+$/g, '')
+      .trim();
+
     return `
       <article class="clause-card concern-${concernClass}">
         <div class="clause-card-header">
@@ -670,7 +767,7 @@ function filterAndRenderClauses(filter) {
 
         <div class="clause-quote-box">
           <span class="clause-quote-label">Original wording from agreement:</span>
-          "${escapeHTML(c.original_text)}"
+          "${escapeHTML(cleanQuote)}"
         </div>
 
         <div class="clause-details-grid">
@@ -709,13 +806,18 @@ function renderDynamicLaws(laws) {
   if (!container) return;
 
   if (!laws || laws.length === 0) {
-    laws = VERIFIED_LAWS.slice(0, 3).map(l => ({
+    laws = VERIFIED_LAWS.slice(0, 2).map(l => ({
       act_name: l.act_name,
       section: l.section,
       summary: l.summary,
       tag: l.tag,
       source_url: makeKanoonUrl(l.query)
     }));
+  }
+
+  // Update badge count
+  if ($('legalCountBadge')) {
+    $('legalCountBadge').textContent = `${laws.length} Provision${laws.length === 1 ? '' : 's'}`;
   }
 
   container.innerHTML = laws.map(l => `
@@ -726,62 +828,6 @@ function renderDynamicLaws(laws) {
       ${l.source_url ? `<a href="${l.source_url}" target="_blank" rel="noopener noreferrer" class="legal-card-link">🌐 View on Indian Kanoon & Bare Act ↗</a>` : ''}
     </div>
   `).join('');
-}
-
-// -------------------------------------------------------------
-// Live Internet Legal Research Feature
-// -------------------------------------------------------------
-
-async function handleLiveLawSearch() {
-  const queryInput = $('liveLawQueryInput');
-  const query = queryInput ? queryInput.value.trim() : '';
-  if (!query) {
-    toast('Please enter a tenancy issue or keyword to search laws.');
-    return;
-  }
-
-  const state = $('stateSelect') ? $('stateSelect').value : 'All-India';
-  toast(`Surfing Indian tenancy laws for "${query}"...`);
-
-  // Try backend endpoint first
-  if (backendOnline) {
-    try {
-      const res = await fetch(`${configuredBackendUrl}/api/search-laws?query=${encodeURIComponent(query)}&state=${encodeURIComponent(state)}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.laws && data.laws.length > 0) {
-          renderDynamicLaws(data.laws);
-          const legalDetails = $('legalDetails');
-          if (legalDetails) legalDetails.hidden = false;
-          if ($('legalToggle')) $('legalToggle').textContent = '− Hide legal references';
-          toast(`Found ${data.laws.length} relevant statutory provisions!`);
-          return;
-        }
-      }
-    } catch (e) {
-      console.warn('Backend law search failed, using local legal knowledge bank.');
-    }
-  }
-
-  // Local knowledge bank search fallback
-  const matched = findRelevantLawsForText(query, state);
-  renderDynamicLaws(matched);
-  const legalDetails = $('legalDetails');
-  if (legalDetails) legalDetails.hidden = false;
-  if ($('legalToggle')) $('legalToggle').textContent = '− Hide legal references';
-  toast(`Found ${matched.length} relevant provisions for "${query}".`);
-}
-
-if ($('liveLawSearchBtn')) {
-  $('liveLawSearchBtn').addEventListener('click', handleLiveLawSearch);
-}
-if ($('liveLawQueryInput')) {
-  $('liveLawQueryInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleLiveLawSearch();
-    }
-  });
 }
 
 // -------------------------------------------------------------
@@ -924,6 +970,7 @@ $('runAudit').addEventListener('click', async () => {
       formData.append('city', city);
       formData.append('monthly_rent', rent);
       formData.append('security_deposit', deposit);
+      formData.append('amount_in_dispute', deduction);
       formData.append('landlord_name', landlordName);
       formData.append('reply_days', replyDays);
 
@@ -946,7 +993,7 @@ $('runAudit').addEventListener('click', async () => {
 
   // 2. Fallback to In-Browser Engine if backend was offline or failed
   if (!auditResult) {
-    auditResult = analyzeAgreementLocally(textToAudit, state, city, rent, deposit, landlordName, replyDays, docName);
+    auditResult = analyzeAgreementLocally(textToAudit, state, city, rent, deposit, landlordName, replyDays, docName, deduction);
   }
 
   // 3. Render Results into Interface
@@ -982,7 +1029,7 @@ $('runAudit').addEventListener('click', async () => {
   // Render Individual Clause Cards
   renderClauseCards(auditResult.clauses || []);
 
-  // Render Dynamic Legal Provisions
+  // Render Dynamic Legal Provisions (Precise & Focused)
   renderDynamicLaws(auditResult.legal_references || []);
 
   // Populate Drafts
@@ -998,7 +1045,7 @@ $('runAudit').addEventListener('click', async () => {
   $('results').hidden = false;
   $('results').scrollIntoView({ behavior: 'smooth' });
 
-  toast('✓ Document analysis complete');
+  toast('✓ Analysis complete');
 });
 
 // Demo scenarios loader
@@ -1089,7 +1136,6 @@ if ($('legalToggle')) {
     if (!d) return;
     d.hidden = !d.hidden;
     $('legalToggle').setAttribute('aria-expanded', String(!d.hidden));
-    $('legalToggle').textContent = (d.hidden ? '＋' : '−') + ' Want to see the legal references?';
   });
 }
 

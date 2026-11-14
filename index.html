@@ -187,24 +187,22 @@
         </div>
       </div>
 
-      <div class="panel legal-panel"><button class="disclosure" id="legalToggle" aria-expanded="false">＋ Want to see the legal references?</button><div id="legalDetails" hidden>
-        <p class="legal-intro">Potentially relevant legal provisions to verify for your state and situation:</p>
-        <div class="internet-law-search-box">
-          <h4>🌐 Live Legal Research (India Code &amp; Indian Kanoon)</h4>
-          <p>Type any specific tenancy problem or keyword to search relevant Indian Acts, High Court &amp; Supreme Court rulings:</p>
-          <div class="search-law-row">
-            <input type="text" id="liveLawQueryInput" placeholder="e.g. landlord cut electricity, 10 month deposit bangalore, eviction notice">
-            <button type="button" class="btn primary" id="liveLawSearchBtn">Search Laws</button>
+      <div class="panel legal-panel">
+        <button class="disclosure" id="legalToggle" aria-expanded="true">
+          <span class="disclosure-title">⚖️ Applicable Indian Legal Provisions &amp; Rights</span>
+          <span class="disclosure-badge" id="legalCountBadge">2 Provisions</span>
+        </button>
+        <div id="legalDetails">
+          <p class="legal-intro">Verified statutory provisions and judicial precedents applicable to your situation:</p>
+          <div class="legal-grid" id="dynamicLegalCards">
+            <!-- Dynamic Legal Cards Injected Here -->
+          </div>
+          <div class="legal-disclaimer">
+            <h3>Important Note</h3>
+            <p>These laws help you understand your rights, but the final outcome depends on your rental agreement, evidence, and the tenancy rules applicable in your state. For serious disputes, consult a qualified lawyer.</p>
           </div>
         </div>
-        <div class="legal-grid" id="dynamicLegalCards">
-          <!-- Dynamic Legal Cards Injected Here -->
-        </div>
-        <div class="legal-disclaimer">
-          <h3>Important Note</h3>
-          <p>These laws help you understand your rights, but the final outcome depends on your rental agreement, evidence, and the tenancy rules applicable in your state. For serious disputes, consult a qualified lawyer.</p>
-        </div>
-      </div></div>
+      </div>
       <div class="section-heading left"><p class="eyebrow">STEP 3 · PREPARE A RESPONSE</p><h2>Make your next message clear</h2></div>
       <div class="panel">
         <div class="form-grid">
