@@ -937,7 +937,7 @@ $('runAudit').addEventListener('click', async () => {
   const deposit = Number($('deposit').value) || 0;
   const deduction = Number($('deduction').value) || 0;
   const landlordName = $('landlordName') ? $('landlordName').value.trim() : '';
-  const replyDays = Math.max(1, Number($('deadline').value) || 7);
+  const replyDays = Math.max(1, Number($('deadline') ? $('deadline').value : 7) || 7);
 
   let textToAudit = '';
   let docName = 'Rental Agreement';
@@ -1046,10 +1046,10 @@ $('runAudit').addEventListener('click', async () => {
   // Render Dynamic Legal Provisions (Precise & Focused)
   renderDynamicLaws(auditResult.legal_references || []);
 
-  // Populate Drafts
-  $('whatsappText').value = auditResult.whatsapp_draft;
-  $('formalText').value = auditResult.formal_letter;
-  syncFormalLetter();
+  // Populate Drafts safely
+  if ($('whatsappText')) $('whatsappText').value = auditResult.whatsapp_draft || '';
+  if ($('formalText')) $('formalText').value = auditResult.formal_letter || '';
+  if (typeof syncFormalLetter === 'function') syncFormalLetter();
 
   // Reset loading indicator
   runBtn.disabled = false;
@@ -1149,8 +1149,8 @@ async function copyText(value) {
   }
 }
 
-if ($('copyMessage')) $('copyMessage').addEventListener('click', () => copyText($('whatsappText').value));
-if ($('copyLetter')) $('copyLetter').addEventListener('click', () => copyText($('formalText').value));
+if ($('copyMessage')) $('copyMessage').addEventListener('click', () => copyText($('whatsappText') ? $('whatsappText').value : ''));
+if ($('copyLetter')) $('copyLetter').addEventListener('click', () => copyText($('formalText') ? $('formalText').value : ''));
 
 // WhatsApp Direct Share
 if ($('whatsappLink')) {
@@ -1366,6 +1366,91 @@ async function initComplaintsPortal() {
     });
   }
 
+  // 4.1 1-Click Quick Dispute Presets
+  const DISPUTE_PRESETS = {
+    deposit: {
+      category: 'security_deposit',
+      urgency: 'urgent',
+      amount: 55000,
+      title: 'Landlord withholding ₹55,000 security deposit for unverified painting and deep cleaning',
+      description: 'I peacefully handed over possession of the premises after completing the agreed 30-day notice period. The landlord inspected the apartment and raised no immediate structural damages. However, upon vacating, the landlord arbitrarily withheld ₹55,000 citing whole-flat repainting and deep cleaning charges without providing itemized contractor tax invoices. Under Section 108(m) of the Transfer of Property Act, normal wear and tear cannot be deducted.',
+      relief: 'Full refund of ₹55,000 withheld security deposit immediately along with 18% p.a. statutory interest and waiver of unverified deductions.'
+    },
+    eviction: {
+      category: 'illegal_eviction',
+      urgency: 'urgent',
+      amount: 0,
+      title: 'Unlawful notice to vacate premises within 7 days without grounds and threat of lockout',
+      description: 'The landlord served a verbal and WhatsApp notice demanding immediate vacation of the rented flat within 7 days, despite the valid 11-month registered lease having 6 months remaining. The landlord is threatening to change main door locks and forcibly remove personal belongings. Under the Model Tenancy Act and Transfer of Property Act, summary eviction without due process of law and a valid Rent Court order is illegal.',
+      relief: 'Immediate withdrawal of unlawful eviction threats, respect for valid lease lock-in period, and guarantee of peaceful possession.'
+    },
+    utility: {
+      category: 'utility_cutoff',
+      urgency: 'urgent',
+      amount: 0,
+      title: 'Illegal disconnection of water supply and electricity to force premature lease termination',
+      description: 'Following a disagreement regarding maintenance fees, the landlord instructed building maintenance to disconnect water supply and electricity to our flat. All utility dues and rents have been paid on time with receipts. Disconnection of essential services violates basic human rights and statutory tenancy laws under Section 14 of the Model Tenancy Act.',
+      relief: 'Immediate restoration of water and electricity connections and cessation of extra-legal coercion.'
+    },
+    renthike: {
+      category: 'rent_hike',
+      urgency: 'medium',
+      amount: 12000,
+      title: 'Arbitrary 25% mid-term rent increase during active fixed-term rental agreement',
+      description: 'The landlord issued a demand letter demanding an immediate 25% rent increase midway through the agreed 11-month tenure, threatening eviction if the revised rent is not paid starting next month. The signed agreement explicitly states fixed monthly rent with rent escalation permitted only upon renewal after 11 months.',
+      relief: 'Adherence to the contractually agreed rental amount until the expiry of the 11-month term and cancellation of demand.'
+    },
+    repairs: {
+      category: 'maintenance',
+      urgency: 'medium',
+      amount: 25000,
+      title: 'Landlord refusal to repair severe bathroom seepage and structural ceiling water leak',
+      description: 'Persistent water seepage from the ceiling has damaged bedroom walls and created electrical short-circuit hazards. Despite multiple written notices over the past 45 days, the landlord has refused to carry out necessary structural repairs, stating that maintenance inside the unit is solely tenant responsibility. Under tenancy law, landlord is obligated to maintain structural integrity and watertight habitability.',
+      relief: 'Urgent structural leak repairs by licensed contractor within 7 days or permission to deduct repair costs from upcoming monthly rent.'
+    }
+  };
+
+  function updateComplaintStatutoryNote(cat) {
+    const noteEl = $('complaintStatutoryNote');
+    if (!noteEl) return;
+    const NOTES = {
+      security_deposit: 'Under Section 108(m) of the Transfer of Property Act, 1882 & Model Tenancy Act, tenants are only responsible for damage beyond reasonable wear and tear. Deductions without contractor tax invoices violate tenancy law and constitute actionable criminal breach of trust (Sec 405 IPC).',
+      illegal_eviction: 'Under Indian tenancy jurisprudence, a tenant cannot be forcibly evicted or locked out without due process of law. Landlords must obtain a formal eviction decree from the competent Rent Authority or civil court.',
+      utility_cutoff: 'Under Section 20 of the Model Tenancy Act & State Rent Control Acts, cutting off essential services like water and electricity is a cognizable legal offense with penal provisions against the landlord.',
+      harassment: 'Tenants enjoy an implied covenant of quiet enjoyment. Unannounced entry, verbal threats, and invasion of privacy entitle tenants to police protection and civil damages.',
+      rent_hike: 'Rent revision can strictly take place according to the terms of the signed agreement or statutory 90-day written notice. Unilateral mid-tenure escalations are legally unenforceable.',
+      maintenance: 'Under Section 15 of Model Tenancy Act, landlords are legally obligated to maintain structural integrity, plumbing, and essential habitability of residential premises.',
+      lease_breach: 'Unfair contract terms, unreasonable lock-in penalties, and non-refundable deposits exceeding statutory limits (max 2 months in modern tenancy laws) can be challenged before Rent Authorities.',
+      unfair_charges: 'Unilateral move-out deductions, administrative penalties, and unverified late fees are legally invalid without verified receipts and explicit contract authorization.'
+    };
+    noteEl.textContent = NOTES[cat] || NOTES.security_deposit;
+  }
+
+  if ($('compCategory')) {
+    $('compCategory').addEventListener('change', () => updateComplaintStatutoryNote($('compCategory').value));
+  }
+
+  document.querySelectorAll('.dispute-preset-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const presetKey = btn.getAttribute('data-preset');
+      const data = DISPUTE_PRESETS[presetKey];
+      if (!data) return;
+
+      if ($('compCategory')) {
+        $('compCategory').value = data.category;
+        updateComplaintStatutoryNote(data.category);
+      }
+      if ($('compUrgency')) $('compUrgency').value = data.urgency;
+      if ($('compAmount') && data.amount) $('compAmount').value = data.amount;
+      if ($('compTitle')) $('compTitle').value = data.title;
+      if ($('compDescription')) $('compDescription').value = data.description;
+      if ($('compRelief')) $('compRelief').value = data.relief;
+      if ($('compDate') && !$('compDate').value) $('compDate').value = new Date().toISOString().split('T')[0];
+
+      toast(`⚡ Loaded "${btn.textContent.trim()}" template! You can customize any details.`);
+    });
+  });
+
   // 5. Tenant Complaint Form Submission ("Put Their Complaint")
   const tenantComplaintForm = $('tenantComplaintForm');
   if (tenantComplaintForm) {
@@ -1467,7 +1552,66 @@ async function initComplaintsPortal() {
     });
   }
 
-  // 7. Legal Notice Sheet Editor & Live Preview Synchronization
+  // 7. Formal Printable Legal Notice Print Engine
+  function printFormalLegalNotice(rawNoticeText, meta = {}) {
+    const printable = $('printable-letter');
+    const text = (rawNoticeText || '').trim();
+    if (!text) {
+      toast('No legal notice draft content to print.');
+      return;
+    }
+
+    const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    const ref = meta.issue_reference || ('CS-LN-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000));
+    const tenant = meta.tenant_name || 'Aggrieved Tenant';
+    const city = meta.city || 'Bengaluru';
+    const state = meta.state || 'Karnataka';
+
+    if (printable) {
+      printable.innerHTML = `
+        <div class="print-legal-notice-doc">
+          <div class="print-doc-header">
+            <div class="print-emblem">⚖️ STATUTORY LEGAL DEMAND NOTICE</div>
+            <div class="print-dispatch-badge">SERVED VIA REGISTERED POST WITH ACKNOWLEDGEMENT DUE (RPAD) &amp; ELECTRONIC TRANSMISSION</div>
+            <div class="print-meta-grid">
+              <div><strong>Notice Reference:</strong> ${escapeHTML(ref)}</div>
+              <div style="text-align:right;"><strong>Date of Service:</strong> ${escapeHTML(today)} · ${escapeHTML(city)}, ${escapeHTML(state)}</div>
+            </div>
+          </div>
+          
+          <div class="print-doc-body">
+            <pre class="print-pre-content">${escapeHTML(text)}</pre>
+          </div>
+
+          <div class="print-doc-signatures">
+            <div class="print-sig-col">
+              <div class="print-sig-line"></div>
+              <strong>Signature of Aggrieved Tenant / Complainant</strong><br>
+              <span>Name: ${escapeHTML(tenant)}</span><br>
+              <small>Verified Tenant Member · ClauseShield Platform</small>
+            </div>
+            <div class="print-sig-col" style="text-align:right;">
+              <div class="print-sig-line" style="margin-left:auto;"></div>
+              <strong>Advocate / Authorized Representative</strong><br>
+              <span>Enrolment No: ________________________</span><br>
+              <small>Bar Council of India · Panel Advocate</small>
+            </div>
+          </div>
+
+          <div class="print-doc-footer">
+            <p>This statutory legal demand notice is issued under Section 106 &amp; 108 of Transfer of Property Act, 1882 &amp; Model Tenancy Act provisions. Drafted and verified via ClauseShield Legal Platform.</p>
+          </div>
+        </div>
+      `;
+    }
+
+    toast('🖨️ Opening print dialogue... Choose "Save as PDF" to export.');
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  }
+
+  // 7.1 Legal Notice Sheet Editor & Live Preview Synchronization
   const noticeEditorText = $('noticeEditorText');
   const noticeSheetPreview = $('noticeSheetPreview');
   const btnPrintNoticeSheet = $('btnPrintNoticeSheet');
@@ -1509,7 +1653,8 @@ async function initComplaintsPortal() {
   if (btnPrintNoticeSheet) {
     btnPrintNoticeSheet.addEventListener('click', () => {
       syncNoticeSheetPreview();
-      window.print();
+      const text = noticeEditorText ? noticeEditorText.value : '';
+      printFormalLegalNotice(text, currentNoticeDraftComplaint || {});
     });
   }
 
@@ -1523,7 +1668,10 @@ async function initComplaintsPortal() {
   const btnPrintModalNotice = $('btnPrintModalNotice');
   const btnCopyModalNotice = $('btnCopyModalNotice');
   if (btnPrintModalNotice) {
-    btnPrintModalNotice.addEventListener('click', () => window.print());
+    btnPrintModalNotice.addEventListener('click', () => {
+      const text = $('modalNoticePreview') ? $('modalNoticePreview').textContent : '';
+      printFormalLegalNotice(text, currentNoticeDraftComplaint || {});
+    });
   }
   if (btnCopyModalNotice) {
     btnCopyModalNotice.addEventListener('click', () => {
@@ -1778,6 +1926,7 @@ function attachComplaintCardListeners(complaints) {
       const cmp = complaints.find(c => c.id === id);
       if (!cmp) return;
 
+      currentNoticeDraftComplaint = cmp;
       const noticeText = ClauseShieldDB.issues.generateLegalNotice(cmp);
       if ($('modalNoticePreview')) $('modalNoticePreview').textContent = noticeText;
       if ($('legalNoticeModalTitle')) $('legalNoticeModalTitle').textContent = `Legal Notice · ${cmp.issue_reference}`;
@@ -1811,7 +1960,7 @@ let currentBookingContext = { lawyer: null, issue: null, initiatedBy: 'tenant' }
 function updateNavUserState() {
   const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
   const authNavBtn = $('authNavBtn');
-  const navAuthGroup = $('navAuthGroup');
+  const navAuthGroup = $('navAuthGroup') || $('guestAuthGroup');
   const userMenuWrapper = $('userMenuWrapper');
   const navUserName = $('navUserName');
   const navUserRole = $('navUserRole');
@@ -2009,6 +2158,14 @@ function initAuthModal() {
     });
   }
 
+  const heroGetStartedBtn = $('heroGetStartedBtn');
+  if (heroGetStartedBtn) {
+    heroGetStartedBtn.addEventListener('click', () => {
+      openModal('authModal');
+      switchAuthTab('register');
+    });
+  }
+
   // Segmented Mode Tabs: Sign In vs Create Account vs Forgot Password
   const tabSignInBtn = $('tabSignInBtn');
   const tabSignUpBtn = $('tabSignUpBtn');
@@ -2072,6 +2229,19 @@ function initAuthModal() {
       if (authModalSubtitle) authModalSubtitle.textContent = 'Enter your email to verify and choose a new secure password.';
     }
   }
+
+  function handleAuthHash() {
+    const hash = window.location.hash;
+    if (hash === '#login' || hash === '#signin') {
+      openModal('authModal');
+      switchAuthTab('login');
+    } else if (hash === '#signup' || hash === '#get-started') {
+      openModal('authModal');
+      switchAuthTab('register');
+    }
+  }
+  window.addEventListener('hashchange', handleAuthHash);
+  setTimeout(handleAuthHash, 100);
 
   if (tabSignInBtn) tabSignInBtn.addEventListener('click', () => switchAuthTab('login'));
   if (tabSignUpBtn) tabSignUpBtn.addEventListener('click', () => switchAuthTab('register'));

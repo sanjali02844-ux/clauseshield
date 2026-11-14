@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ClauseShield connects tenants facing rental disputes with verified advocates for online legal consultations, lease audits, and evidence-based notice drafting.">
   <title>ClauseShield | Complete Legal Assistance & Tenant Support Platform</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2.3">
   
   <!-- Supabase Client CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -33,10 +33,10 @@
       <a href="#calculator">Dispute Calculator</a>
       <a href="#lawyers">Find a Lawyer</a>
       
-      <!-- Guest Actions: Sign In & Get Started -->
+      <!-- Guest Actions: Sign In & Get Started Free -->
       <div class="nav-auth-group" id="navAuthGroup">
         <button type="button" class="nav-auth-link" id="navSignInBtn">Sign In</button>
-        <button type="button" class="btn primary nav-cta" id="authNavBtn">Get Started</button>
+        <button type="button" class="btn primary nav-cta" id="authNavBtn">Get Started Free</button>
       </div>
       
       <!-- Authenticated User Menu Dropdown (Initially Hidden) -->
@@ -102,7 +102,8 @@
         <h1>Connect with verified lawyers for <span>real tenant protection.</span></h1>
         <p class="lead">Audit your lease, post your rental dispute to verified advocates, and receive confidential online video consultations from licensed legal professionals.</p>
         <div class="actions">
-          <a class="btn primary" href="#post-issue">Post Your Legal Issue</a>
+          <button type="button" class="btn primary" id="heroGetStartedBtn">✨ Get Started Free</button>
+          <a class="btn secondary" href="#complaint-generator">📝 Generate Complaint</a>
           <a class="btn secondary" href="#lawyers">Find a Lawyer</a>
           <button class="btn secondary" id="tryDemo">Try Demo Lease Audit</button>
         </div>
@@ -912,111 +913,237 @@
 
         <!-- PANE 1: FILE / GENERATE COMPLAINT FORM -->
         <div id="portalPaneFile">
+          <!-- Form Header & Step Indicator Bar -->
+          <div class="complaint-steps-nav">
+            <div class="complaint-step-item active">
+              <span class="step-circle">1</span>
+              <div class="step-text">
+                <strong>Your Details</strong>
+                <small>Privacy Shielded</small>
+              </div>
+            </div>
+            <div class="step-divider"></div>
+            <div class="complaint-step-item active">
+              <span class="step-circle">2</span>
+              <div class="step-text">
+                <strong>Dispute Overview</strong>
+                <small>1-Click Templates</small>
+              </div>
+            </div>
+            <div class="step-divider"></div>
+            <div class="complaint-step-item active">
+              <span class="step-circle">3</span>
+              <div class="step-text">
+                <strong>Facts &amp; Relief</strong>
+                <small>Legal Notice Ready</small>
+              </div>
+            </div>
+          </div>
+
           <div class="shield-notice" style="margin-bottom:24px;">
             <span class="shield-icon">🛡️</span>
             <div>
               <strong>Tenant Confidentiality &amp; Free Legal Aid Assurance:</strong>
-              Your private contact details are shielded from public viewers. Once you submit, licensed advocates on ClauseShield review the facts for free, advise on statutory Indian tenancy rights, and help prepare legal demand notices.
+              Your private phone and contact details are shielded from public viewers. Once you submit, licensed advocates on ClauseShield review the facts for free, advise on statutory Indian tenancy rights, and help prepare legal demand notices.
             </div>
           </div>
 
-          <form id="tenantComplaintForm">
-            <div class="form-grid">
-              <div>
-                <label for="compTenantName">Tenant Name *</label>
-                <input type="text" id="compTenantName" placeholder="e.g. Arjun Mehra" required>
-                <label style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:normal;color:var(--muted);cursor:pointer;margin-top:-10px;margin-bottom:14px;">
-                  <input type="checkbox" id="compAnonymousToggle" style="width:auto;margin:0;"> Keep my identity anonymous to public viewers
-                </label>
+          <form id="tenantComplaintForm" class="complaint-builder-form">
+            <!-- STEP 1 CARD: Tenant Details & Privacy -->
+            <div class="form-card-step">
+              <div class="card-step-header">
+                <span class="step-pill-tag">STEP 1 OF 3</span>
+                <h3>👤 Tenant Contact Details &amp; Privacy Shield</h3>
+                <p>Provide contact details so verified advocates can contact you for pro bono consultations.</p>
               </div>
 
-              <div>
-                <label for="compTenantEmail">Email Address *</label>
-                <input type="email" id="compTenantEmail" placeholder="your.name@example.com" required>
-              </div>
+              <div class="form-grid">
+                <div>
+                  <label for="compTenantName">Tenant Name <span class="req-star">*</span></label>
+                  <div class="input-field-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="compTenantName" placeholder="e.g. Arjun Mehra" required>
+                  </div>
+                </div>
 
-              <div>
-                <label for="compTenantPhone">Mobile / WhatsApp Number <small style="font-weight:normal;color:var(--muted);">(Shielded from public)</small></label>
-                <input type="tel" id="compTenantPhone" placeholder="+91 98765 43210">
-              </div>
+                <div>
+                  <label for="compTenantEmail">Email Address <span class="req-star">*</span></label>
+                  <div class="input-field-wrapper">
+                    <span class="input-icon">✉️</span>
+                    <input type="email" id="compTenantEmail" placeholder="your.name@example.com" required>
+                  </div>
+                </div>
 
-              <div>
-                <label for="compCategory">Complaint Variety / Category *</label>
-                <select id="compCategory" required>
-                  <option value="security_deposit" selected>🛡️ Security Deposit Withholding &amp; Deductions</option>
-                  <option value="illegal_eviction">🚫 Illegal Eviction Notice &amp; Lockout Threat</option>
-                  <option value="utility_cutoff">⚡ Water / Electricity Disconnection</option>
-                  <option value="harassment">🛑 Landlord Harassment &amp; Privacy Invasion</option>
-                  <option value="rent_hike">📈 Arbitrary Mid-Term Rent Hike</option>
-                  <option value="maintenance">🔧 Refusal to Repair Leaks &amp; Structural Hazards</option>
-                  <option value="lease_breach">📑 Unfair Lease Terms &amp; Unreasonable Lock-in</option>
-                  <option value="unfair_charges">🏷️ Unfair Move-out Charges &amp; Late Fees</option>
-                </select>
-              </div>
+                <div>
+                  <label for="compTenantPhone">Mobile / WhatsApp Number <small class="field-badge-shield">🔒 Shielded</small></label>
+                  <div class="input-field-wrapper">
+                    <span class="input-icon">📞</span>
+                    <input type="tel" id="compTenantPhone" placeholder="+91 98765 43210">
+                  </div>
+                </div>
 
-              <div>
-                <label for="compUrgency">Urgency / Severity Level *</label>
-                <select id="compUrgency" required>
-                  <option value="urgent" selected>🔴 Urgent (Eviction threat, lockout, water/power cut within 7 days)</option>
-                  <option value="medium">🟡 Medium (Deposit withheld after move-out, disputed repair bill)</option>
-                  <option value="low">🟢 Standard (General lease dispute, clarification request)</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="compState">State / Jurisdiction *</label>
-                <select id="compState" required>
-                  <option value="Karnataka" selected>Karnataka (Bengaluru)</option>
-                  <option value="Maharashtra">Maharashtra (Pune / Mumbai)</option>
-                  <option value="Delhi">Delhi NCR (Delhi / Gurgaon / Noida)</option>
-                  <option value="Telangana">Telangana (Hyderabad)</option>
-                  <option value="Tamil Nadu">Tamil Nadu (Chennai)</option>
-                  <option value="West Bengal">West Bengal (Kolkata)</option>
-                  <option value="Gujarat">Gujarat (Ahmedabad)</option>
-                  <option value="Other">Other State</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="compCity">City / Locality *</label>
-                <input type="text" id="compCity" placeholder="e.g. Koramangala, Bengaluru" required>
-              </div>
-
-              <div>
-                <label for="compAmount">Amount Involved in Dispute (₹) <small style="font-weight:normal;color:var(--muted);">(Optional)</small></label>
-                <input type="number" id="compAmount" min="0" placeholder="e.g. 55000">
-              </div>
-
-              <div>
-                <label for="compDate">Date of Incident / Notice Date *</label>
-                <input type="date" id="compDate" required>
-              </div>
-
-              <div>
-                <label for="compLandlordName">Landlord / Owner Name <small style="font-weight:normal;color:var(--muted);">(Optional)</small></label>
-                <input type="text" id="compLandlordName" placeholder="e.g. Mr. R. K. Sharma">
-              </div>
-
-              <div class="full-grid-span">
-                <label for="compTitle">Complaint Subject / Summary *</label>
-                <input type="text" id="compTitle" placeholder="e.g. Landlord withholding ₹55,000 security deposit for whole-flat repainting and deep cleaning" required>
-              </div>
-
-              <div class="full-grid-span">
-                <label for="compDescription">Detailed Facts &amp; Description of What Happened *</label>
-                <textarea id="compDescription" rows="6" placeholder="Describe the chronological facts: Did you provide notice? What did the landlord say or deduct? Are there invoices or agreement clauses?..." required></textarea>
-              </div>
-
-              <div class="full-grid-span">
-                <label for="compRelief">Desired Resolution / Relief Sought *</label>
-                <input type="text" id="compRelief" placeholder="e.g. Full refund of ₹55,000 security deposit, cessation of harassment, restoration of electricity" required>
+                <div>
+                  <label>Public Board Privacy Preference</label>
+                  <label class="custom-toggle-card" for="compAnonymousToggle">
+                    <input type="checkbox" id="compAnonymousToggle" class="styled-checkbox">
+                    <div class="toggle-card-body">
+                      <strong>Keep identity anonymous to public</strong>
+                      <small>Shows as "Tenant (Anonymous)". Only verified advocates who review your case see full details.</small>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
 
-            <div class="actions" style="margin-top:20px;">
-              <button type="submit" class="btn primary" id="btnSubmitComplaint">🚀 Submit Complaint &amp; Notify Free Lawyers</button>
-              <button type="button" class="btn secondary" id="btnDraftNoticeFromForm">📄 Preview Formal Legal Notice</button>
+            <!-- STEP 2 CARD: Dispute Overview & 1-Click Templates -->
+            <div class="form-card-step">
+              <div class="card-step-header">
+                <span class="step-pill-tag">STEP 2 OF 3</span>
+                <h3>⚖️ Dispute Context &amp; 1-Click Templates</h3>
+                <p>Click a quick template to auto-populate common tenancy violations, or fill manually.</p>
+              </div>
+
+              <!-- 1-Click Presets -->
+              <div class="dispute-presets-box">
+                <div class="presets-header-row">
+                  <span class="presets-spark">⚡</span>
+                  <strong>1-Click Quick Dispute Presets (Auto-fills form below):</strong>
+                </div>
+                <div class="presets-chips-row">
+                  <button type="button" class="dispute-preset-chip" data-preset="deposit">
+                    <span>🛡️</span> Security Deposit Deductions
+                  </button>
+                  <button type="button" class="dispute-preset-chip" data-preset="eviction">
+                    <span>🚫</span> Illegal Eviction / Lockout
+                  </button>
+                  <button type="button" class="dispute-preset-chip" data-preset="utility">
+                    <span>⚡</span> Water / Power Cutoff
+                  </button>
+                  <button type="button" class="dispute-preset-chip" data-preset="renthike">
+                    <span>📈</span> Sudden Mid-Term Rent Hike
+                  </button>
+                  <button type="button" class="dispute-preset-chip" data-preset="repairs">
+                    <span>🔧</span> Refusal to Repair Leaks
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div>
+                  <label for="compCategory">Complaint Category / Variety <span class="req-star">*</span></label>
+                  <select id="compCategory" required>
+                    <option value="security_deposit" selected>🛡️ Security Deposit Withholding &amp; Deductions</option>
+                    <option value="illegal_eviction">🚫 Illegal Eviction Notice &amp; Lockout Threat</option>
+                    <option value="utility_cutoff">⚡ Water / Electricity Disconnection</option>
+                    <option value="harassment">🛑 Landlord Harassment &amp; Privacy Invasion</option>
+                    <option value="rent_hike">📈 Arbitrary Mid-Term Rent Hike</option>
+                    <option value="maintenance">🔧 Refusal to Repair Leaks &amp; Structural Hazards</option>
+                    <option value="lease_breach">📑 Unfair Lease Terms &amp; Unreasonable Lock-in</option>
+                    <option value="unfair_charges">🏷️ Unfair Move-out Charges &amp; Late Fees</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="compUrgency">Urgency / Severity Level <span class="req-star">*</span></label>
+                  <select id="compUrgency" required>
+                    <option value="urgent" selected>🔴 Urgent (Eviction threat, lockout, water/power cut within 7 days)</option>
+                    <option value="medium">🟡 Medium (Deposit withheld after move-out, disputed repair bill)</option>
+                    <option value="low">🟢 Standard (General lease dispute, clarification request)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="compState">State / Jurisdiction <span class="req-star">*</span></label>
+                  <select id="compState" required>
+                    <option value="Karnataka" selected>Karnataka (Bengaluru)</option>
+                    <option value="Maharashtra">Maharashtra (Pune / Mumbai)</option>
+                    <option value="Delhi">Delhi NCR (Delhi / Gurgaon / Noida)</option>
+                    <option value="Telangana">Telangana (Hyderabad)</option>
+                    <option value="Tamil Nadu">Tamil Nadu (Chennai)</option>
+                    <option value="West Bengal">West Bengal (Kolkata)</option>
+                    <option value="Gujarat">Gujarat (Ahmedabad)</option>
+                    <option value="Other">Other State</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="compCity">City / Locality <span class="req-star">*</span></label>
+                  <div class="input-field-wrapper">
+                    <span class="input-icon">📍</span>
+                    <input type="text" id="compCity" placeholder="e.g. Koramangala, Bengaluru" required>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="compAmount">Amount Involved in Dispute (₹) <small>(Optional)</small></label>
+                  <div class="input-field-wrapper">
+                    <span class="input-icon">₹</span>
+                    <input type="number" id="compAmount" min="0" placeholder="e.g. 55000">
+                  </div>
+                </div>
+
+                <div>
+                  <label for="compDate">Date of Incident / Notice Received <span class="req-star">*</span></label>
+                  <input type="date" id="compDate" required>
+                </div>
+
+                <div class="full-grid-span">
+                  <label for="compLandlordName">Landlord / Owner Name <small>(Optional)</small></label>
+                  <div class="input-field-wrapper">
+                    <span class="input-icon">🏢</span>
+                    <input type="text" id="compLandlordName" placeholder="e.g. Mr. R. K. Sharma / Property Manager">
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <!-- STEP 3 CARD: Chronological Facts & Relief Sought -->
+            <div class="form-card-step">
+              <div class="card-step-header">
+                <span class="step-pill-tag">STEP 3 OF 3</span>
+                <h3>📝 Chronological Facts &amp; Desired Resolution</h3>
+                <p>Provide chronological facts so lawyers can evaluate breaches and draft formal notices.</p>
+              </div>
+
+              <div class="form-grid">
+                <div class="full-grid-span">
+                  <label for="compTitle">Complaint Subject / Summary Headline <span class="req-star">*</span></label>
+                  <input type="text" id="compTitle" placeholder="e.g. Landlord withholding ₹55,000 security deposit for whole-flat repainting and deep cleaning" required>
+                </div>
+
+                <div class="full-grid-span">
+                  <div class="form-label-row">
+                    <label for="compDescription">Detailed Facts &amp; Description of What Happened <span class="req-star">*</span></label>
+                    <span class="label-hint">Include: Notice served, amounts withheld, landlord statements</span>
+                  </div>
+                  <textarea id="compDescription" rows="6" placeholder="Describe the chronological facts: Did you provide notice? What did the landlord say or deduct? Are there invoices or agreement clauses?..." required></textarea>
+                </div>
+
+                <div class="full-grid-span">
+                  <label for="compRelief">Desired Resolution / Relief Sought <span class="req-star">*</span></label>
+                  <input type="text" id="compRelief" placeholder="e.g. Full refund of ₹55,000 security deposit, cessation of harassment, restoration of electricity" required>
+                </div>
+              </div>
+
+              <!-- Real-time Statutory Protection Shield Callout -->
+              <div class="legal-statutory-callout">
+                <span class="statutory-pill">⚖️ Statutory Tenant Protection Note</span>
+                <p id="complaintStatutoryNote">Under Section 108(m) of the Transfer of Property Act, 1882 &amp; Model Tenancy Act, tenants are only responsible for damage beyond reasonable wear and tear. Deductions without tax invoices violate tenancy law.</p>
+              </div>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div class="form-footer-actions">
+              <button type="submit" class="btn primary btn-hero" id="btnSubmitComplaint">
+                <span>🚀 Submit Complaint &amp; Notify Free Lawyers</span>
+              </button>
+              <button type="button" class="btn secondary btn-hero" id="btnDraftNoticeFromForm">
+                <span>📜 Preview Formal Legal Notice Draft</span>
+              </button>
+            </div>
+            <p class="form-footer-guarantee">
+              🛡️ 100% Free Pro Bono Legal Aid · Bar Council of India Compliant · Shielded Confidential Data
+            </p>
           </form>
         </div>
 
@@ -1211,7 +1338,7 @@
        MODALS & DIALOGS
        ============================================================================== -->
 
-  <!-- 1. AUTHENTICATION MODAL (REFINED EXECUTIVE EDITION) -->
+  <!-- 1. AUTHENTICATION & ONBOARDING PORTAL (EXECUTIVE EDITION) -->
   <div class="cs-modal-backdrop" id="authModal">
     <div class="cs-modal">
       <div class="modal-header auth-modal-header">
@@ -1220,11 +1347,11 @@
             <span class="brand-mark small">C</span>
             <span class="auth-security-pill">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              Secure Auth
+              Secure 256-Bit SSL
             </span>
           </div>
-          <h3 id="authModalTitle">Sign In to ClauseShield</h3>
-          <p id="authModalSubtitle">Access tenant legal assistance, lease audits, and verified advocate advice.</p>
+          <h3 id="authModalTitle">Welcome to ClauseShield</h3>
+          <p id="authModalSubtitle">Get started with free tenant legal aid or sign in to manage your consultations.</p>
         </div>
         <button type="button" class="modal-close-btn" data-close="authModal" aria-label="Close dialog">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1241,9 +1368,9 @@
           <div class="auth-demo-chips">
             <button type="button" class="demo-chip demo-login-btn" data-email="tenant@example.com" data-pass="password123" title="Log in as Arjun (Tenant)">
               <span class="chip-icon">👤</span>
-              <span class="chip-text">Tenant (Arjun)</span>
+              <span class="chip-text">Tenant (Arjun Mehra)</span>
             </button>
-            <button type="button" class="demo-chip demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123" title="Log in as Adv. Rajesh (Advocate)">
+            <button type="button" class="demo-chip demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123" title="Log in as Adv. Rajesh (Free Lawyer)">
               <span class="chip-icon">⚖️</span>
               <span class="chip-text">Advocate (Rajesh)</span>
             </button>
@@ -1254,7 +1381,7 @@
           </div>
         </div>
 
-        <!-- Mode Toggle Segmented Tabs -->
+        <!-- Mode Toggle Segmented Tabs (Merged Sign In & Get Started) -->
         <div class="auth-tabs-segmented" role="tablist">
           <button type="button" class="auth-tab-btn active" id="tabSignInBtn" role="tab" aria-selected="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -1262,7 +1389,7 @@
           </button>
           <button type="button" class="auth-tab-btn" id="tabSignUpBtn" role="tab" aria-selected="false">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-            <span>Create Account</span>
+            <span>Get Started Free</span>
           </button>
         </div>
 
@@ -1801,7 +1928,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- APPLICATION JAVASCRIPT -->
-  <script src="supabase-client.js?v=2.2"></script>
-  <script src="script.js?v=2.2"></script>
+  <script src="supabase-client.js?v=2.3"></script>
+  <script src="script.js?v=2.3"></script>
 </body>
 </html>

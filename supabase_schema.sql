@@ -229,3 +229,202 @@ create policy "Users can view payments they are party to"
 create policy "Public can read platform settings"
     on public.platform_settings for select
     using (true);
+
+
+-- ==============================================================================
+-- DEDICATED ADVOCATE PORTAL TABLES & ACCESS CONTROLS (STAGE 7 / EXTENSION)
+-- ==============================================================================
+
+-- 9. ADVOCATE PROFILES TABLE (Detailed professional credentials & verification)
+create table if not exists public.advocate_profiles (
+    id uuid primary key default uuid_generate_v4(),
+    user_id uuid references public.profiles(id) on delete cascade unique not null,
+    bar_council_number text not null,
+    state_bar_council text not null,
+    state_of_practice text not null,
+    city_of_practice text not null,
+    years_experience integer default 0 not null,
+    practice_areas text[] default '{}'::text[] not null,
+    bio text,
+    profile_photo text,
+    verification_status text default 'pending_verification' check (
+        verification_status in ('pending_verification', 'verified', 'rejected', 'additional_info_required')
+    ),
+    verified_at timestamp with time zone,
+    verified_by uuid references public.profiles(id),
+    rejection_reason text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 10. ADVOCATE VERIFICATIONS AUDIT LOG
+create table if not exists public.advocate_verifications (
+    id uuid primary key default uuid_generate_v4(),
+    advocate_id uuid references public.advocate_profiles(id) on delete cascade not null,
+    status text not null check (status in ('pending_verification', 'verified', 'rejected', 'additional_info_required')),
+    reviewed_by uuid references public.profiles(id) not null,
+    notes text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 11. ADVOCATE CLIENTS TABLE (Strict advocate isolation)
+create table if not exists public.clients (
+    id uuid primary key default uuid_generate_v4(),
+    advocate_id uuid references public.profiles(id) on delete cascade not null,
+    full_name text not null,
+    email text,
+    phone text not null,
+    city text not null,
+    state text not null,
+    private_notes text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 12. ADVOCATE CASES TABLE
+create table if not exists public.cases (
+    id uuid primary key default uuid_generate_v4(),
+    case_reference text unique not null, -- e.g. CS-CAS-2026-1049
+    advocate_id uuid references public.profiles(id) on delete cascade not null,
+    client_id uuid references public.clients(id) on delete set null,
+    title text not null,
+    nature_of_dispute text not null check (nature_of_dispute in (
+        'rental_dispute', 'property_law', 'civil_litigation', 'contract_law', 
+        'consumer_dispute', 'deposit_dispute', 'eviction_defense', 'other'
+    )),
+    property_location text not null,
+    security_deposit_amount numeric(12,2) default 0,
+    rent_amount numeric(12,2) default 0,
+    description text not null,
+    status text default 'new' check (
+        status in ('new', 'under_review', 'awaiting_client_info', 'in_progress', 'resolved', 'closed')
+    ),
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 13. CASE DOCUMENTS TABLE
+create table if not exists public.case_documents (
+    id uuid primary key default uuid_generate_v4(),
+    case_id uuid references public.cases(id) on delete cascade not null,
+    advocate_id uuid references public.profiles(id) on delete cascade not null,
+    document_name text not null,
+    document_type text not null check (document_type in (
+        'rental_agreement', 'landlord_notice', 'supporting_evidence', 'rebuttal_draft', 'legal_notice', 'other'
+    )),
+    file_size_bytes integer default 0,
+    mime_type text default 'application/pdf',
+    storage_path text not null,
+    uploaded_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 14. CASE NOTES TABLE (Private advocate work-product)
+create table if not exists public.case_notes (
+    id uuid primary key default uuid_generate_v4(),
+    case_id uuid references public.cases(id) on delete cascade not null,
+    advocate_id uuid references public.profiles(id) on delete cascade not null,
+    note_content text not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 15. APPOINTMENTS TABLE
+create table if not exists public.appointments (
+    id uuid primary key default uuid_generate_v4(),
+    advocate_id uuid references public.profiles(id) on delete cascade not null,
+    client_id uuid references public.clients(id) on delete set null,
+    case_id uuid references public.cases(id) on delete set null,
+    scheduled_at timestamp with time zone not null,
+    duration_minutes integer default 30 not null,
+    meeting_type text default 'office_consultation' check (meeting_type in ('office_consultation', 'phone_call', 'video_conference')),
+    meeting_notes text,
+    status text default 'scheduled' check (status in ('scheduled', 'completed', 'cancelled', 'rescheduled')),
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 16. AUDITS TABLE (Linked to Advocate Workspace)
+create table if not exists public.audits (
+    id uuid primary key default uuid_generate_v4(),
+    advocate_id uuid references public.profiles(id) on delete cascade not null,
+    case_id uuid references public.cases(id) on delete set null,
+    document_name text not null,
+    risk_score integer default 0,
+    concern_level text,
+    clauses_data jsonb not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 17. REBUTTALS TABLE (Linked to Advocate Workspace)
+create table if not exists public.rebuttals (
+    id uuid primary key default uuid_generate_v4(),
+    advocate_id uuid references public.profiles(id) on delete cascade not null,
+    case_id uuid references public.cases(id) on delete set null,
+    dispute_category text not null,
+    landlord_message text not null,
+    client_explanation text,
+    draft_rebuttal text not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- ------------------------------------------------------------------------------
+-- ROW LEVEL SECURITY (RLS) POLICIES FOR ADVOCATE TABLES
+-- ------------------------------------------------------------------------------
+
+alter table public.advocate_profiles enable row level security;
+alter table public.advocate_verifications enable row level security;
+alter table public.clients enable row level security;
+alter table public.cases enable row level security;
+alter table public.case_documents enable row level security;
+alter table public.case_notes enable row level security;
+alter table public.appointments enable row level security;
+alter table public.audits enable row level security;
+alter table public.rebuttals enable row level security;
+
+-- Advocate Profiles: Public can view verified advocates; advocates can edit their own
+create policy "Public can view verified advocate profiles"
+    on public.advocate_profiles for select
+    using (verification_status = 'verified');
+
+create policy "Advocates can view their own advocate profile"
+    on public.advocate_profiles for select
+    using (auth.uid() = user_id);
+
+create policy "Advocates can update their own advocate profile"
+    on public.advocate_profiles for update
+    using (auth.uid() = user_id);
+
+-- Clients: Advocates can manage ONLY their own clients
+create policy "Advocates manage their own clients"
+    on public.clients for all
+    using (auth.uid() = advocate_id);
+
+-- Cases: Advocates can manage ONLY their own cases
+create policy "Advocates manage their own cases"
+    on public.cases for all
+    using (auth.uid() = advocate_id);
+
+-- Case Documents: Strictly confidential to the assigned advocate
+create policy "Advocates manage their own case documents"
+    on public.case_documents for all
+    using (auth.uid() = advocate_id);
+
+-- Case Notes: Strictly confidential work-product
+create policy "Advocates manage their own case notes"
+    on public.case_notes for all
+    using (auth.uid() = advocate_id);
+
+-- Appointments: Strictly scoped to the advocate
+create policy "Advocates manage their own appointments"
+    on public.appointments for all
+    using (auth.uid() = advocate_id);
+
+-- Audits: Scoped to the advocate
+create policy "Advocates manage their own audits"
+    on public.audits for all
+    using (auth.uid() = advocate_id);
+
+-- Rebuttals: Scoped to the advocate
+create policy "Advocates manage their own rebuttals"
+    on public.rebuttals for all
+    using (auth.uid() = advocate_id);
