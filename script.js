@@ -1321,15 +1321,26 @@ async function initComplaintsPortal() {
 
   // Listen for hash changes to #complaints-board
   window.addEventListener('hashchange', () => {
+    const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+    const isTenant = user && user.role === 'tenant';
     if (window.location.hash === '#complaints-board') {
-      switchPortalTab('board');
+      if (isTenant) {
+        switchPortalTab('file');
+      } else {
+        switchPortalTab('board');
+      }
     } else if (window.location.hash === '#complaint-generator') {
       switchPortalTab('file');
     }
   });
 
   if (window.location.hash === '#complaints-board') {
-    switchPortalTab('board');
+    const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+    if (user && user.role === 'tenant') {
+      switchPortalTab('file');
+    } else {
+      switchPortalTab('board');
+    }
   }
 
   // 2. Variety Filter Chips (Pills)
@@ -1984,7 +1995,8 @@ function updateNavUserState() {
   if (tenantCont) tenantCont.style.display = 'block';
 
   const authNavBtn = $('authNavBtn');
-  const guestAuthGroup = $('guestAuthGroup');
+  const navAuthGroup = $('navAuthGroup') || $('guestAuthGroup');
+  const navSignInBtn = $('navSignInBtn');
   const userMenuWrapper = $('userMenuWrapper');
   const navUserName = $('navUserName');
   const navUserRole = $('navUserRole');
@@ -1995,9 +2007,26 @@ function updateNavUserState() {
   const dropdownUserStatus = $('dropdownUserStatus');
   const navDashboardLink = $('navDashboardLink');
 
+  // Tenant-specific Free Lawyer Board visibility: hide for tenants
+  const isTenant = user && user.role === 'tenant';
+  const navFreeLawyerBoard = $('navFreeLawyerBoard') || document.querySelector('#mainNav a[href="#complaints-board"]');
+  const dropdownFreeLawyerBoard = $('dropdownFreeLawyerBoard') || document.querySelector('#userDropdown a[href="#complaints-board"]');
+  const tabBtnLawyerBoard = $('tabBtnLawyerBoard');
+
+  if (isTenant) {
+    if (navFreeLawyerBoard) navFreeLawyerBoard.style.display = 'none';
+    if (dropdownFreeLawyerBoard) dropdownFreeLawyerBoard.style.display = 'none';
+    if (tabBtnLawyerBoard) tabBtnLawyerBoard.style.display = 'none';
+  } else {
+    if (navFreeLawyerBoard) navFreeLawyerBoard.style.display = '';
+    if (dropdownFreeLawyerBoard) dropdownFreeLawyerBoard.style.display = '';
+    if (tabBtnLawyerBoard) tabBtnLawyerBoard.style.display = '';
+  }
+
   if (user) {
-    if (guestAuthGroup) guestAuthGroup.style.display = 'none';
+    if (navAuthGroup) navAuthGroup.style.display = 'none';
     if (authNavBtn) authNavBtn.style.display = 'none';
+    if (navSignInBtn) navSignInBtn.style.display = 'none';
     if (userMenuWrapper) userMenuWrapper.style.display = 'inline-flex';
     if (navUserName) navUserName.textContent = user.full_name || 'My Account';
     if (navUserAvatar && user.avatar_url) navUserAvatar.src = user.avatar_url;
@@ -2022,8 +2051,9 @@ function updateNavUserState() {
     if (user.role === 'tenant') loadTenantDashboard();
     else if (user.role === 'admin') loadAdminDashboard();
   } else {
-    if (guestAuthGroup) guestAuthGroup.style.display = 'inline-flex';
-    if (authNavBtn) authNavBtn.style.display = 'none';
+    if (navAuthGroup) navAuthGroup.style.display = 'inline-flex';
+    if (authNavBtn) authNavBtn.style.display = 'inline-block';
+    if (navSignInBtn) navSignInBtn.style.display = 'inline-block';
     if (userMenuWrapper) userMenuWrapper.style.display = 'none';
     hideAllDashboards();
   }
@@ -2080,6 +2110,12 @@ function handleHashNavigation() {
   const advShell = $('advocateAppShell');
   if (advShell) advShell.style.display = 'none';
   if (tenantCont) tenantCont.style.display = 'block';
+
+  // If a tenant tries to access the lawyer complaints board, smoothly redirect to complaint generator
+  if (hash === '#complaints-board' && user && user.role === 'tenant') {
+    window.location.hash = '#complaint-generator';
+    return;
+  }
 
   hideAllDashboards();
 
