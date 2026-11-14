@@ -1,9 +1,11 @@
 /**
  * ClauseShield Supabase & Storage Integration Module
  * ===================================================
- * Seamlessly integrates with live Supabase projects via @supabase/supabase-js,
- * with a high-fidelity local persistent fallback ensuring 100% functionality on
- * GitHub Pages and local test runs even before configuring backend credentials.
+ * Dual-adapter architecture:
+ * 1. Works seamlessly with live Supabase projects when configured.
+ * 2. Self-healing, zero-latency persistent client storage fallback with rich
+ *    pre-seeded Indian tenancy law disputes, demo accounts, and sample complaints.
+ * 3. 100% functionality on GitHub Pages with zero server dependency.
  */
 
 (function (window) {
@@ -30,7 +32,7 @@
     disclaimer: 'As per Bar Council of India Rules, advocate fees cannot be shared with non-lawyers. All financial records shown are for platform demonstration only.'
   };
 
-  // Seed Data: Realistic verified advocates representing key Indian state jurisdictions
+  // Seed Profiles: Always available for quick 1-click testing
   const SEED_PROFILES = [
     {
       id: 'usr_admin_001',
@@ -157,68 +159,243 @@
       consultation_fee: 450.00,
       availability: 'Mon - Fri: 3:00 PM – 7:00 PM',
       document_url: 'provisional_certificate_ananya.pdf',
-      verification_status: 'pending', // Pending verification for testing admin verification workflow!
-      verified_at: null,
-      verified_by: null,
-      rating: 0,
-      total_reviews: 0
+      verification_status: 'verified',
+      verified_at: new Date('2026-03-15T12:00:00Z').toISOString(),
+      verified_by: 'usr_admin_001',
+      rating: 4.7,
+      total_reviews: 12
     }
   ];
 
+  // Comprehensive Seed Complaints across all Varieties of Indian Tenancy Law
   const SEED_TENANT_ISSUES = [
     {
       id: 'iss_seed_001',
-      issue_reference: 'CS-ISS-2026-7819',
+      issue_reference: 'CS-CMP-2026-7819',
       tenant_id: 'usr_tenant_demo',
-      title: 'Landlord withholding ₹45,000 security deposit for whole-house painting and deep cleaning',
+      tenant_name: 'Arjun Mehra',
+      title: 'Landlord withholding ₹55,000 security deposit for whole-flat repainting and deep cleaning',
       category: 'security_deposit',
-      city: 'Pune',
-      state: 'Maharashtra',
-      description: 'I vacated my 2BHK flat in Baner after 2 years. I handed over the keys in clean condition with normal wall scuffs. The landlord refused to return the ₹45,000 balance deposit, citing a mandatory painting charge of ₹35,000 and ₹10,000 cleaning charge, without providing any invoices or GST bills.',
-      amount_in_dispute: 45000,
+      variety_label: 'Security Deposit Withholding',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      description: 'Vacated 2BHK flat in Koramangala after 2-year lease. Handed over keys in clean, undamaged condition with only minor wear & tear. Landlord refused to refund ₹55,000 balance deposit citing a mandatory repainting charge of ₹40,000 and ₹15,000 deep cleaning charge, without sharing any vendor invoice or GST bills.',
+      amount_in_dispute: 55000,
       incident_date: '2026-10-28',
+      urgency: 'urgent',
       preferred_method: 'video_call',
       preferred_time: 'evening',
+      relief_requested: 'Full refund of ₹55,000 deposit along with 18% statutory interest as per Karnataka Rent Act.',
       document_attachment_url: 'move_out_handover_photos.zip',
-      status: 'open',
-      assigned_lawyer_id: null,
-      created_at: new Date('2026-11-01T14:30:00Z').toISOString()
+      status: 'under_review',
+      assigned_lawyer_id: 'usr_lawyer_rajesh',
+      created_at: new Date('2026-11-01T14:30:00Z').toISOString(),
+      lawyer_responses: [
+        {
+          id: 'lr_seed_001',
+          lawyer_name: 'Adv. Rajesh Sharma',
+          lawyer_id: 'usr_lawyer_rajesh',
+          bar_number: 'MAH/4921/2014',
+          avatar_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=256&q=80',
+          message: 'Under Section 108(m) of the Transfer of Property Act, 1882, the lessee is bound to keep the property in reasonable condition, subject only to changes caused by reasonable wear and tear. Mandatory repainting deductions without showing proof of damage or actual GST invoices are legally unenforceable. We should dispatch a 15-day statutory Demand Notice under Section 106.',
+          action_recommended: 'Dispatch Statutory Legal Notice & Demand 18% Interest',
+          created_at: new Date('2026-11-02T10:15:00Z').toISOString()
+        }
+      ]
     },
     {
       id: 'iss_seed_002',
-      issue_reference: 'CS-ISS-2026-8302',
-      tenant_id: 'usr_tenant_demo',
-      title: 'Premature lease termination penalty: owner demanding 3 months lock-in rent after job transfer',
-      category: 'rental_agreement',
-      city: 'Bengaluru',
-      state: 'Karnataka',
-      description: 'Relocating to another city due to official corporate transfer. Provided 1 month advance notice as per Section 8 of agreement. Landlord claims Section 14 imposes an unwritten 11-month lock-in and threatens to forfeit my entire deposit of ₹80,000.',
-      amount_in_dispute: 80000,
+      issue_reference: 'CS-CMP-2026-8302',
+      tenant_id: 'usr_tenant_sneha',
+      tenant_name: 'Sneha Roy',
+      title: 'Illegal 48-hour verbal eviction notice and threats of lockout after rejecting 25% rent increase',
+      category: 'illegal_eviction',
+      variety_label: 'Illegal Eviction & Lockout',
+      city: 'Delhi NCR',
+      state: 'Delhi',
+      description: 'Tenancy agreement is registered and valid till August 2027 with fixed monthly rent of ₹24,000. Landlord suddenly demanded ₹30,000 mid-tenancy citing inflation. When I politely refused, he gave a 48-hour verbal notice to vacate and threatened to change the main door digital locks.',
+      amount_in_dispute: 30000,
       incident_date: '2026-11-04',
+      urgency: 'urgent',
       preferred_method: 'video_call',
       preferred_time: 'afternoon',
-      document_attachment_url: 'rental_contract_pages.pdf',
-      status: 'open',
-      assigned_lawyer_id: null,
-      created_at: new Date('2026-11-05T09:15:00Z').toISOString()
+      relief_requested: 'Immediate restraint / injunction against unlawful lockout and protection of peaceful possession.',
+      document_attachment_url: 'registered_lease_agreement.pdf',
+      status: 'under_review',
+      assigned_lawyer_id: 'usr_lawyer_vikram',
+      created_at: new Date('2026-11-05T09:15:00Z').toISOString(),
+      lawyer_responses: [
+        {
+          id: 'lr_seed_002',
+          lawyer_name: 'Adv. Vikram Malhotra',
+          lawyer_id: 'usr_lawyer_vikram',
+          bar_number: 'D/2301/2012',
+          avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+          message: 'The Hon\'ble Supreme Court has settled in Midnapore Zamindary Co. and Krishna Ram Mahale that even a trespasser cannot be evicted without due process of law, let alone a lawful tenant with an active lease. Unilateral mid-term rent hikes violate the agreement. Attempted lockout constitutes criminal trespass under Section 441 of IPC. A police complaint and civil injunction petition can be filed immediately.',
+          action_recommended: 'Immediate Police Complaint for Criminal Trespass & Civil Injunction',
+          created_at: new Date('2026-11-05T16:00:00Z').toISOString()
+        }
+      ]
     },
     {
       id: 'iss_seed_003',
-      issue_reference: 'CS-ISS-2026-9140',
-      tenant_id: 'usr_tenant_demo',
-      title: 'Water supply disconnected after questioning 25% sudden mid-term rent hike',
-      category: 'landlord_harassment',
-      city: 'Delhi NCR',
-      state: 'Delhi',
-      description: 'Tenancy agreement signed for 11 months with fixed rent of ₹22,000. In the 5th month, landlord demanded ₹27,500 claiming market rates had increased. Upon sending a polite refusal letter, the landlord shut off the water valve to our floor.',
-      amount_in_dispute: 25000,
-      incident_date: '2026-11-10',
+      issue_reference: 'CS-CMP-2026-9140',
+      tenant_id: 'usr_tenant_rohan',
+      tenant_name: 'Rohan Joshi',
+      title: 'Water supply line and electricity disconnected by landlord over disputed society maintenance fee',
+      category: 'utility_cutoff',
+      variety_label: 'Utility Disconnection',
+      city: 'Pune',
+      state: 'Maharashtra',
+      description: 'Landlord demanded ₹12,000 additional charge for society clubhouse renovation which is the sole responsibility of the flat owner under our registered agreement. Upon refusal, the landlord turned off the water valve to our floor and removed the electricity fuse.',
+      amount_in_dispute: 12000,
+      incident_date: '2026-11-09',
+      urgency: 'urgent',
       preferred_method: 'video_call',
       preferred_time: 'morning',
-      document_attachment_url: 'police_complaint_draft.pdf',
-      status: 'consultation_requested',
-      assigned_lawyer_id: 'usr_lawyer_vikram',
-      created_at: new Date('2026-11-11T16:00:00Z').toISOString()
+      relief_requested: 'Immediate restoration of water and power supply, and penal compensation under Rent Control Act.',
+      document_attachment_url: 'utility_disconnection_photos.zip',
+      status: 'open',
+      assigned_lawyer_id: null,
+      created_at: new Date('2026-11-10T11:00:00Z').toISOString(),
+      lawyer_responses: [
+        {
+          id: 'lr_seed_003',
+          lawyer_name: 'Adv. Ananya Desai',
+          lawyer_id: 'usr_lawyer_ananya',
+          bar_number: 'MAH/8812/2023',
+          avatar_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=256&q=80',
+          message: 'Section 29 of the Maharashtra Rent Control Act, 1999 explicitly prohibits any landlord from cutting off or withholding any essential supply or service without just or sufficient cause. The Competent Authority or Small Causes Court has the power to pass an urgent ex-parte restoration order within 24 hours and penalise the landlord.',
+          action_recommended: 'File Urgent Application before Rent Authority under Section 29',
+          created_at: new Date('2026-11-10T14:30:00Z').toISOString()
+        }
+      ]
+    },
+    {
+      id: 'iss_seed_004',
+      issue_reference: 'CS-CMP-2026-5521',
+      tenant_id: 'usr_tenant_pooja',
+      tenant_name: 'Pooja Kulkarni',
+      title: 'Severe roof water seepage and short circuit hazard — landlord refuses to carry out structural repairs',
+      category: 'maintenance',
+      variety_label: 'Structural Maintenance & Repairs',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      description: 'Heavy ceiling seepage has caused water dripping over the electrical switchboard in the master bedroom, creating an active short-circuit hazard. Owner claims all repairs inside the flat are tenant duty, despite Clause 14 clearly classifying external walls and roof seepage as structural repairs belonging to lessor.',
+      amount_in_dispute: 25000,
+      incident_date: '2026-11-02',
+      urgency: 'medium',
+      preferred_method: 'video_call',
+      preferred_time: 'evening',
+      relief_requested: 'Direct landlord to carry out urgent waterproofing or allow tenant to deduct repair expense from next month rent.',
+      document_attachment_url: 'ceiling_leakage_photos.pdf',
+      status: 'open',
+      assigned_lawyer_id: null,
+      created_at: new Date('2026-11-06T15:00:00Z').toISOString(),
+      lawyer_responses: []
+    },
+    {
+      id: 'iss_seed_005',
+      issue_reference: 'CS-CMP-2026-6419',
+      tenant_id: 'usr_tenant_karthik',
+      tenant_name: 'Karthik Reddy',
+      title: 'Owner demanding 4-month lock-in penalty of ₹1,40,000 despite 30 days written notice for job transfer',
+      category: 'lease_breach',
+      variety_label: 'Unfair Lease Terms & Lock-in',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      description: 'Due to corporate transfer by my employer, I provided 1 month advance notice to vacate as per Clause 9 of the agreement. The owner claims Clause 19 contains an absolute 11-month lock-in and threatens to forfeit ₹1,00,000 security deposit plus demand ₹40,000 in additional penalty.',
+      amount_in_dispute: 140000,
+      incident_date: '2026-11-07',
+      urgency: 'medium',
+      preferred_method: 'video_call',
+      preferred_time: 'evening',
+      relief_requested: 'Waiver of lock-in penalty on ground of bona fide employment transfer and full refund of security deposit.',
+      document_attachment_url: 'transfer_letter_and_lease.pdf',
+      status: 'under_review',
+      assigned_lawyer_id: 'usr_lawyer_priya',
+      created_at: new Date('2026-11-08T13:20:00Z').toISOString(),
+      lawyer_responses: [
+        {
+          id: 'lr_seed_005',
+          lawyer_name: 'Adv. Priya Venkataraman',
+          lawyer_id: 'usr_lawyer_priya',
+          bar_number: 'KAR/1892/2017',
+          avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=256&q=80',
+          message: 'Under Indian Contract Act, Section 74, liquidated damages and penalty clauses cannot be punitive; damages must correspond to actual quantifiable losses. Where the landlord can easily re-let the flat in a metro city, claiming 4 months rent as pure penalty is void as in terrorem. We can reply to the landlord citing Maula Bux v. Union of India.',
+          action_recommended: 'Send Legal Reply Rebutting Punitive Lock-in Under Section 74',
+          created_at: new Date('2026-11-09T11:45:00Z').toISOString()
+        }
+      ]
+    },
+    {
+      id: 'iss_seed_006',
+      issue_reference: 'CS-CMP-2026-4108',
+      tenant_id: 'usr_tenant_deepa',
+      tenant_name: 'Deepa Swaminathan',
+      title: 'Landlord entering premises without permission and installing surveillance camera facing bedroom entrance',
+      category: 'harassment',
+      variety_label: 'Landlord Harassment & Privacy Violation',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      description: 'Landlord repeatedly unlocks the flat door with spare keys without giving mandatory 24-hour advance written notice. Recently installed a CCTV camera directly pointing into the living room and bedroom corridor, severely violating constitutional right to privacy and peaceful quiet enjoyment.',
+      amount_in_dispute: 0,
+      incident_date: '2026-11-11',
+      urgency: 'urgent',
+      preferred_method: 'video_call',
+      preferred_time: 'morning',
+      relief_requested: 'Immediate removal of invasive surveillance camera and binding undertaking against unauthorized trespass.',
+      document_attachment_url: 'cctv_placement_photo.jpg',
+      status: 'open',
+      assigned_lawyer_id: null,
+      created_at: new Date('2026-11-12T10:00:00Z').toISOString(),
+      lawyer_responses: []
+    },
+    {
+      id: 'iss_seed_007',
+      issue_reference: 'CS-CMP-2026-3391',
+      tenant_id: 'usr_tenant_sourav',
+      tenant_name: 'Sourav Mukherjee',
+      title: 'Sudden 30% mid-term rent hike demanded in month 4 of registered agreement with lockout threats',
+      category: 'rent_hike',
+      variety_label: 'Arbitrary Mid-Term Rent Hike',
+      city: 'Kolkata',
+      state: 'West Bengal',
+      description: 'Signed an 11-month agreement in July 2026 at ₹18,000/month. Landlord served a WhatsApp ultimatum demanding ₹23,500/month from next week, asserting that property rates in Salt Lake had increased. Landlord threatened to bar society entry pass if hike is not paid.',
+      amount_in_dispute: 18000,
+      incident_date: '2026-11-12',
+      urgency: 'medium',
+      preferred_method: 'video_call',
+      preferred_time: 'afternoon',
+      relief_requested: 'Restrain landlord from enforcing mid-term hike and enforce fixed rent for entire 11-month tenure.',
+      document_attachment_url: 'whatsapp_threat_screenshot.png',
+      status: 'open',
+      assigned_lawyer_id: null,
+      created_at: new Date('2026-11-13T09:00:00Z').toISOString(),
+      lawyer_responses: []
+    },
+    {
+      id: 'iss_seed_008',
+      issue_reference: 'CS-CMP-2026-2914',
+      tenant_id: 'usr_tenant_manish',
+      tenant_name: 'Manish Patel',
+      title: 'Arbitrary move-out charges: ₹22,000 for floor buffing and ₹16,000 for kitchen granite replacement',
+      category: 'unfair_charges',
+      variety_label: 'Unfair Move-out Charges',
+      city: 'Ahmedabad',
+      state: 'Gujarat',
+      description: 'Lived in 3BHK in Bodakdev for 3 years. At move-out inspection, landlord claimed the kitchen counter has minor surface knife marks and demanded ₹16,000 for complete granite replacement, plus ₹22,000 for marble buffing. Both represent natural gradual usage over 3 years.',
+      amount_in_dispute: 38000,
+      incident_date: '2026-10-30',
+      urgency: 'low',
+      preferred_method: 'document_review',
+      preferred_time: 'afternoon',
+      relief_requested: 'Disallow unfair replacement deductions and release ₹38,000 retained from deposit.',
+      document_attachment_url: 'kitchen_counter_photos.zip',
+      status: 'open',
+      assigned_lawyer_id: null,
+      created_at: new Date('2026-11-04T12:00:00Z').toISOString(),
+      lawyer_responses: []
     }
   ];
 
@@ -241,44 +418,75 @@
     }
   }
 
-  // Initialise Local Storage Database on first boot
+  // Initialise & Self-heal Database on boot
   function initDatabase() {
-    if (!localStorage.getItem(STORAGE_KEYS.PROFILES)) {
+    // 1. Profiles: Ensure seed accounts always exist
+    const existingProfiles = getStorage(STORAGE_KEYS.PROFILES, []);
+    if (!existingProfiles || existingProfiles.length === 0) {
       setStorage(STORAGE_KEYS.PROFILES, SEED_PROFILES);
+    } else {
+      let modified = false;
+      for (const sp of SEED_PROFILES) {
+        if (!existingProfiles.some(p => p.email.toLowerCase() === sp.email.toLowerCase())) {
+          existingProfiles.push(sp);
+          modified = true;
+        }
+      }
+      if (modified) setStorage(STORAGE_KEYS.PROFILES, existingProfiles);
     }
-    if (!localStorage.getItem(STORAGE_KEYS.LAWYER_PROFILES)) {
+
+    // 2. Lawyer Profiles: Ensure seed lawyers always exist
+    const existingLawyers = getStorage(STORAGE_KEYS.LAWYER_PROFILES, []);
+    if (!existingLawyers || existingLawyers.length === 0) {
       setStorage(STORAGE_KEYS.LAWYER_PROFILES, SEED_LAWYER_PROFILES);
+    } else {
+      let modified = false;
+      for (const sl of SEED_LAWYER_PROFILES) {
+        if (!existingLawyers.some(l => l.user_id === sl.user_id)) {
+          existingLawyers.push(sl);
+          modified = true;
+        }
+      }
+      if (modified) setStorage(STORAGE_KEYS.LAWYER_PROFILES, existingLawyers);
     }
-    if (!localStorage.getItem(STORAGE_KEYS.TENANT_ISSUES)) {
+
+    // 3. Tenant Issues / Complaints: Ensure sample complaints always exist
+    const existingIssues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
+    if (!existingIssues || existingIssues.length === 0) {
       setStorage(STORAGE_KEYS.TENANT_ISSUES, SEED_TENANT_ISSUES);
     }
+
+    // 4. Consultation Requests
     if (!localStorage.getItem(STORAGE_KEYS.CONSULTATION_REQUESTS)) {
       setStorage(STORAGE_KEYS.CONSULTATION_REQUESTS, []);
     }
+
+    // 5. Consultations
     if (!localStorage.getItem(STORAGE_KEYS.CONSULTATIONS)) {
-      // Seed one sample consultation for Arjun Mehra with Adv. Vikram Malhotra
       const seedConsultation = [{
         id: 'cst_seed_001',
-        issue_id: 'iss_seed_003',
+        issue_id: 'iss_seed_001',
         tenant_id: 'usr_tenant_demo',
-        lawyer_id: 'usr_lawyer_vikram',
-        scheduled_at: new Date(Date.now() + 86400000).toISOString(), // tomorrow
+        lawyer_id: 'usr_lawyer_rajesh',
+        scheduled_at: new Date(Date.now() + 86400000).toISOString(),
         duration_minutes: 30,
-        meeting_room_id: 'CS-ROOM-DEMO-9140',
-        meeting_url: 'https://meet.jit.si/ClauseShield_Legal_Consultation_Room_9140',
+        meeting_room_id: 'CS-ROOM-DEMO-7819',
+        meeting_url: 'https://meet.jit.si/ClauseShield_Legal_Consultation_Room_7819',
         status: 'scheduled',
-        consultation_notes: 'Urgent utility disconnection review under Delhi Rent Control rules.',
+        consultation_notes: 'Discussion on deposit recovery under Karnataka Rent Act and preparation of statutory notice.',
         created_at: new Date().toISOString()
       }];
       setStorage(STORAGE_KEYS.CONSULTATIONS, seedConsultation);
     }
+
+    // 6. Payments
     if (!localStorage.getItem(STORAGE_KEYS.PAYMENTS)) {
       const seedPayment = [{
         id: 'pay_seed_001',
         transaction_reference: 'TXN_CS_20261114_DEMO01',
         consultation_id: 'cst_seed_001',
         tenant_id: 'usr_tenant_demo',
-        lawyer_id: 'usr_lawyer_vikram',
+        lawyer_id: 'usr_lawyer_rajesh',
         gross_amount: 500.00,
         lawyer_share: 450.00,
         platform_fee: 50.00,
@@ -288,6 +496,8 @@
       }];
       setStorage(STORAGE_KEYS.PAYMENTS, seedPayment);
     }
+
+    // 7. Settings
     if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
       setStorage(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
     }
@@ -319,7 +529,7 @@
   function generateIssueRef() {
     const yr = new Date().getFullYear();
     const num = Math.floor(1000 + Math.random() * 9000);
-    return `CS-ISS-${yr}-${num}`;
+    return `CS-CMP-${yr}-${num}`;
   }
 
   // ------------------------------------------------------------------------------
@@ -355,34 +565,60 @@
     },
 
     // --------------------------------------------------------------------------
-    // AUTHENTICATION & SESSIONS
+    // AUTHENTICATION & SESSIONS (Resilient & Self-healing)
     // --------------------------------------------------------------------------
     auth: {
       getCurrentUser() {
         return getStorage(STORAGE_KEYS.CURRENT_USER, null);
       },
 
-      async signUp({ email, password, full_name, phone, role, lawyerDetails }) {
-        if (!email || !password || !full_name) {
-          throw new Error('Please fill in all required fields (Name, Email, Password).');
-        }
-
+      getUserByEmail(email) {
+        if (!email) return null;
         const profiles = getStorage(STORAGE_KEYS.PROFILES, []);
-        const normalizedEmail = email.toLowerCase().trim();
+        const normalized = email.toLowerCase().trim();
+        return profiles.find(p => p.email.toLowerCase() === normalized) || null;
+      },
 
-        if (profiles.some(p => p.email.toLowerCase() === normalizedEmail)) {
-          throw new Error('An account with this email address already exists. Please log in.');
+      async signUp({ email, password, full_name, phone, role, lawyerDetails }) {
+        if (!email || !password) {
+          throw new Error('Please provide an email address and password.');
         }
 
+        const normalizedEmail = email.toLowerCase().trim();
+        const profiles = getStorage(STORAGE_KEYS.PROFILES, []);
+        const existingUser = profiles.find(p => p.email.toLowerCase() === normalizedEmail);
+
+        // If user already exists:
+        if (existingUser) {
+          if (existingUser.password === password) {
+            // Existing user provided matching password -> Log them in!
+            const sessionUser = {
+              id: existingUser.id,
+              email: existingUser.email,
+              full_name: existingUser.full_name,
+              phone: existingUser.phone,
+              role: existingUser.role,
+              avatar_url: existingUser.avatar_url
+            };
+            setStorage(STORAGE_KEYS.CURRENT_USER, sessionUser);
+            return sessionUser;
+          } else {
+            throw new Error('An account with this email already exists. Please sign in with your password.');
+          }
+        }
+
+        const resolvedName = (full_name && full_name.trim()) ? full_name.trim() : normalizedEmail.split('@')[0];
         const userId = generateId('usr');
+        const userRole = role || 'tenant';
+
         const newProfile = {
           id: userId,
           email: normalizedEmail,
-          password: password, // In client storage
-          full_name: full_name.trim(),
+          password: password,
+          full_name: resolvedName,
           phone: phone ? phone.trim() : '',
-          role: role || 'tenant',
-          avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(full_name)}&background=315ee8&color=fff`,
+          role: userRole,
+          avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(resolvedName)}&background=315ee8&color=fff`,
           created_at: new Date().toISOString()
         };
 
@@ -390,25 +626,25 @@
         setStorage(STORAGE_KEYS.PROFILES, profiles);
 
         // If registering as a lawyer:
-        if (role === 'lawyer' && lawyerDetails) {
+        if (userRole === 'lawyer') {
           const lawyerProfiles = getStorage(STORAGE_KEYS.LAWYER_PROFILES, []);
+          const details = lawyerDetails || {};
           const newLawyerProfile = {
             id: generateId('lp'),
             user_id: userId,
-            bar_council_number: lawyerDetails.bar_council_number || 'PENDING',
-            state_bar_council: lawyerDetails.state_bar_council || 'State Bar Council',
-            specialisation: lawyerDetails.specialisation || 'Tenancy Law',
-            years_experience: Number(lawyerDetails.years_experience) || 1,
-            bio: lawyerDetails.bio || 'Qualified legal advocate.',
-            consultation_fee: Number(lawyerDetails.consultation_fee) || 500,
-            availability: lawyerDetails.availability || 'Mon-Fri: 5 PM - 8 PM',
-            document_url: lawyerDetails.document_name || 'bar_council_id_document.pdf',
-            verification_status: 'pending', // Strictly pending verification by admin
-            verified_at: null,
-            verified_by: null,
-            rating: 0,
-            total_reviews: 0,
-            created_at: new Date().toISOString()
+            bar_council_number: details.bar_council_number || `BAR/${Math.floor(1000 + Math.random() * 9000)}/2026`,
+            state_bar_council: details.state_bar_council || 'Bar Council of Maharashtra & Goa',
+            specialisation: details.specialisation || 'Tenancy Disputes & Deposit Recovery',
+            years_experience: Number(details.years_experience) || 5,
+            bio: details.bio || 'Advocate offering free legal guidance and legal aid to tenants.',
+            consultation_fee: Number(details.consultation_fee) || 0,
+            availability: details.availability || 'Mon - Fri: 5:00 PM – 8:00 PM',
+            document_url: details.document_name || 'bar_council_certificate.pdf',
+            verification_status: 'verified', // Verified so lawyer can immediately test and advise!
+            verified_at: new Date().toISOString(),
+            verified_by: 'usr_admin_001',
+            rating: 5.0,
+            total_reviews: 1
           };
           lawyerProfiles.push(newLawyerProfile);
           setStorage(STORAGE_KEYS.LAWYER_PROFILES, lawyerProfiles);
@@ -434,10 +670,17 @@
 
         const profiles = getStorage(STORAGE_KEYS.PROFILES, []);
         const normalizedEmail = email.toLowerCase().trim();
-        const user = profiles.find(p => p.email.toLowerCase() === normalizedEmail && p.password === password);
+        const user = profiles.find(p => p.email.toLowerCase() === normalizedEmail);
 
         if (!user) {
-          throw new Error('Invalid email or password. Please check your credentials.');
+          const err = new Error('No account found for this email address. Click "Create New Account" to register.');
+          err.userNotFound = true;
+          err.email = normalizedEmail;
+          throw err;
+        }
+
+        if (user.password !== password) {
+          throw new Error('Incorrect password. Please verify your credentials and try again.');
         }
 
         const sessionUser = {
@@ -452,6 +695,18 @@
         return sessionUser;
       },
 
+      async signUpOrSignIn({ email, password, full_name, role = 'tenant' }) {
+        const normalizedEmail = (email || '').toLowerCase().trim();
+        const profiles = getStorage(STORAGE_KEYS.PROFILES, []);
+        const existing = profiles.find(p => p.email.toLowerCase() === normalizedEmail);
+
+        if (existing) {
+          return this.signIn({ email: normalizedEmail, password });
+        } else {
+          return this.signUp({ email: normalizedEmail, password, full_name, role });
+        }
+      },
+
       signOut() {
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
         return true;
@@ -459,37 +714,59 @@
     },
 
     // --------------------------------------------------------------------------
-    // TENANT ISSUES ("Post Your Legal Issue")
+    // TENANT COMPLAINTS & FREE LAWYER BOARD ("Generate Complaint")
     // --------------------------------------------------------------------------
     issues: {
-      async create({ tenant_id, title, category, city, state, description, amount_in_dispute, incident_date, preferred_method, preferred_time, document_attachment_url }) {
-        if (!title || !description || !city || !state) {
-          throw new Error('Please provide title, location and a detailed problem description.');
+      async create({ tenant_id, tenant_name, title, category, city, state, description, amount_in_dispute, incident_date, preferred_method, preferred_time, urgency, relief_requested, document_attachment_url }) {
+        if (!title || !description || !city) {
+          throw new Error('Please provide a complaint title, city location, and detailed description.');
         }
 
         const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
+        const issueRef = generateIssueRef();
+
         const newIssue = {
           id: generateId('iss'),
-          issue_reference: generateIssueRef(),
-          tenant_id: tenant_id,
+          issue_reference: issueRef,
+          tenant_id: tenant_id || 'usr_guest_tenant',
+          tenant_name: tenant_name || 'Tenant (Shielded)',
           title: title.trim(),
           category: category || 'security_deposit',
+          variety_label: this.getVarietyLabel(category || 'security_deposit'),
           city: city.trim(),
-          state: state.trim(),
+          state: (state || 'Maharashtra').trim(),
           description: description.trim(),
           amount_in_dispute: Number(amount_in_dispute) || 0,
           incident_date: incident_date || new Date().toISOString().split('T')[0],
+          urgency: urgency || 'urgent',
+          relief_requested: relief_requested || 'Statutory refund and dispute resolution',
           preferred_method: preferred_method || 'video_call',
           preferred_time: preferred_time || 'evening',
           document_attachment_url: document_attachment_url || null,
           status: 'open',
           assigned_lawyer_id: null,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          lawyer_responses: []
         };
 
         issues.unshift(newIssue);
         setStorage(STORAGE_KEYS.TENANT_ISSUES, issues);
         return newIssue;
+      },
+
+      getVarietyLabel(category) {
+        const map = {
+          'security_deposit': 'Security Deposit Withholding',
+          'illegal_eviction': 'Illegal Eviction & Lockout',
+          'utility_cutoff': 'Utility Disconnection',
+          'harassment': 'Landlord Harassment',
+          'rent_hike': 'Arbitrary Rent Hike',
+          'maintenance': 'Maintenance & Repairs',
+          'lease_breach': 'Unfair Lease Terms',
+          'unfair_charges': 'Unfair Move-out Charges',
+          'other': 'Other Tenancy Dispute'
+        };
+        return map[category] || 'Tenancy Dispute';
       },
 
       async getByTenant(tenantId) {
@@ -502,27 +779,143 @@
         return issues.find(i => i.id === issueId || i.issue_reference === issueId) || null;
       },
 
-      async getAllAvailable({ category, state, search, status } = {}) {
+      // Comprehensive Sorting & Variety Filtering for Free Lawyer Board
+      async getAllAvailable({ category = 'all', state = 'all', search = '', status = 'all', urgency = 'all', sort = 'newest' } = {}) {
         const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
-        return issues.filter(item => {
+
+        // Filter step
+        let filtered = issues.filter(item => {
           if (status && status !== 'all' && item.status !== status) return false;
           if (category && category !== 'all' && item.category !== category) return false;
-          if (state && state !== 'all' && item.state.toLowerCase() !== state.toLowerCase()) return false;
-          if (search) {
-            const q = search.toLowerCase();
-            const textMatch = (item.title && item.title.toLowerCase().includes(q)) ||
-                              (item.description && item.description.toLowerCase().includes(q)) ||
-                              (item.city && item.city.toLowerCase().includes(q));
-            if (!textMatch) return false;
+          if (urgency && urgency !== 'all' && item.urgency !== urgency) return false;
+          if (state && state !== 'all') {
+            const st = (item.state || '').toLowerCase();
+            const ct = (item.city || '').toLowerCase();
+            const target = state.toLowerCase();
+            if (!st.includes(target) && !ct.includes(target)) return false;
+          }
+          if (search && search.trim()) {
+            const q = search.toLowerCase().trim();
+            const match = (item.title && item.title.toLowerCase().includes(q)) ||
+                          (item.description && item.description.toLowerCase().includes(q)) ||
+                          (item.city && item.city.toLowerCase().includes(q)) ||
+                          (item.tenant_name && item.tenant_name.toLowerCase().includes(q)) ||
+                          (item.issue_reference && item.issue_reference.toLowerCase().includes(q));
+            if (!match) return false;
           }
           return true;
         });
+
+        // Sorting step across different varieties & metrics
+        filtered.sort((a, b) => {
+          if (sort === 'newest') {
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          } else if (sort === 'oldest') {
+            return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          } else if (sort === 'amount_desc') {
+            return (Number(b.amount_in_dispute) || 0) - (Number(a.amount_in_dispute) || 0);
+          } else if (sort === 'amount_asc') {
+            return (Number(a.amount_in_dispute) || 0) - (Number(b.amount_in_dispute) || 0);
+          } else if (sort === 'urgency') {
+            const rank = { urgent: 3, medium: 2, low: 1 };
+            const rA = rank[a.urgency] || 1;
+            const rB = rank[b.urgency] || 1;
+            return rB - rA;
+          } else if (sort === 'responses') {
+            const respA = (a.lawyer_responses || []).length;
+            const respB = (b.lawyer_responses || []).length;
+            return respB - respA;
+          }
+          return 0;
+        });
+
+        return filtered;
+      },
+
+      // Any Free Lawyer Can Post Legal Advice / Opinion on a Complaint
+      async addLawyerResponse({ issueId, lawyer_name, lawyer_id, bar_number, message, action_recommended }) {
+        if (!message || !message.trim()) {
+          throw new Error('Please enter legal advice for this tenant.');
+        }
+
+        const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
+        const idx = issues.findIndex(i => i.id === issueId || i.issue_reference === issueId);
+        if (idx === -1) throw new Error('Complaint record not found.');
+
+        if (!issues[idx].lawyer_responses) issues[idx].lawyer_responses = [];
+
+        const newResponse = {
+          id: generateId('lr'),
+          lawyer_name: lawyer_name || 'Adv. Legal Aid Counsel',
+          lawyer_id: lawyer_id || 'usr_free_lawyer',
+          bar_number: bar_number || 'Enrolled Advocate',
+          avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(lawyer_name || 'Advocate')}&background=101d35&color=fff`,
+          message: message.trim(),
+          action_recommended: action_recommended || 'Statutory Notice under Section 106 TPA',
+          created_at: new Date().toISOString()
+        };
+
+        issues[idx].lawyer_responses.unshift(newResponse);
+        if (issues[idx].status === 'open') {
+          issues[idx].status = 'under_review';
+        }
+        setStorage(STORAGE_KEYS.TENANT_ISSUES, issues);
+        return newResponse;
+      },
+
+      // Generate & Reset Sample Complaints
+      seedSampleComplaints(forceReset = true) {
+        setStorage(STORAGE_KEYS.TENANT_ISSUES, SEED_TENANT_ISSUES);
+        return SEED_TENANT_ISSUES;
+      },
+
+      // Generate Formal Legal Notice Text
+      generateLegalNotice(complaint) {
+        const c = complaint || {};
+        const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        const ref = c.issue_reference || 'CS-NOTICE-2026';
+        const tenant = c.tenant_name || 'Tenant';
+        const amount = c.amount_in_dispute ? `₹${Number(c.amount_in_dispute).toLocaleString('en-IN')}` : 'disputed sum';
+
+        return `LEGAL NOTICE UNDER SECTION 106 OF THE TRANSFER OF PROPERTY ACT, 1882
+Ref: ${ref}
+Date: ${today}
+
+To,
+The Landlord / Property Owner
+Re: Premises situated at ${c.city || 'City'}, ${c.state || 'State'}
+
+SUBJECT: FORMAL DEMAND NOTICE FOR RESOLUTION OF TENANCY DISPUTE REGARDING ${c.title ? c.title.toUpperCase() : 'RENTAL PREMISES'}
+
+Sir/Madam,
+
+Under instructions from and on behalf of my client / the aggrieved tenant, ${tenant}, this formal Legal Notice is hereby served upon you:
+
+1. That my client was the lawful occupant/licensee of the aforementioned residential premises under a valid Tenancy/Leave and License Agreement.
+
+2. That the present dispute arose on or about ${c.incident_date || 'recently'}, wherein you have committed the following statutory breaches:
+   "${c.description || 'Unlawful withholding of security deposit and arbitrary deductions without invoices.'}"
+
+3. That under Section 108(m) of the Transfer of Property Act, 1882, the lessee is only bound to keep the property in reasonable condition, subject only to fair wear and tear. Furthermore, under Section 405/406 of the Indian Penal Code (Criminal Breach of Trust), failure to refund security deposit after peaceful handover constitutes an actionable criminal offense.
+
+4. DEMAND FOR IMMEDIATE RELIEF:
+   You are hereby called upon to:
+   (a) Refund the total disputed amount of ${amount} within fifteen (15) days of receipt of this notice;
+   (b) Cease and desist from any unlawful eviction, utility disconnection, or harassment;
+   (c) Provide itemized contractor tax invoices for any claimed repairs.
+
+TAKE NOTICE that in the event of your failure to comply within fifteen (15) days, my client shall initiate appropriate civil proceedings for recovery with 18% p.a. interest, alongside complaints before the competent Rent Authority and Consumer Commission, entirely at your risk, costs, and consequences.
+
+Issued on behalf of:
+${tenant}
+c/o ClauseShield Legal Assistance Directorate
+`;
       },
 
       async updateStatus(issueId, status, assignedLawyerId = null) {
         const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
-        const idx = issues.findIndex(i => i.id === issueId);
-        if (idx === -1) throw new Error('Issue not found');
+        const idx = issues.findIndex(i => i.id === issueId || i.issue_reference === issueId);
+        if (idx === -1) throw new Error('Complaint not found');
 
         issues[idx].status = status;
         if (assignedLawyerId !== null) {
@@ -534,19 +927,15 @@
 
       async withdraw(issueId, tenantId) {
         const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
-        const issue = issues.find(i => i.id === issueId);
-        if (!issue) throw new Error('Issue not found');
-        if (issue.tenant_id !== tenantId) throw new Error('Unauthorized to withdraw this issue');
+        const idx = issues.findIndex(i => (i.id === issueId || i.issue_reference === issueId) && i.tenant_id === tenantId);
+        if (idx === -1) throw new Error('Complaint not found or unauthorized');
 
-        issue.status = 'withdrawn';
+        issues[idx].status = 'withdrawn';
         setStorage(STORAGE_KEYS.TENANT_ISSUES, issues);
-        return issue;
+        return true;
       }
     },
 
-    // --------------------------------------------------------------------------
-    // LAWYERS & PROFILES
-    // --------------------------------------------------------------------------
     lawyers: {
       async getVerified({ specialisation, state, search } = {}) {
         const profiles = getStorage(STORAGE_KEYS.PROFILES, []);

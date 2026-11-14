@@ -27,11 +27,11 @@
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
     <nav id="mainNav">
       <a href="#home">Home</a>
-      <a href="#know-rights">Know Your Rights</a>
-      <a href="#audit">AI Legal Assistant</a>
       <a href="#complaint-generator">Generate Complaint</a>
+      <a href="#complaints-board">Free Lawyer Board</a>
+      <a href="#audit">AI Lease Audit</a>
+      <a href="#calculator">Dispute Calculator</a>
       <a href="#lawyers">Find a Lawyer</a>
-      <a href="#post-issue">Post an Issue</a>
       
       <!-- Guest Action: Login / Sign Up -->
       <button class="btn primary nav-cta" id="authNavBtn">Login / Sign Up</button>
@@ -45,6 +45,8 @@
         </div>
         <div class="user-dropdown" id="userDropdown">
           <a href="#tenant-dashboard" id="navDashboardLink">📋 Dashboard</a>
+          <a href="#complaint-generator">📝 Generate Complaint</a>
+          <a href="#complaints-board">⚖️ Free Lawyer Board</a>
           <a href="javascript:void(0)" id="navOpenSupabaseConfig">⚙️ Supabase Settings</a>
           <hr>
           <button type="button" class="logout-btn" id="logoutBtn">🚪 Log Out</button>
@@ -827,7 +829,7 @@
       </div>
 
       <!-- Legal Provisions Disclosure (Know Your Rights anchor) -->
-      <div class="panel legal-panel" id="know-rights">
+      <div class="panel legal-panel" id="audit-legal-provisions">
         <button class="disclosure" id="legalToggle" aria-expanded="true">
           <span class="disclosure-title">⚖️ Applicable Indian Legal Provisions &amp; Rights</span>
           <span class="disclosure-badge" id="legalCountBadge">2 Provisions</span>
@@ -843,43 +845,272 @@
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- Response Generator Section (Generate Complaint anchor) -->
-      <div class="section-heading left" id="complaint-generator">
-        <p class="eyebrow">STEP 3 · PREPARE A RESPONSE</p>
-        <h2>Make your next message clear</h2>
+      <!-- ==============================================================================
+         GENERATE COMPLAINT & FREE LAWYER BOARD PORTAL
+         ============================================================================== -->
+    <section class="section" id="complaint-generator">
+      <div id="complaints-board"></div>
+      <div class="section-heading">
+        <p class="eyebrow">TENANT LEGAL COMPLAINT &amp; ADVOCATE PORTAL · INDIA</p>
+        <h2>Generate &amp; File a Tenant Complaint</h2>
+        <p>Submit your tenancy dispute directly to verified advocates across India. Free lawyers review complaints, advise on applicable statutory provisions, and help generate binding legal notices.</p>
       </div>
-      <div class="panel">
-        <div class="form-grid">
-          <div><label for="landlordName">Landlord's name (optional)</label><input id="landlordName" placeholder="e.g. Mr. Sharma"></div>
-          <div><label for="deadline">Reply timeline (days)</label><input id="deadline" type="number" min="1" value="7"></div>
+
+      <div class="complaints-portal">
+        <!-- Portal Sub-navigation Tabs -->
+        <div class="portal-nav-tabs">
+          <button type="button" class="portal-tab-btn active" id="tabBtnFileComplaint">
+            <span>📝</span> File / Generate Complaint
+          </button>
+          <button type="button" class="portal-tab-btn" id="tabBtnLawyerBoard">
+            <span>⚖️</span> Free Lawyer Complaints Board
+            <span class="badge-variety" id="portalBadgeCount" style="margin-left:6px;">8 Active</span>
+          </button>
+          <button type="button" class="portal-tab-btn" id="tabBtnNoticeDraft">
+            <span>📜</span> Printable Legal Notice Draft
+          </button>
         </div>
-        <div class="tabs"><button class="tab active" data-tab="whatsapp">WhatsApp message</button><button class="tab" data-tab="formal">Formal letter</button></div>
-        <div id="whatsappPane">
-          <label for="whatsappText">Editable message</label>
-          <textarea id="whatsappText" rows="7"></textarea>
-          <div class="actions">
-            <button class="btn primary" id="copyMessage">Copy text</button>
-            <a class="btn secondary" id="whatsappLink" target="_blank" rel="noopener">Open WhatsApp</a>
+
+        <!-- PANE 1: FILE / GENERATE COMPLAINT FORM -->
+        <div id="portalPaneFile">
+          <div class="shield-notice" style="margin-bottom:24px;">
+            <span class="shield-icon">🛡️</span>
+            <div>
+              <strong>Tenant Confidentiality &amp; Free Legal Aid Assurance:</strong>
+              Your private contact details are shielded from public viewers. Once you submit, licensed advocates on ClauseShield review the facts for free, advise on statutory Indian tenancy rights, and help prepare legal demand notices.
+            </div>
+          </div>
+
+          <form id="tenantComplaintForm">
+            <div class="form-grid">
+              <div>
+                <label for="compTenantName">Tenant Name *</label>
+                <input type="text" id="compTenantName" placeholder="e.g. Arjun Mehra" required>
+                <label style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:normal;color:var(--muted);cursor:pointer;margin-top:-10px;margin-bottom:14px;">
+                  <input type="checkbox" id="compAnonymousToggle" style="width:auto;margin:0;"> Keep my identity anonymous to public viewers
+                </label>
+              </div>
+
+              <div>
+                <label for="compTenantEmail">Email Address *</label>
+                <input type="email" id="compTenantEmail" placeholder="your.name@example.com" required>
+              </div>
+
+              <div>
+                <label for="compTenantPhone">Mobile / WhatsApp Number <small style="font-weight:normal;color:var(--muted);">(Shielded from public)</small></label>
+                <input type="tel" id="compTenantPhone" placeholder="+91 98765 43210">
+              </div>
+
+              <div>
+                <label for="compCategory">Complaint Variety / Category *</label>
+                <select id="compCategory" required>
+                  <option value="security_deposit" selected>🛡️ Security Deposit Withholding &amp; Deductions</option>
+                  <option value="illegal_eviction">🚫 Illegal Eviction Notice &amp; Lockout Threat</option>
+                  <option value="utility_cutoff">⚡ Water / Electricity Disconnection</option>
+                  <option value="harassment">🛑 Landlord Harassment &amp; Privacy Invasion</option>
+                  <option value="rent_hike">📈 Arbitrary Mid-Term Rent Hike</option>
+                  <option value="maintenance">🔧 Refusal to Repair Leaks &amp; Structural Hazards</option>
+                  <option value="lease_breach">📑 Unfair Lease Terms &amp; Unreasonable Lock-in</option>
+                  <option value="unfair_charges">🏷️ Unfair Move-out Charges &amp; Late Fees</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="compUrgency">Urgency / Severity Level *</label>
+                <select id="compUrgency" required>
+                  <option value="urgent" selected>🔴 Urgent (Eviction threat, lockout, water/power cut within 7 days)</option>
+                  <option value="medium">🟡 Medium (Deposit withheld after move-out, disputed repair bill)</option>
+                  <option value="low">🟢 Standard (General lease dispute, clarification request)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="compState">State / Jurisdiction *</label>
+                <select id="compState" required>
+                  <option value="Karnataka" selected>Karnataka (Bengaluru)</option>
+                  <option value="Maharashtra">Maharashtra (Pune / Mumbai)</option>
+                  <option value="Delhi">Delhi NCR (Delhi / Gurgaon / Noida)</option>
+                  <option value="Telangana">Telangana (Hyderabad)</option>
+                  <option value="Tamil Nadu">Tamil Nadu (Chennai)</option>
+                  <option value="West Bengal">West Bengal (Kolkata)</option>
+                  <option value="Gujarat">Gujarat (Ahmedabad)</option>
+                  <option value="Other">Other State</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="compCity">City / Locality *</label>
+                <input type="text" id="compCity" placeholder="e.g. Koramangala, Bengaluru" required>
+              </div>
+
+              <div>
+                <label for="compAmount">Amount Involved in Dispute (₹) <small style="font-weight:normal;color:var(--muted);">(Optional)</small></label>
+                <input type="number" id="compAmount" min="0" placeholder="e.g. 55000">
+              </div>
+
+              <div>
+                <label for="compDate">Date of Incident / Notice Date *</label>
+                <input type="date" id="compDate" required>
+              </div>
+
+              <div>
+                <label for="compLandlordName">Landlord / Owner Name <small style="font-weight:normal;color:var(--muted);">(Optional)</small></label>
+                <input type="text" id="compLandlordName" placeholder="e.g. Mr. R. K. Sharma">
+              </div>
+
+              <div class="full-grid-span">
+                <label for="compTitle">Complaint Subject / Summary *</label>
+                <input type="text" id="compTitle" placeholder="e.g. Landlord withholding ₹55,000 security deposit for whole-flat repainting and deep cleaning" required>
+              </div>
+
+              <div class="full-grid-span">
+                <label for="compDescription">Detailed Facts &amp; Description of What Happened *</label>
+                <textarea id="compDescription" rows="6" placeholder="Describe the chronological facts: Did you provide notice? What did the landlord say or deduct? Are there invoices or agreement clauses?..." required></textarea>
+              </div>
+
+              <div class="full-grid-span">
+                <label for="compRelief">Desired Resolution / Relief Sought *</label>
+                <input type="text" id="compRelief" placeholder="e.g. Full refund of ₹55,000 security deposit, cessation of harassment, restoration of electricity" required>
+              </div>
+            </div>
+
+            <div class="actions" style="margin-top:20px;">
+              <button type="submit" class="btn primary" id="btnSubmitComplaint">🚀 Submit Complaint &amp; Notify Free Lawyers</button>
+              <button type="button" class="btn secondary" id="btnDraftNoticeFromForm">📄 Preview Formal Legal Notice</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- PANE 2: FREE LAWYER COMPLAINTS BOARD -->
+        <div id="portalPaneBoard" style="display:none;">
+          <!-- Variety Filter Chips (Pills) -->
+          <div style="margin-bottom:8px;font-size:.82rem;font-weight:700;color:var(--navy);">SORT &amp; FILTER BY DISPUTE VARIETY:</div>
+          <div class="variety-chips-scroll" id="varietyChipsContainer">
+            <button type="button" class="variety-chip active" data-variety="all">
+              <span>🌐</span> All Varieties <span class="chip-count" id="chipCountAll">8</span>
+            </button>
+            <button type="button" class="variety-chip" data-variety="security_deposit">
+              <span>🛡️</span> Security Deposit <span class="chip-count" id="chipCountDeposit">1</span>
+            </button>
+            <button type="button" class="variety-chip" data-variety="illegal_eviction">
+              <span>🚫</span> Illegal Eviction <span class="chip-count" id="chipCountEviction">1</span>
+            </button>
+            <button type="button" class="variety-chip" data-variety="utility_cutoff">
+              <span>⚡</span> Utility Cutoff <span class="chip-count" id="chipCountUtility">1</span>
+            </button>
+            <button type="button" class="variety-chip" data-variety="harassment">
+              <span>🛑</span> Harassment <span class="chip-count" id="chipCountHarass">1</span>
+            </button>
+            <button type="button" class="variety-chip" data-variety="rent_hike">
+              <span>📈</span> Rent Hike <span class="chip-count" id="chipCountRentHike">1</span>
+            </button>
+            <button type="button" class="variety-chip" data-variety="maintenance">
+              <span>🔧</span> Maintenance <span class="chip-count" id="chipCountMaint">1</span>
+            </button>
+            <button type="button" class="variety-chip" data-variety="lease_breach">
+              <span>📑</span> Lease Breach <span class="chip-count" id="chipCountLease">1</span>
+            </button>
+            <button type="button" class="variety-chip" data-variety="unfair_charges">
+              <span>🏷️</span> Unfair Charges <span class="chip-count" id="chipCountCharges">1</span>
+            </button>
+          </div>
+
+          <!-- Filter & Sort Bar -->
+          <div class="filter-sort-bar">
+            <div>
+              <label for="boardSearchInput">🔍 Search Complaints</label>
+              <input type="text" id="boardSearchInput" placeholder="Keywords, city, tenant, ref...">
+            </div>
+
+            <div>
+              <label for="boardSortBy">↕️ Sort Varieties By</label>
+              <select id="boardSortBy">
+                <option value="newest" selected>🕒 Newest First</option>
+                <option value="oldest">⏳ Oldest First</option>
+                <option value="amount_desc">💰 Amount: High to Low</option>
+                <option value="amount_asc">💵 Amount: Low to High</option>
+                <option value="urgency">🚨 Urgency: Urgent First</option>
+                <option value="responses">💬 Most Lawyer Responses</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="boardUrgencyFilter">Urgency</label>
+              <select id="boardUrgencyFilter">
+                <option value="all" selected>All Urgencies</option>
+                <option value="urgent">🔴 Urgent</option>
+                <option value="medium">🟡 Medium</option>
+                <option value="low">🟢 Standard</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="boardStateFilter">State / Region</label>
+              <select id="boardStateFilter">
+                <option value="all" selected>All States</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Delhi">Delhi NCR</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="West Bengal">West Bengal</option>
+                <option value="Gujarat">Gujarat</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="boardStatusFilter">Status</label>
+              <select id="boardStatusFilter">
+                <option value="all" selected>All Statuses</option>
+                <option value="open">🟢 Open (Awaiting Advice)</option>
+                <option value="under_review">🔵 Under Lawyer Review</option>
+                <option value="resolved">✅ Resolved</option>
+              </select>
+            </div>
+
+            <div>
+              <label>&nbsp;</label>
+              <button type="button" class="btn secondary" id="btnResetSampleComplaints" title="Re-generate and populate realistic sample complaints">
+                ✨ Generate Sample Complaints
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Board Metric Bar -->
+          <div class="compact" style="border-radius:12px;margin-bottom:24px;">
+            <div><strong id="metricTotalComplaints">8</strong><span>Total Complaints</span></div>
+            <div><strong id="metricUrgentComplaints" style="color:var(--red);">4</strong><span>Urgent Matters</span></div>
+            <div><strong id="metricTotalDisputeVal" style="color:var(--blue);">₹3,20,000</strong><span>Disputed Value</span></div>
+            <div><strong id="metricLawyerResponses" style="color:var(--green);">4</strong><span>Lawyer Opinions</span></div>
+          </div>
+
+          <!-- Dynamic Complaints Feed List -->
+          <div class="complaints-feed-grid" id="complaintsFeedList">
+            <!-- Dynamically populated by script.js -->
           </div>
         </div>
-        <div id="formalPane" hidden>
+
+        <!-- PANE 3: LEGAL NOTICE GENERATOR PREVIEW -->
+        <div id="portalPaneNotice" style="display:none;">
           <div class="formal-layout">
             <div class="formal-editor-side">
-              <label for="formalText">Editable formal letter <small>(Edit text below or print directly)</small></label>
-              <textarea id="formalText" rows="13"></textarea>
+              <label for="noticeEditorText"><strong>Editable Formal Legal Notice</strong> <small>(Customize text or print directly)</small></label>
+              <textarea id="noticeEditorText" rows="16"></textarea>
             </div>
             <div class="formal-preview-side">
               <div class="preview-header">
-                <span><strong>Formal Letter Preview</strong> (Print-Ready)</span>
-                <span class="preview-badge">A4 Standard Format</span>
+                <span><strong>A4 Legal Notice Preview</strong></span>
+                <span class="preview-badge">Statutory Section 106 TPA</span>
               </div>
-              <div id="formalPreview" class="letter-sheet-preview"></div>
+              <div id="noticeSheetPreview" class="letter-sheet-preview"></div>
             </div>
           </div>
-          <div class="actions">
-            <button class="btn primary" id="printLetter">Print / Save as PDF</button>
-            <button class="btn secondary" id="copyLetter">Copy letter</button>
+          <div class="actions" style="margin-top:16px;">
+            <button class="btn primary" id="btnPrintNoticeSheet">🖨️ Print / Save Notice as PDF</button>
+            <button class="btn secondary" id="btnCopyNoticeSheet">📋 Copy Notice Text</button>
+            <a class="btn secondary" id="btnWhatsAppNoticeSheet" target="_blank" rel="noopener">💬 Send via WhatsApp</a>
           </div>
         </div>
       </div>
@@ -947,132 +1178,174 @@
   <div class="cs-modal-backdrop" id="authModal">
     <div class="cs-modal">
       <div class="modal-header">
-        <h3 id="authModalTitle">Welcome to ClauseShield</h3>
-        <button type="button" class="modal-close-btn" data-close="authModal">×</button>
+        <div>
+          <h3 id="authModalTitle" style="margin:0 0 4px;">Welcome to ClauseShield</h3>
+          <p id="authModalSubtitle" style="font-size:.85rem;color:var(--muted);margin:0;">Access tenant legal assistance, free lawyer advice, and complaint tracking.</p>
+        </div>
+        <button type="button" class="modal-close-btn" data-close="authModal" aria-label="Close dialog">×</button>
       </div>
       <div class="modal-body">
-        <div class="auth-type-selector">
-          <button type="button" class="auth-type-btn active" data-type="tenant">👤 Tenant Account</button>
-          <button type="button" class="auth-type-btn" data-type="lawyer">⚖️ Lawyer Registration</button>
-          <button type="button" class="auth-type-btn" data-type="admin">🛡️ Administrator</button>
+        <!-- Quick Demo Login Bar -->
+        <div class="quick-demo-banner">
+          <span style="font-size:.8rem;font-weight:700;color:var(--navy);">⚡ Instant 1-Click Demo Logins:</span>
+          <div class="quick-demo-buttons">
+            <button type="button" class="btn secondary demo-login-btn" data-email="tenant@example.com" data-pass="password123">👤 Tenant Demo (Arjun)</button>
+            <button type="button" class="btn secondary demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123">⚖️ Free Lawyer Demo (Adv. Rajesh)</button>
+            <button type="button" class="btn secondary demo-login-btn" data-email="admin@clauseshield.com" data-pass="password123">🛡️ Admin Demo</button>
+          </div>
         </div>
 
-        <div class="auth-mode-toggle" id="authModeToggle">
-          <button type="button" class="active" id="showLoginBtn">Sign In</button>
-          <button type="button" id="showRegisterBtn">Create New Account</button>
+        <!-- Mode Toggle Tabs (Sign In vs Create Account) -->
+        <div class="auth-tabs-segmented" role="tablist">
+          <button type="button" class="auth-tab-btn active" id="tabSignInBtn">🔑 Sign In</button>
+          <button type="button" class="auth-tab-btn" id="tabSignUpBtn">✨ Create New Account</button>
         </div>
 
-        <!-- Sign In Form (Common for all roles) -->
-        <form id="signInForm">
-          <label for="loginEmail">Email Address</label>
-          <input type="email" id="loginEmail" placeholder="your.name@example.com" required>
+        <!-- Sign In Form Pane -->
+        <div id="authSignInPane">
+          <form id="signInForm">
+            <label for="loginEmail">Email Address *</label>
+            <input type="email" id="loginEmail" placeholder="your.name@example.com" required autocomplete="email">
 
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" required>
+            <label for="loginPassword">Password *</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
 
-          <button type="submit" class="btn primary full">Sign In</button>
-          
-          <div style="text-align:center;margin-top:14px;">
-            <small class="fine">Quick Demo Login: 
-              <a href="javascript:void(0)" class="quick-login-link" data-email="tenant@example.com" data-pass="password123">Tenant Demo</a> · 
-              <a href="javascript:void(0)" class="quick-login-link" data-email="rajesh.sharma@advocates.in" data-pass="password123">Lawyer Demo</a> · 
-              <a href="javascript:void(0)" class="quick-login-link" data-email="admin@clauseshield.com" data-pass="password123">Admin Demo</a>
-            </small>
-          </div>
-        </form>
+            <div id="signInErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
 
-        <!-- Tenant Registration Form -->
-        <form id="tenantRegisterForm" style="display:none;">
-          <label for="tenantFullName">Full Name *</label>
-          <input type="text" id="tenantFullName" placeholder="e.g. Arjun Mehra" required>
+            <button type="submit" class="btn primary full" id="signInSubmitBtn">Sign In</button>
 
-          <label for="tenantRegEmail">Email Address *</label>
-          <input type="email" id="tenantRegEmail" placeholder="arjun.mehra@example.com" required>
-
-          <label for="tenantRegPhone">Phone Number *</label>
-          <input type="tel" id="tenantRegPhone" placeholder="+91 98765 43210" required>
-
-          <label for="tenantRegPassword">Password *</label>
-          <input type="password" id="tenantRegPassword" placeholder="Minimum 6 characters" required>
-
-          <button type="submit" class="btn primary full">Register as Tenant</button>
-        </form>
-
-        <!-- Lawyer Registration Form -->
-        <form id="lawyerRegisterForm" style="display:none;">
-          <label for="lawyerFullName">Full Name (Advocate) *</label>
-          <input type="text" id="lawyerFullName" placeholder="e.g. Adv. Rohit Deshmukh" required>
-
-          <div class="form-grid">
-            <div>
-              <label for="lawyerRegEmail">Email Address *</label>
-              <input type="email" id="lawyerRegEmail" placeholder="adv.rohit@example.com" required>
+            <div style="text-align:center;margin-top:16px;font-size:.85rem;color:var(--muted);">
+              Don't have an account yet? 
+              <a href="javascript:void(0)" id="switchRegisterLink" style="color:var(--blue);font-weight:700;text-decoration:none;">Create New Account here &rarr;</a>
             </div>
-            <div>
-              <label for="lawyerRegPhone">Phone Number *</label>
-              <input type="tel" id="lawyerRegPhone" placeholder="+91 98200 12345" required>
+          </form>
+        </div>
+
+        <!-- Create Account Form Pane -->
+        <div id="authSignUpPane" style="display:none;">
+          <div style="margin-bottom:16px;">
+            <label style="font-size:.84rem;font-weight:700;color:var(--navy);display:block;margin-bottom:8px;">Choose Account Type *</label>
+            <div class="auth-role-cards">
+              <label class="auth-role-card active" id="roleCardTenant">
+                <input type="radio" name="signupRole" value="tenant" checked style="display:none;">
+                <span class="role-icon">👤</span>
+                <span class="role-title">Tenant Account</span>
+                <span class="role-sub">File complaints &amp; get free legal aid</span>
+              </label>
+              <label class="auth-role-card" id="roleCardLawyer">
+                <input type="radio" name="signupRole" value="lawyer" style="display:none;">
+                <span class="role-icon">⚖️</span>
+                <span class="role-title">Free Lawyer / Advocate</span>
+                <span class="role-sub">Review complaints &amp; advise tenants</span>
+              </label>
             </div>
           </div>
 
-          <label for="lawyerRegPassword">Password *</label>
-          <input type="password" id="lawyerRegPassword" placeholder="Create secure password" required>
+          <!-- Tenant Registration Form -->
+          <form id="tenantRegisterForm">
+            <label for="tenantFullName">Full Name *</label>
+            <input type="text" id="tenantFullName" placeholder="e.g. Arjun Mehra" required autocomplete="name">
 
-          <div class="form-grid">
-            <div>
-              <label for="lawyerBarNumber">Bar Council Enrolment No. *</label>
-              <input type="text" id="lawyerBarNumber" placeholder="e.g. MAH/5821/2016" required>
+            <label for="tenantRegEmail">Email Address *</label>
+            <input type="email" id="tenantRegEmail" placeholder="arjun.mehra@example.com" required autocomplete="email">
+
+            <label for="tenantRegPassword">Password *</label>
+            <input type="password" id="tenantRegPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+
+            <label for="tenantRegPhone">Phone Number <small style="font-weight:normal;color:var(--muted);">(Optional)</small></label>
+            <input type="tel" id="tenantRegPhone" placeholder="+91 98765 43210">
+
+            <div id="tenantRegErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
+
+            <button type="submit" class="btn primary full" id="tenantRegisterSubmitBtn">Create Tenant Account &amp; Log In</button>
+          </form>
+
+          <!-- Lawyer Registration Form -->
+          <form id="lawyerRegisterForm" style="display:none;">
+            <label for="lawyerFullName">Advocate Full Name *</label>
+            <input type="text" id="lawyerFullName" placeholder="e.g. Adv. Rohit Deshmukh" required autocomplete="name">
+
+            <div class="form-grid">
+              <div>
+                <label for="lawyerRegEmail">Email Address *</label>
+                <input type="email" id="lawyerRegEmail" placeholder="adv.rohit@lawchambers.in" required autocomplete="email">
+              </div>
+              <div>
+                <label for="lawyerRegPassword">Password *</label>
+                <input type="password" id="lawyerRegPassword" placeholder="Create password" required autocomplete="new-password">
+              </div>
             </div>
-            <div>
-              <label for="lawyerStateBar">State Bar Council *</label>
-              <select id="lawyerStateBar" required>
-                <option value="Bar Council of Maharashtra & Goa">Bar Council of Maharashtra &amp; Goa</option>
-                <option value="Karnataka State Bar Council">Karnataka State Bar Council</option>
-                <option value="Bar Council of Delhi">Bar Council of Delhi</option>
-                <option value="Bar Council of Tamil Nadu">Bar Council of Tamil Nadu</option>
-                <option value="Bar Council of Telangana">Bar Council of Telangana</option>
-                <option value="Bar Council of West Bengal">Bar Council of West Bengal</option>
-                <option value="Other State Bar Council">Other State Bar Council</option>
-              </select>
+
+            <div class="form-grid">
+              <div>
+                <label for="lawyerBarNumber">Bar Council Enrolment No. *</label>
+                <input type="text" id="lawyerBarNumber" placeholder="e.g. MAH/5821/2020" value="MAH/5821/2020" required>
+              </div>
+              <div>
+                <label for="lawyerStateBar">State Bar Council *</label>
+                <select id="lawyerStateBar" required>
+                  <option value="Bar Council of Maharashtra & Goa">Bar Council of Maharashtra &amp; Goa</option>
+                  <option value="Karnataka State Bar Council">Karnataka State Bar Council</option>
+                  <option value="Bar Council of Delhi">Bar Council of Delhi</option>
+                  <option value="Bar Council of Tamil Nadu">Bar Council of Tamil Nadu</option>
+                  <option value="Bar Council of Telangana">Bar Council of Telangana</option>
+                  <option value="Bar Council of West Bengal">Bar Council of West Bengal</option>
+                  <option value="Other State Bar Council">Other State Bar Council</option>
+                </select>
+              </div>
             </div>
+
+            <div class="form-grid">
+              <div>
+                <label for="lawyerSpecialty">Legal Specialisation *</label>
+                <select id="lawyerSpecialty" required>
+                  <option value="Tenancy Disputes & Deposit Recovery">Tenancy Disputes &amp; Deposit Recovery</option>
+                  <option value="Rental Agreements & Eviction Defense">Rental Agreements &amp; Eviction Defense</option>
+                  <option value="Landlord Harassment & Utility Rights">Landlord Harassment &amp; Utility Rights</option>
+                  <option value="Unfair Charges & Move-out Repairs">Unfair Charges &amp; Move-out Repairs</option>
+                  <option value="Civil & Consumer Tenancy Law">Civil &amp; Consumer Tenancy Law</option>
+                </select>
+              </div>
+              <div>
+                <label for="lawyerFee">Consultation Mode *</label>
+                <select id="lawyerFee">
+                  <option value="0" selected>Pro Bono / Free Legal Aid (₹0)</option>
+                  <option value="500">Standard Consultation (₹500)</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="lawyerRegErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
+
+            <button type="submit" class="btn primary full" id="lawyerRegisterSubmitBtn">Create Advocate Account &amp; Access Board</button>
+          </form>
+
+          <div style="text-align:center;margin-top:16px;font-size:.85rem;color:var(--muted);">
+            Already have an account? 
+            <a href="javascript:void(0)" id="switchSignInLink" style="color:var(--blue);font-weight:700;text-decoration:none;">Sign In here &rarr;</a>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-          <div class="form-grid">
-            <div>
-              <label for="lawyerSpecialty">Legal Specialisation *</label>
-              <select id="lawyerSpecialty" required>
-                <option value="Tenancy Disputes & Deposit Recovery">Tenancy Disputes &amp; Deposit Recovery</option>
-                <option value="Rental Agreements & Eviction Defense">Rental Agreements &amp; Eviction Defense</option>
-                <option value="Landlord Harassment & Utility Rights">Landlord Harassment &amp; Utility Rights</option>
-                <option value="Unfair Charges & Move-out Repairs">Unfair Charges &amp; Move-out Repairs</option>
-                <option value="Civil & Consumer Tenancy Law">Civil &amp; Consumer Tenancy Law</option>
-              </select>
-            </div>
-            <div>
-              <label for="lawyerExperience">Years of Experience *</label>
-              <input type="number" id="lawyerExperience" min="1" max="50" value="5" required>
-            </div>
-          </div>
-
-          <label for="lawyerBio">Professional Biography *</label>
-          <textarea id="lawyerBio" rows="3" placeholder="Briefly describe your courts of practice, tenancy litigation experience, and background..." required></textarea>
-
-          <div class="form-grid">
-            <div>
-              <label for="lawyerFee">Consultation Charges (₹) *</label>
-              <input type="number" id="lawyerFee" min="100" step="50" value="500" required>
-            </div>
-            <div>
-              <label for="lawyerAvailability">Availability *</label>
-              <input type="text" id="lawyerAvailability" value="Mon-Fri: 5 PM - 8 PM" required>
-            </div>
-          </div>
-
-          <label for="lawyerDocUpload">Bar Council ID / Certificate Document (PDF/Image) *</label>
-          <input type="file" id="lawyerDocUpload" accept=".pdf,.jpg,.jpeg,.png">
-          <small class="fine">Your credentials remain pending until verified by an administrator. Never shown as verified prematurely.</small>
-
-          <button type="submit" class="btn primary full" style="margin-top:16px;">Submit Application for Advocate Verification</button>
-        </form>
+  <!-- 1.1 LEGAL NOTICE DRAFT PREVIEW MODAL -->
+  <div class="cs-modal-backdrop" id="legalNoticeModal">
+    <div class="cs-modal wide">
+      <div class="modal-header">
+        <div>
+          <h3 id="legalNoticeModalTitle" style="margin:0 0 4px;">Formal Legal Demand Notice</h3>
+          <p id="legalNoticeModalSubtitle" style="font-size:.85rem;color:var(--muted);margin:0;">Print-ready statutory demand notice under Section 106 &amp; 108 of Transfer of Property Act, 1882.</p>
+        </div>
+        <button type="button" class="modal-close-btn" data-close="legalNoticeModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalNoticePreview" class="letter-sheet-preview" style="max-height:480px;min-height:360px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn secondary" id="btnCopyModalNotice">📋 Copy Notice Text</button>
+        <button type="button" class="btn primary" id="btnPrintModalNotice">🖨️ Print / Save as PDF</button>
+        <button type="button" class="btn secondary" data-close="legalNoticeModal">Close</button>
       </div>
     </div>
   </div>

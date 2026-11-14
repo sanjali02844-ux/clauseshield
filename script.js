@@ -1259,7 +1259,536 @@ if (photoUpload && photoPreview) {
 }
 
 // Initialise on DOM Ready
+
+// ==============================================================================
+// TENANT COMPLAINT GENERATOR & FREE LAWYER BOARD CONTROLLER
+// ==============================================================================
+
+let activeVarietyFilter = 'all';
+let currentNoticeDraftComplaint = null;
+
+
+function debounce(func, wait = 250) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+async function initComplaintsPortal() {
+  // Ensure sample complaints are loaded into database
+  ClauseShieldDB.issues.seedSampleComplaints(false);
+
+  // 1. Sub-navigation Tabs (File Complaint / Free Lawyer Board / Legal Notice Draft)
+  const tabBtnFile = $('tabBtnFileComplaint');
+  const tabBtnBoard = $('tabBtnLawyerBoard');
+  const tabBtnNotice = $('tabBtnNoticeDraft');
+  const paneFile = $('portalPaneFile');
+  const paneBoard = $('portalPaneBoard');
+  const paneNotice = $('portalPaneNotice');
+
+  function switchPortalTab(tab) {
+    if (tab === 'file') {
+      if (tabBtnFile) tabBtnFile.classList.add('active');
+      if (tabBtnBoard) tabBtnBoard.classList.remove('active');
+      if (tabBtnNotice) tabBtnNotice.classList.remove('active');
+      if (paneFile) paneFile.style.display = 'block';
+      if (paneBoard) paneBoard.style.display = 'none';
+      if (paneNotice) paneNotice.style.display = 'none';
+    } else if (tab === 'board') {
+      if (tabBtnBoard) tabBtnBoard.classList.add('active');
+      if (tabBtnFile) tabBtnFile.classList.remove('active');
+      if (tabBtnNotice) tabBtnNotice.classList.remove('active');
+      if (paneFile) paneFile.style.display = 'none';
+      if (paneBoard) paneBoard.style.display = 'block';
+      if (paneNotice) paneNotice.style.display = 'none';
+      renderComplaintsFeed();
+    } else if (tab === 'notice') {
+      if (tabBtnNotice) tabBtnNotice.classList.add('active');
+      if (tabBtnFile) tabBtnFile.classList.remove('active');
+      if (tabBtnBoard) tabBtnBoard.classList.remove('active');
+      if (paneFile) paneFile.style.display = 'none';
+      if (paneBoard) paneBoard.style.display = 'none';
+      if (paneNotice) paneNotice.style.display = 'block';
+      syncNoticeSheetPreview();
+    }
+  }
+
+  if (tabBtnFile) tabBtnFile.addEventListener('click', () => switchPortalTab('file'));
+  if (tabBtnBoard) tabBtnBoard.addEventListener('click', () => switchPortalTab('board'));
+  if (tabBtnNotice) tabBtnNotice.addEventListener('click', () => switchPortalTab('notice'));
+
+  // Listen for hash changes to #complaints-board
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash === '#complaints-board') {
+      switchPortalTab('board');
+    } else if (window.location.hash === '#complaint-generator') {
+      switchPortalTab('file');
+    }
+  });
+
+  if (window.location.hash === '#complaints-board') {
+    switchPortalTab('board');
+  }
+
+  // 2. Variety Filter Chips (Pills)
+  const varietyChips = document.querySelectorAll('.variety-chip');
+  varietyChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      varietyChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeVarietyFilter = chip.getAttribute('data-variety') || 'all';
+      renderComplaintsFeed();
+    });
+  });
+
+  // 3. Filter & Sort Bar Inputs
+  const boardSortBy = $('boardSortBy');
+  const boardUrgency = $('boardUrgencyFilter');
+  const boardState = $('boardStateFilter');
+  const boardStatus = $('boardStatusFilter');
+  const boardSearch = $('boardSearchInput');
+
+  if (boardSortBy) boardSortBy.addEventListener('change', renderComplaintsFeed);
+  if (boardUrgency) boardUrgency.addEventListener('change', renderComplaintsFeed);
+  if (boardState) boardState.addEventListener('change', renderComplaintsFeed);
+  if (boardStatus) boardStatus.addEventListener('change', renderComplaintsFeed);
+  if (boardSearch) boardSearch.addEventListener('input', debounce(renderComplaintsFeed, 250));
+
+  // 4. "Generate Sample Complaints" Button
+  const btnReset = $('btnResetSampleComplaints');
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      ClauseShieldDB.issues.seedSampleComplaints(true);
+      toast('✓ 8 Realistic Sample Tenancy Complaints Generated!');
+      renderComplaintsFeed();
+    });
+  }
+
+  // 5. Tenant Complaint Form Submission ("Put Their Complaint")
+  const tenantComplaintForm = $('tenantComplaintForm');
+  if (tenantComplaintForm) {
+    tenantComplaintForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const full_name = $('compTenantName').value.trim();
+      const isAnon = $('compAnonymousToggle') ? $('compAnonymousToggle').checked : false;
+      const email = $('compTenantEmail').value.trim();
+      const phone = $('compTenantPhone') ? $('compTenantPhone').value.trim() : '';
+      const category = $('compCategory').value;
+      const urgency = $('compUrgency').value;
+      const state = $('compState').value;
+      const city = $('compCity').value.trim();
+      const amount = $('compAmount') ? Number($('compAmount').value) || 0 : 0;
+      const date = $('compDate').value;
+      const landlord = $('compLandlordName') ? $('compLandlordName').value.trim() : '';
+      const title = $('compTitle').value.trim();
+      const description = $('compDescription').value.trim();
+      const relief = $('compRelief').value.trim();
+
+      // Ensure user session exists (auto-create tenant account if guest)
+      let currentUser = ClauseShieldDB.auth.getCurrentUser();
+      if (!currentUser) {
+        try {
+          currentUser = await ClauseShieldDB.auth.signUpOrSignIn({
+            email,
+            password: 'password123',
+            full_name,
+            role: 'tenant'
+          });
+          updateNavUserState();
+        } catch (authErr) {
+          console.warn('Silent tenant guest account creation note:', authErr);
+        }
+      }
+
+      try {
+        const newComplaint = await ClauseShieldDB.issues.create({
+          tenant_id: currentUser ? currentUser.id : 'usr_guest_tenant',
+          tenant_name: isAnon ? 'Tenant (Anonymous)' : full_name,
+          title,
+          category,
+          city,
+          state,
+          description: landlord ? `Landlord: ${landlord}. ${description}` : description,
+          amount_in_dispute: amount,
+          incident_date: date,
+          urgency,
+          relief_requested: relief
+        });
+
+        currentNoticeDraftComplaint = newComplaint;
+        toast(`✓ Complaint ${newComplaint.issue_reference} published! Free advocates notified.`);
+        
+        // Reset form fields
+        tenantComplaintForm.reset();
+
+        // Switch to complaints board and highlight newly added complaint
+        switchPortalTab('board');
+        setTimeout(() => {
+          const card = document.querySelector(`[data-card-ref="${newComplaint.issue_reference}"]`);
+          if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.style.outline = '3px solid var(--blue)';
+            setTimeout(() => card.style.outline = 'none', 3000);
+          }
+        }, 300);
+
+      } catch (err) {
+        toast(err.message || 'Failed to submit complaint.');
+      }
+    });
+  }
+
+  // 6. Preview Formal Legal Notice from Form button
+  const btnDraftNoticeFromForm = $('btnDraftNoticeFromForm');
+  if (btnDraftNoticeFromForm) {
+    btnDraftNoticeFromForm.addEventListener('click', () => {
+      const full_name = $('compTenantName').value.trim() || 'Tenant';
+      const city = $('compCity').value.trim() || 'City';
+      const state = $('compState').value || 'State';
+      const amount = $('compAmount') ? Number($('compAmount').value) || 0 : 0;
+      const title = $('compTitle').value.trim() || 'Rental Dispute';
+      const description = $('compDescription').value.trim() || 'Unlawful withholding of security deposit.';
+      const date = $('compDate').value || new Date().toISOString().split('T')[0];
+
+      currentNoticeDraftComplaint = {
+        issue_reference: 'CS-NOTICE-' + Math.floor(1000 + Math.random() * 9000),
+        tenant_name: full_name,
+        city,
+        state,
+        amount_in_dispute: amount,
+        title,
+        description,
+        incident_date: date
+      };
+
+      switchPortalTab('notice');
+    });
+  }
+
+  // 7. Legal Notice Sheet Editor & Live Preview Synchronization
+  const noticeEditorText = $('noticeEditorText');
+  const noticeSheetPreview = $('noticeSheetPreview');
+  const btnPrintNoticeSheet = $('btnPrintNoticeSheet');
+  const btnCopyNoticeSheet = $('btnCopyNoticeSheet');
+  const btnWhatsAppNoticeSheet = $('btnWhatsAppNoticeSheet');
+
+  function syncNoticeSheetPreview() {
+    if (!noticeEditorText) return;
+    if (!noticeEditorText.value.trim()) {
+      const cmp = currentNoticeDraftComplaint || {
+        issue_reference: 'CS-NOTICE-2026-DEMO',
+        tenant_name: 'Arjun Mehra',
+        city: 'Baner, Pune',
+        state: 'Maharashtra',
+        amount_in_dispute: 45000,
+        title: 'Withholding of Security Deposit without Invoice',
+        description: 'Tenant peacefully handed over possession. Landlord refused deposit refund citing unverified painting costs.',
+        incident_date: '2026-11-01'
+      };
+      noticeEditorText.value = ClauseShieldDB.issues.generateLegalNotice(cmp);
+    }
+    if (noticeSheetPreview) {
+      noticeSheetPreview.textContent = noticeEditorText.value;
+    }
+    if (btnWhatsAppNoticeSheet) {
+      btnWhatsAppNoticeSheet.href = 'https://wa.me/?text=' + encodeURIComponent(noticeEditorText.value);
+    }
+  }
+
+  if (noticeEditorText) {
+    noticeEditorText.addEventListener('input', () => {
+      if (noticeSheetPreview) noticeSheetPreview.textContent = noticeEditorText.value;
+      if (btnWhatsAppNoticeSheet) {
+        btnWhatsAppNoticeSheet.href = 'https://wa.me/?text=' + encodeURIComponent(noticeEditorText.value);
+      }
+    });
+  }
+
+  if (btnPrintNoticeSheet) {
+    btnPrintNoticeSheet.addEventListener('click', () => {
+      syncNoticeSheetPreview();
+      window.print();
+    });
+  }
+
+  if (btnCopyNoticeSheet) {
+    btnCopyNoticeSheet.addEventListener('click', () => {
+      copyText(noticeEditorText ? noticeEditorText.value : '');
+    });
+  }
+
+  // 8. Modal Legal Notice Preview Actions
+  const btnPrintModalNotice = $('btnPrintModalNotice');
+  const btnCopyModalNotice = $('btnCopyModalNotice');
+  if (btnPrintModalNotice) {
+    btnPrintModalNotice.addEventListener('click', () => window.print());
+  }
+  if (btnCopyModalNotice) {
+    btnCopyModalNotice.addEventListener('click', () => {
+      const text = $('modalNoticePreview') ? $('modalNoticePreview').textContent : '';
+      copyText(text);
+    });
+  }
+
+  // Render initial complaints feed
+  await renderComplaintsFeed();
+}
+
+// Render Complaints Feed with Sorting & Filtering across All Varieties
+async function renderComplaintsFeed() {
+  const container = $('complaintsFeedList');
+  if (!container) return;
+
+  const category = activeVarietyFilter;
+  const sort = $('boardSortBy') ? $('boardSortBy').value : 'newest';
+  const urgency = $('boardUrgencyFilter') ? $('boardUrgencyFilter').value : 'all';
+  const state = $('boardStateFilter') ? $('boardStateFilter').value : 'all';
+  const status = $('boardStatusFilter') ? $('boardStatusFilter').value : 'all';
+  const search = $('boardSearchInput') ? $('boardSearchInput').value : '';
+
+  const complaints = await ClauseShieldDB.issues.getAllAvailable({
+    category,
+    sort,
+    urgency,
+    state,
+    status,
+    search
+  });
+
+  // Calculate live stats
+  const allComplaints = await ClauseShieldDB.issues.getAllAvailable({});
+  const urgentCount = allComplaints.filter(c => c.urgency === 'urgent').length;
+  const totalVal = allComplaints.reduce((acc, c) => acc + (Number(c.amount_in_dispute) || 0), 0);
+  const totalOpinions = allComplaints.reduce((acc, c) => acc + (c.lawyer_responses ? c.lawyer_responses.length : 0), 0);
+
+  if ($('metricTotalComplaints')) $('metricTotalComplaints').textContent = allComplaints.length;
+  if ($('metricUrgentComplaints')) $('metricUrgentComplaints').textContent = urgentCount;
+  if ($('metricTotalDisputeVal')) $('metricTotalDisputeVal').textContent = formatINR(totalVal);
+  if ($('metricLawyerResponses')) $('metricLawyerResponses').textContent = totalOpinions;
+  if ($('portalBadgeCount')) $('portalBadgeCount').textContent = `${allComplaints.length} Active`;
+
+  // Update variety counts on filter pills
+  const countsByCat = {};
+  allComplaints.forEach(c => {
+    countsByCat[c.category] = (countsByCat[c.category] || 0) + 1;
+  });
+  if ($('chipCountAll')) $('chipCountAll').textContent = allComplaints.length;
+  if ($('chipCountDeposit')) $('chipCountDeposit').textContent = countsByCat['security_deposit'] || 0;
+  if ($('chipCountEviction')) $('chipCountEviction').textContent = countsByCat['illegal_eviction'] || 0;
+  if ($('chipCountUtility')) $('chipCountUtility').textContent = countsByCat['utility_cutoff'] || 0;
+  if ($('chipCountHarass')) $('chipCountHarass').textContent = countsByCat['harassment'] || 0;
+  if ($('chipCountRentHike')) $('chipCountRentHike').textContent = countsByCat['rent_hike'] || 0;
+  if ($('chipCountMaint')) $('chipCountMaint').textContent = countsByCat['maintenance'] || 0;
+  if ($('chipCountLease')) $('chipCountLease').textContent = countsByCat['lease_breach'] || 0;
+  if ($('chipCountCharges')) $('chipCountCharges').textContent = countsByCat['unfair_charges'] || 0;
+
+  if (complaints.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:50px 20px;background:#fff;border-radius:14px;border:1px dashed var(--line);">
+        <p style="font-size:1.15rem;font-weight:700;color:var(--navy);margin-bottom:8px;">No complaints match this filter.</p>
+        <p style="font-size:.9rem;color:var(--muted);margin-bottom:18px;">Try selecting "All Varieties" or clearing search terms.</p>
+        <button type="button" class="btn primary" onclick="$('btnResetSampleComplaints').click()">✨ Generate Sample Complaints</button>
+      </div>
+    `;
+    return;
+  }
+
+  const currentUser = ClauseShieldDB.auth.getCurrentUser();
+  const isLawyer = currentUser && currentUser.role === 'lawyer';
+
+  container.innerHTML = complaints.map(c => {
+    const responses = c.lawyer_responses || [];
+    const urgencyClass = c.urgency === 'urgent' ? 'urgent' : (c.urgency === 'medium' ? 'medium' : 'low');
+    const urgencyLabel = c.urgency ? c.urgency.toUpperCase() : 'STANDARD';
+
+    return `
+      <div class="complaint-card" data-card-ref="${escapeHTML(c.issue_reference)}">
+        <div class="complaint-card-header">
+          <div class="complaint-badges-group">
+            <span class="issue-ref">${escapeHTML(c.issue_reference)}</span>
+            <span class="badge-variety">${escapeHTML(c.variety_label || ClauseShieldDB.issues.getVarietyLabel(c.category))}</span>
+            <span class="badge-urgency ${urgencyClass}">${urgencyLabel}</span>
+            <span class="status-pill status-${c.status}">${(c.status || 'open').replace('_', ' ')}</span>
+          </div>
+          ${c.amount_in_dispute > 0 ? `
+            <div style="text-align:right;">
+              <span style="font-size:.74rem;color:var(--muted);display:block;">Dispute Amount</span>
+              <span class="dispute-val-large">${formatINR(c.amount_in_dispute)}</span>
+            </div>
+          ` : ''}
+        </div>
+
+        <h3 class="complaint-card-title">${escapeHTML(c.title)}</h3>
+
+        <div class="complaint-meta-bar">
+          <span class="complaint-meta-item">👤 <strong>${escapeHTML(c.tenant_name || 'Tenant')}</strong></span>
+          <span class="complaint-meta-item">📍 ${escapeHTML(c.city)}, ${escapeHTML(c.state)}</span>
+          <span class="complaint-meta-item">📅 Incident: ${escapeHTML(c.incident_date || 'Recent')}</span>
+          <span class="complaint-meta-item">💬 <strong>${responses.length}</strong> Lawyer ${responses.length === 1 ? 'Advice' : 'Opinions'}</span>
+        </div>
+
+        <div class="complaint-description">
+          ${escapeHTML(c.description)}
+        </div>
+
+        ${c.relief_requested ? `
+          <div class="complaint-relief-box">
+            <strong>🎯 Resolution / Relief Demanded:</strong> ${escapeHTML(c.relief_requested)}
+          </div>
+        ` : ''}
+
+        <!-- Lawyer Advice Thread -->
+        <div class="lawyer-responses-container" id="responses_${c.id}">
+          <div class="lawyer-response-header">
+            <span style="font-weight:700;font-size:.88rem;color:var(--navy);">
+              ⚖️ Verified Advocate Legal Opinions (${responses.length})
+            </span>
+            <span style="font-size:.76rem;color:var(--muted);">Pro Bono &amp; Statutory Guidance</span>
+          </div>
+
+          ${responses.length === 0 ? `
+            <div style="font-size:.85rem;color:var(--muted);padding:8px 0;">
+              No advocate responses yet. Verified lawyers can provide free statutory advice below.
+            </div>
+          ` : responses.map(r => `
+            <div class="lawyer-response-item">
+              <div class="lawyer-profile-tag">
+                <img src="${r.avatar_url || 'https://ui-avatars.com/api/?name=Advocate&background=101d35&color=fff'}" class="lawyer-avatar-small" alt="Advocate">
+                <div class="lawyer-info-text">
+                  <strong>${escapeHTML(r.lawyer_name)} <span class="verified-icon">✓ Bar Council</span></strong>
+                  <small>${escapeHTML(r.bar_number)} · ${new Date(r.created_at).toLocaleDateString('en-IN')}</small>
+                </div>
+              </div>
+              <div class="lawyer-advice-text">
+                ${escapeHTML(r.message)}
+              </div>
+              ${r.action_recommended ? `
+                <span class="lawyer-rec-tag">Recommended: ${escapeHTML(r.action_recommended)}</span>
+              ` : ''}
+            </div>
+          `).join('')}
+
+          <!-- Expandable Inline Advocate Advice Form -->
+          <div class="lawyer-reply-form" id="replyForm_${c.id}" style="display:none;">
+            <h4 style="font-size:.92rem;margin:0 0 10px;color:var(--navy);">Provide Free Legal Advice as Advocate:</h4>
+            <div class="form-grid" style="margin-bottom:10px;">
+              <div>
+                <label style="font-size:.75rem;">Your Full Name / Advocate Title *</label>
+                <input type="text" id="advName_${c.id}" value="${currentUser && currentUser.role === 'lawyer' ? escapeHTML(currentUser.full_name) : 'Adv. Rohit Deshmukh'}" style="margin-bottom:8px;padding:8px 10px;font-size:.84rem;">
+              </div>
+              <div>
+                <label style="font-size:.75rem;">Bar Council Enrolment No. *</label>
+                <input type="text" id="advBar_${c.id}" value="MAH/5821/2016" style="margin-bottom:8px;padding:8px 10px;font-size:.84rem;">
+              </div>
+            </div>
+            <label style="font-size:.75rem;">Legal Assessment &amp; Statutory Guidance *</label>
+            <textarea id="advMsg_${c.id}" rows="3" placeholder="Cite applicable provisions (e.g. Section 108 TPA, Rent Act Section 29, IPC 405) and outline immediate steps..." style="margin-bottom:10px;padding:10px;font-size:.86rem;"></textarea>
+            
+            <label style="font-size:.75rem;">Recommended Legal Action</label>
+            <input type="text" id="advAction_${c.id}" value="Dispatch Statutory Notice under Section 106 TPA" style="margin-bottom:12px;padding:8px 10px;font-size:.84rem;">
+
+            <div style="display:flex;gap:8px;">
+              <button type="button" class="btn primary btn-submit-advice" data-issue-id="${c.id}" style="padding:8px 14px;font-size:.84rem;">Post Free Legal Advice</button>
+              <button type="button" class="btn secondary btn-cancel-advice" data-issue-id="${c.id}" style="padding:8px 14px;font-size:.84rem;">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="complaint-actions-row">
+          <button type="button" class="btn primary btn-toggle-reply" data-issue-id="${c.id}" style="padding:8px 16px;font-size:.85rem;">
+            ⚖️ Provide Free Legal Advice
+          </button>
+          <button type="button" class="btn secondary btn-open-notice-modal" data-issue-id="${c.id}" style="padding:8px 16px;font-size:.85rem;">
+            📜 View Legal Notice Draft
+          </button>
+          <a class="btn secondary" href="https://wa.me/?text=${encodeURIComponent('ClauseShield Legal Notice: ' + c.title + ' - Reference ' + c.issue_reference)}" target="_blank" rel="noopener" style="padding:8px 16px;font-size:.85rem;">
+            💬 WhatsApp Notice
+          </a>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Attach event listeners to card actions
+  attachComplaintCardListeners(complaints);
+}
+
+// Card Interactive Event Handlers
+function attachComplaintCardListeners(complaints) {
+  // 1. Toggle Reply Form
+  document.querySelectorAll('.btn-toggle-reply').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-issue-id');
+      const form = $(`replyForm_${id}`);
+      if (form) {
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') {
+          form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    });
+  });
+
+  // 2. Cancel Reply Form
+  document.querySelectorAll('.btn-cancel-advice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-issue-id');
+      const form = $(`replyForm_${id}`);
+      if (form) form.style.display = 'none';
+    });
+  });
+
+  // 3. Submit Free Legal Advice
+  document.querySelectorAll('.btn-submit-advice').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-issue-id');
+      const advName = $(`advName_${id}`) ? $(`advName_${id}`).value.trim() : 'Advocate';
+      const advBar = $(`advBar_${id}`) ? $(`advBar_${id}`).value.trim() : 'Bar Council Enrolled';
+      const advMsg = $(`advMsg_${id}`) ? $(`advMsg_${id}`).value.trim() : '';
+      const advAction = $(`advAction_${id}`) ? $(`advAction_${id}`).value.trim() : '';
+
+      if (!advMsg) {
+        toast('Please enter your legal advice message.');
+        return;
+      }
+
+      try {
+        await ClauseShieldDB.issues.addLawyerResponse({
+          issueId: id,
+          lawyer_name: advName,
+          bar_number: advBar,
+          message: advMsg,
+          action_recommended: advAction
+        });
+        toast('✓ Free legal advice posted successfully!');
+        renderComplaintsFeed();
+      } catch (err) {
+        toast(err.message || 'Failed to post legal advice.');
+      }
+    });
+  });
+
+  // 4. Open Modal Legal Notice Draft Preview
+  document.querySelectorAll('.btn-open-notice-modal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-issue-id');
+      const cmp = complaints.find(c => c.id === id);
+      if (!cmp) return;
+
+      const noticeText = ClauseShieldDB.issues.generateLegalNotice(cmp);
+      if ($('modalNoticePreview')) $('modalNoticePreview').textContent = noticeText;
+      if ($('legalNoticeModalTitle')) $('legalNoticeModalTitle').textContent = `Legal Notice · ${cmp.issue_reference}`;
+      openModal('legalNoticeModal');
+    });
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  initAuthModal();
+  initComplaintsPortal();
   checkBackendStatus();
   calculate();
   syncFormalLetter();
@@ -1426,188 +1955,256 @@ document.querySelectorAll('.cs-modal-backdrop').forEach(backdrop => {
   });
 });
 
-// Auth Modal Trigger
-const authNavBtn = $('authNavBtn');
-if (authNavBtn) {
-  authNavBtn.addEventListener('click', () => openModal('authModal'));
-}
-
 // ------------------------------------------------------------------------------
-// Auth Modal Tabs & Submission Handlers
+// Streamlined & Resilient Authentication Management
 // ------------------------------------------------------------------------------
 
-let activeAuthRole = 'tenant';
-let activeAuthMode = 'login'; // 'login' or 'register'
+let activeSignUpRole = 'tenant';
 
-const authTypeBtns = document.querySelectorAll('.auth-type-btn');
-authTypeBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    authTypeBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeAuthRole = btn.getAttribute('data-type');
-    updateAuthModalView();
-  });
-});
+function initAuthModal() {
+  const authNavBtn = $('authNavBtn');
+  if (authNavBtn) {
+    authNavBtn.addEventListener('click', () => {
+      openModal('authModal');
+      switchAuthTab('login');
+    });
+  }
 
-const showLoginBtn = $('showLoginBtn');
-const showRegisterBtn = $('showRegisterBtn');
-
-if (showLoginBtn && showRegisterBtn) {
-  showLoginBtn.addEventListener('click', () => {
-    activeAuthMode = 'login';
-    showLoginBtn.classList.add('active');
-    showRegisterBtn.classList.remove('active');
-    updateAuthModalView();
-  });
-
-  showRegisterBtn.addEventListener('click', () => {
-    activeAuthMode = 'register';
-    showRegisterBtn.classList.add('active');
-    showLoginBtn.classList.remove('active');
-    updateAuthModalView();
-  });
-}
-
-function updateAuthModalView() {
-  const signInForm = $('signInForm');
-  const tenantRegisterForm = $('tenantRegisterForm');
-  const lawyerRegisterForm = $('lawyerRegisterForm');
+  // Segmented Mode Tabs: Sign In vs Create Account
+  const tabSignInBtn = $('tabSignInBtn');
+  const tabSignUpBtn = $('tabSignUpBtn');
+  const authSignInPane = $('authSignInPane');
+  const authSignUpPane = $('authSignUpPane');
   const authModalTitle = $('authModalTitle');
 
-  if (activeAuthRole === 'admin') {
-    // Admin is login-only
-    if (showRegisterBtn) showRegisterBtn.style.display = 'none';
-    activeAuthMode = 'login';
-    if (showLoginBtn) showLoginBtn.classList.add('active');
-    if (authModalTitle) authModalTitle.textContent = 'Administrator Portal Login';
-  } else {
-    if (showRegisterBtn) showRegisterBtn.style.display = 'inline-block';
-    if (authModalTitle) {
-      authModalTitle.textContent = activeAuthRole === 'lawyer' ? 'Advocate Portal' : 'Tenant Support Portal';
+  function switchAuthTab(mode) {
+    const errBox1 = $('signInErrorBox');
+    const errBox2 = $('tenantRegErrorBox');
+    const errBox3 = $('lawyerRegErrorBox');
+    if (errBox1) errBox1.style.display = 'none';
+    if (errBox2) errBox2.style.display = 'none';
+    if (errBox3) errBox3.style.display = 'none';
+
+    if (mode === 'login') {
+      if (tabSignInBtn) tabSignInBtn.classList.add('active');
+      if (tabSignUpBtn) tabSignUpBtn.classList.remove('active');
+      if (authSignInPane) authSignInPane.style.display = 'block';
+      if (authSignUpPane) authSignUpPane.style.display = 'none';
+      if (authModalTitle) authModalTitle.textContent = 'Sign In to ClauseShield';
+    } else {
+      if (tabSignUpBtn) tabSignUpBtn.classList.add('active');
+      if (tabSignInBtn) tabSignInBtn.classList.remove('active');
+      if (authSignInPane) authSignInPane.style.display = 'none';
+      if (authSignUpPane) authSignUpPane.style.display = 'block';
+      if (authModalTitle) authModalTitle.textContent = 'Create Your Free Account';
     }
   }
 
-  if (activeAuthMode === 'login') {
-    if (signInForm) signInForm.style.display = 'block';
-    if (tenantRegisterForm) tenantRegisterForm.style.display = 'none';
-    if (lawyerRegisterForm) lawyerRegisterForm.style.display = 'none';
-  } else {
-    if (signInForm) signInForm.style.display = 'none';
-    if (activeAuthRole === 'tenant') {
+  if (tabSignInBtn) tabSignInBtn.addEventListener('click', () => switchAuthTab('login'));
+  if (tabSignUpBtn) tabSignUpBtn.addEventListener('click', () => switchAuthTab('register'));
+
+  const switchRegisterLink = $('switchRegisterLink');
+  if (switchRegisterLink) {
+    switchRegisterLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('register');
+    });
+  }
+
+  const switchSignInLink = $('switchSignInLink');
+  if (switchSignInLink) {
+    switchSignInLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('login');
+    });
+  }
+
+  // Quick 1-Click Demo Login Buttons
+  document.querySelectorAll('.demo-login-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = btn.getAttribute('data-email');
+      const pass = btn.getAttribute('data-pass');
+      try {
+        const user = await ClauseShieldDB.auth.signIn({ email, password: pass });
+        toast(`✓ Logged in as ${user.full_name} (${user.role.toUpperCase()})`);
+        closeModal('authModal');
+        updateNavUserState();
+        if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+      } catch (err) {
+        toast(err.message || 'Demo login failed');
+      }
+    });
+  });
+
+  // Role Card Switcher in Create Account
+  const roleCardTenant = $('roleCardTenant');
+  const roleCardLawyer = $('roleCardLawyer');
+  const tenantRegisterForm = $('tenantRegisterForm');
+  const lawyerRegisterForm = $('lawyerRegisterForm');
+
+  if (roleCardTenant && roleCardLawyer) {
+    roleCardTenant.addEventListener('click', () => {
+      activeSignUpRole = 'tenant';
+      roleCardTenant.classList.add('active');
+      roleCardLawyer.classList.remove('active');
       if (tenantRegisterForm) tenantRegisterForm.style.display = 'block';
       if (lawyerRegisterForm) lawyerRegisterForm.style.display = 'none';
-    } else if (activeAuthRole === 'lawyer') {
+    });
+
+    roleCardLawyer.addEventListener('click', () => {
+      activeSignUpRole = 'lawyer';
+      roleCardLawyer.classList.add('active');
+      roleCardTenant.classList.remove('active');
       if (tenantRegisterForm) tenantRegisterForm.style.display = 'none';
       if (lawyerRegisterForm) lawyerRegisterForm.style.display = 'block';
-    }
+    });
+  }
+
+  // Sign In Form Submission (With Smart Auto-Account Creation)
+  const signInForm = $('signInForm');
+  if (signInForm) {
+    signInForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = $('loginEmail').value.trim();
+      const password = $('loginPassword').value;
+      const errBox = $('signInErrorBox');
+      if (errBox) errBox.style.display = 'none';
+
+      try {
+        const user = await ClauseShieldDB.auth.signIn({ email, password });
+        toast(`✓ Welcome back, ${user.full_name}!`);
+        closeModal('authModal');
+        updateNavUserState();
+        if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+
+        if (user.role === 'tenant') {
+          window.location.hash = '#complaint-generator';
+        } else if (user.role === 'lawyer') {
+          window.location.hash = '#complaints-board';
+        } else if (user.role === 'admin') {
+          window.location.hash = '#admin-dashboard';
+        }
+      } catch (err) {
+        // If account not found: auto-create user or provide friendly 1-click option
+        if (err.userNotFound) {
+          if (errBox) {
+            errBox.style.display = 'block';
+            errBox.innerHTML = `
+              <strong>No account found for "${escapeHTML(email)}".</strong><br>
+              <div style="margin-top:8px;">
+                <button type="button" class="btn primary" id="btnAutoCreateTenant" style="padding:6px 12px;font-size:.82rem;">Create as Tenant</button>
+                <button type="button" class="btn secondary" id="btnAutoCreateLawyer" style="padding:6px 12px;font-size:.82rem;margin-left:6px;">Create as Advocate</button>
+              </div>
+            `;
+            $('btnAutoCreateTenant').onclick = async () => {
+              const u = await ClauseShieldDB.auth.signUp({ email, password, full_name: email.split('@')[0], role: 'tenant' });
+              toast(`✓ Account created! Welcome, ${u.full_name}`);
+              closeModal('authModal');
+              updateNavUserState();
+              if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+            };
+            $('btnAutoCreateLawyer').onclick = async () => {
+              const u = await ClauseShieldDB.auth.signUp({ email, password, full_name: 'Adv. ' + email.split('@')[0], role: 'lawyer' });
+              toast(`✓ Advocate account created! Welcome, ${u.full_name}`);
+              closeModal('authModal');
+              updateNavUserState();
+              if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+            };
+          } else {
+            toast(err.message);
+          }
+        } else {
+          if (errBox) {
+            errBox.style.display = 'block';
+            errBox.textContent = err.message || 'Login failed. Please check credentials.';
+          } else {
+            toast(err.message || 'Login failed.');
+          }
+        }
+      }
+    });
+  }
+
+  // Tenant Register Form Submission
+  if (tenantRegisterForm) {
+    tenantRegisterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const full_name = $('tenantFullName').value.trim();
+      const email = $('tenantRegEmail').value.trim();
+      const password = $('tenantRegPassword').value;
+      const phone = $('tenantRegPhone') ? $('tenantRegPhone').value.trim() : '';
+      const errBox = $('tenantRegErrorBox');
+      if (errBox) errBox.style.display = 'none';
+
+      try {
+        const user = await ClauseShieldDB.auth.signUp({
+          email,
+          password,
+          full_name,
+          phone,
+          role: 'tenant'
+        });
+        toast(`✓ Account created! Welcome, ${user.full_name}`);
+        closeModal('authModal');
+        updateNavUserState();
+        if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+        window.location.hash = '#complaint-generator';
+      } catch (err) {
+        if (errBox) {
+          errBox.style.display = 'block';
+          errBox.textContent = err.message || 'Registration failed.';
+        } else {
+          toast(err.message || 'Registration failed.');
+        }
+      }
+    });
+  }
+
+  // Lawyer Register Form Submission
+  if (lawyerRegisterForm) {
+    lawyerRegisterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const full_name = $('lawyerFullName').value.trim();
+      const email = $('lawyerRegEmail').value.trim();
+      const password = $('lawyerRegPassword').value;
+      const bar_council_number = $('lawyerBarNumber') ? $('lawyerBarNumber').value.trim() : 'PENDING';
+      const state_bar_council = $('lawyerStateBar') ? $('lawyerStateBar').value : 'Bar Council of Maharashtra & Goa';
+      const specialisation = $('lawyerSpecialty') ? $('lawyerSpecialty').value : 'Tenancy Law';
+      const consultation_fee = $('lawyerFee') ? Number($('lawyerFee').value) : 0;
+      const errBox = $('lawyerRegErrorBox');
+      if (errBox) errBox.style.display = 'none';
+
+      try {
+        const user = await ClauseShieldDB.auth.signUp({
+          email,
+          password,
+          full_name,
+          role: 'lawyer',
+          lawyerDetails: {
+            bar_council_number,
+            state_bar_council,
+            specialisation,
+            consultation_fee
+          }
+        });
+        toast(`✓ Advocate Account active! Welcome, ${user.full_name}`);
+        closeModal('authModal');
+        updateNavUserState();
+        if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+        window.location.hash = '#complaints-board';
+      } catch (err) {
+        if (errBox) {
+          errBox.style.display = 'block';
+          errBox.textContent = err.message || 'Advocate registration failed.';
+        } else {
+          toast(err.message || 'Advocate registration failed.');
+        }
+      }
+    });
   }
 }
 
-// Quick demo login shortcuts
-document.querySelectorAll('.quick-login-link').forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    const email = link.getAttribute('data-email');
-    const pass = link.getAttribute('data-pass');
-    $('loginEmail').value = email;
-    $('loginPassword').value = pass;
-    $('signInForm').dispatchEvent(new Event('submit'));
-  });
-});
-
-// Sign In Form Submit
-const signInForm = $('signInForm');
-if (signInForm) {
-  signInForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = $('loginEmail').value.trim();
-    const password = $('loginPassword').value;
-
-    try {
-      const user = await ClauseShieldDB.auth.signIn({ email, password });
-      toast(`✓ Welcome back, ${user.full_name}!`);
-      closeModal('authModal');
-      updateNavUserState();
-
-      // Navigate to appropriate dashboard
-      if (user.role === 'tenant') window.location.hash = '#tenant-dashboard';
-      else if (user.role === 'lawyer') window.location.hash = '#lawyer-dashboard';
-      else if (user.role === 'admin') window.location.hash = '#admin-dashboard';
-    } catch (err) {
-      toast(err.message || 'Login failed. Please check credentials.');
-    }
-  });
-}
-
-// Tenant Register Form Submit
-const tenantRegisterForm = $('tenantRegisterForm');
-if (tenantRegisterForm) {
-  tenantRegisterForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const full_name = $('tenantFullName').value.trim();
-    const email = $('tenantRegEmail').value.trim();
-    const phone = $('tenantRegPhone').value.trim();
-    const password = $('tenantRegPassword').value;
-
-    try {
-      const user = await ClauseShieldDB.auth.signUp({
-        email,
-        password,
-        full_name,
-        phone,
-        role: 'tenant'
-      });
-      toast(`✓ Account created! Welcome, ${user.full_name}`);
-      closeModal('authModal');
-      updateNavUserState();
-      window.location.hash = '#tenant-dashboard';
-    } catch (err) {
-      toast(err.message || 'Registration failed.');
-    }
-  });
-}
-
-// Lawyer Register Form Submit
-const lawyerRegisterForm = $('lawyerRegisterForm');
-if (lawyerRegisterForm) {
-  lawyerRegisterForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const full_name = $('lawyerFullName').value.trim();
-    const email = $('lawyerRegEmail').value.trim();
-    const phone = $('lawyerRegPhone').value.trim();
-    const password = $('lawyerRegPassword').value;
-
-    const lawyerDetails = {
-      bar_council_number: $('lawyerBarNumber').value.trim(),
-      state_bar_council: $('lawyerStateBar').value,
-      specialisation: $('lawyerSpecialty').value,
-      years_experience: Number($('lawyerExperience').value) || 1,
-      bio: $('lawyerBio').value.trim(),
-      consultation_fee: Number($('lawyerFee').value) || 500,
-      availability: $('lawyerAvailability').value.trim(),
-      document_name: 'bar_council_id_document.pdf'
-    };
-
-    try {
-      const user = await ClauseShieldDB.auth.signUp({
-        email,
-        password,
-        full_name,
-        phone,
-        role: 'lawyer',
-        lawyerDetails
-      });
-      toast(`✓ Application submitted! Your credentials are now pending administrative verification.`);
-      closeModal('authModal');
-      updateNavUserState();
-      window.location.hash = '#lawyer-dashboard';
-    } catch (err) {
-      toast(err.message || 'Lawyer registration failed.');
-    }
-  });
-}
-
-// ------------------------------------------------------------------------------
 // "Post Your Legal Issue" Submission Form
 // ------------------------------------------------------------------------------
 
@@ -2503,6 +3100,8 @@ document.querySelectorAll('.dash-tabs').forEach(tabGroup => {
 // ------------------------------------------------------------------------------
 
 window.addEventListener('DOMContentLoaded', () => {
+  initAuthModal();
+  initComplaintsPortal();
   updateNavUserState();
   loadLawyerDirectory();
   handleHashNavigation();

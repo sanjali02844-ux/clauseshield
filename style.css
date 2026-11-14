@@ -584,3 +584,478 @@
 
 /* Verified Badge in Lawyer Card */
 .verified-icon{color:var(--green);font-weight:bold;margin-left:4px}
+
+
+/* ==============================================================================
+   TENANT COMPLAINTS PORTAL & FREE LAWYER BOARD STYLES
+   ============================================================================== */
+
+.complaints-portal {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  padding: 36px;
+  box-shadow: 0 10px 40px rgba(16,29,53,0.06);
+  margin-bottom: 40px;
+}
+
+.portal-nav-tabs {
+  display: flex;
+  gap: 12px;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 30px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.portal-tab-btn {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -6px;
+  transition: all .2s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.portal-tab-btn:hover {
+  color: var(--blue);
+}
+
+.portal-tab-btn.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+}
+
+/* Quick Variety Filter Chips */
+.variety-chips-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  scrollbar-width: thin;
+}
+
+.variety-chip {
+  background: #f4f7fc;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: .84rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.variety-chip:hover {
+  background: #e8effd;
+  border-color: #cbdcfc;
+  color: var(--blue);
+}
+
+.variety-chip.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+  box-shadow: 0 3px 10px rgba(49,94,232,0.3);
+}
+
+.variety-chip .chip-count {
+  background: rgba(0,0,0,0.08);
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: .74rem;
+}
+
+.variety-chip.active .chip-count {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+}
+
+/* Filter & Sort Controls Grid */
+.filter-sort-bar {
+  background: #f8faff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 26px;
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+@media (max-width: 1100px) {
+  .filter-sort-bar {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .filter-sort-bar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter-sort-bar label {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.filter-sort-bar select, .filter-sort-bar input {
+  margin-bottom: 0 !important;
+  padding: 10px 12px !important;
+  font-size: .86rem !important;
+  border-radius: 8px !important;
+}
+
+/* Complaints Feed Cards */
+.complaints-feed-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.complaint-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 26px;
+  transition: all .2s;
+  box-shadow: 0 4px 16px rgba(16,29,53,0.04);
+}
+
+.complaint-card:hover {
+  border-color: #cbdcfc;
+  box-shadow: 0 8px 26px rgba(49,94,232,0.08);
+}
+
+.complaint-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.complaint-badges-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge-variety {
+  background: #eef3ff;
+  color: var(--blue);
+  border: 1px solid #d4e3ff;
+  font-weight: 700;
+  font-size: .75rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.badge-urgency {
+  font-size: .72rem;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.badge-urgency.urgent {
+  background: #fde8e8;
+  color: #c81e1e;
+  border: 1px solid #f8b4b4;
+}
+
+.badge-urgency.medium {
+  background: #fef08a;
+  color: #854d0e;
+  border: 1px solid #fde047;
+}
+
+.badge-urgency.low {
+  background: #def7ec;
+  color: #03543f;
+  border: 1px solid #bcf0da;
+}
+
+.complaint-card-title {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0 0 10px;
+  line-height: 1.35;
+}
+
+.complaint-meta-bar {
+  display: flex;
+  gap: 16px;
+  font-size: .84rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.complaint-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.complaint-dispute-box {
+  background: #f8faff;
+  border-left: 4px solid var(--blue);
+  padding: 12px 16px;
+  border-radius: 0 8px 8px 0;
+  font-size: .92rem;
+  color: var(--ink);
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dispute-val-large {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--blue);
+}
+
+.complaint-description {
+  font-size: .92rem;
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.complaint-relief-box {
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: .85rem;
+  color: #713f12;
+  margin-bottom: 18px;
+}
+
+/* Lawyer Advice Box on Card */
+.lawyer-responses-container {
+  background: #fbfcfe;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.lawyer-response-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.lawyer-response-item {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 14px;
+}
+
+.lawyer-response-item:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.lawyer-profile-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.lawyer-avatar-small {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.lawyer-info-text strong {
+  font-size: .88rem;
+  color: var(--navy);
+  display: block;
+}
+
+.lawyer-info-text small {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.lawyer-advice-text {
+  font-size: .88rem;
+  color: #1f2937;
+  line-height: 1.55;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.lawyer-rec-tag {
+  display: inline-block;
+  background: #def7ec;
+  color: #03543f;
+  font-weight: 700;
+  font-size: .74rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+/* Inline Lawyer Response Form */
+.lawyer-reply-form {
+  background: #f0f5ff;
+  border: 1px solid #c7d9fc;
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 16px;
+}
+
+.complaint-actions-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+/* Quick Demo Bar in Auth Modal */
+.quick-demo-banner {
+  background: #f0f4fd;
+  border: 1px solid #d3e2fc;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+}
+
+.quick-demo-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.quick-demo-buttons .demo-login-btn {
+  font-size: .78rem;
+  padding: 7px 11px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #cbdcfc;
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.quick-demo-buttons .demo-login-btn:hover {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+.auth-tabs-segmented {
+  display: flex;
+  background: #edf2fc;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.auth-tab-btn.active {
+  background: #fff;
+  color: var(--blue);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.auth-role-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.auth-role-card {
+  border: 2px solid var(--line);
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: all .2s;
+}
+
+.auth-role-card:hover {
+  border-color: #cbdcfc;
+}
+
+.auth-role-card.active {
+  border-color: var(--blue);
+  background: #f6f9ff;
+}
+
+.auth-role-card .role-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.auth-role-card .role-title {
+  font-size: .92rem;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.auth-role-card .role-sub {
+  font-size: .75rem;
+  color: var(--muted);
+}
