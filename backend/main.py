@@ -109,7 +109,7 @@ VERIFIED_LAWS_KNOWLEDGE_BASE = [
         "keywords": ["expired", "expire", "lapse", "not renewed", "unrenewed", "holding over"],
         "act_name": "Transfer of Property Act, 1882",
         "section": "Section 111(a) & Section 116 (Determination of Lease & Holding Over)",
-        "summary": "When a lease period expires by efflux of time, its covenants (including lock-in restrictions and penalties) lapse automatically. Continuing occupancy with rent payment becomes a month-to-month tenancy without lock-in liability.",
+        "summary": "When your rental agreement expires, all lock-in periods and exit penalties end automatically. If you stay on and pay rent, you are only required to give standard written notice, and the landlord cannot charge you an early exit fee.",
         "tag": "Statutory Protection",
         "query": "Transfer of Property Act 1882 Section 111 Section 116 holding over expiry of lease"
     },
@@ -117,7 +117,7 @@ VERIFIED_LAWS_KNOWLEDGE_BASE = [
         "keywords": ["notice", "15 days", "month to month", "vacate notice", "relocating", "job transfer"],
         "act_name": "Transfer of Property Act, 1882",
         "section": "Section 106 (Notice to Terminate Month-to-Month Tenancy)",
-        "summary": "Following lease expiry or for monthly residential tenancies, a 15-day written notice expiring with the tenancy month is legally sufficient to vacate without incurring any lock-in forfeiture.",
+        "summary": "When an agreement has expired or is on a month-to-month basis, a 15-day written notice to vacate is legally sufficient, and no lock-in penalty can be imposed.",
         "tag": "Notice Standards",
         "query": "Transfer of Property Act 1882 Section 106 notice to quit month to month"
     },
@@ -125,7 +125,7 @@ VERIFIED_LAWS_KNOWLEDGE_BASE = [
         "keywords": ["lock-in", "lockin", "premature", "early exit", "forfeit", "forfeiture", "break lease", "penalty"],
         "act_name": "Supreme Court Precedent & Contract Law",
         "section": "Section 74 ICA & Kailash Nath Associates v. DDA (2015)",
-        "summary": "Liquidated damages cannot be punitive. A landlord cannot automatically seize deposits or levy early exit penalties unless they demonstrate actual, unmitigated financial vacancy loss despite reasonable efforts to re-let.",
+        "summary": "The Supreme Court of India ruled that a landlord cannot keep a tenant's deposit just because the agreement mentions a penalty. The landlord must prove they suffered real financial loss, and they must try to re-rent the property to minimize any vacancy.",
         "tag": "Judicial Precedent",
         "query": "Kailash Nath Associates vs DDA Section 74 liquidated damages forfeiture"
     },
@@ -133,7 +133,7 @@ VERIFIED_LAWS_KNOWLEDGE_BASE = [
         "keywords": ["paint", "whitewash", "colour", "repainting", "wear", "tear"],
         "act_name": "Indian Contract Act, 1872",
         "section": "Section 74 (Fair Wear & Tear vs Deductions)",
-        "summary": "Stipulating an automatic deduction (like 1 month's rent) for painting without proving actual damage beyond normal atmospheric wear and tear is an unenforceable penalty. Deductions must reflect actual, itemized contractor invoices.",
+        "summary": "Normal paint fading and wall scuffs are fair wear and tear. Deducting money or demanding 1 month's rent for painting without proving tenant damage and showing actual GST bills is illegal.",
         "tag": "Contract Doctrine",
         "query": "Indian Contract Act 1872 Section 74 penalty wear and tear"
     },
@@ -141,7 +141,7 @@ VERIFIED_LAWS_KNOWLEDGE_BASE = [
         "keywords": ["deposit", "advance", "refund", "withhold", "caution"],
         "act_name": "Model Tenancy Act, 2021",
         "section": "Section 11 (Security Deposit Cap & Refund)",
-        "summary": "Recommends that security deposits for residential premises shall not exceed two months' rent. The deposit must be refunded to the tenant within 30 days of handing over vacant possession, after valid agreed deductions.",
+        "summary": "Caps residential deposits at maximum 2 months' rent. The landlord must refund the deposit upon key handover (or within 30 days max) after fair, agreed adjustments.",
         "tag": "Statutory Cap",
         "query": "Model Tenancy Act 2021 Section 11 security deposit refund"
     },
@@ -149,7 +149,7 @@ VERIFIED_LAWS_KNOWLEDGE_BASE = [
         "keywords": ["maintenance", "repair", "structural", "seepage", "plumbing", "electrical"],
         "act_name": "Transfer of Property Act, 1882",
         "section": "Section 108(m) & Model Tenancy Act Second Schedule",
-        "summary": "Divides upkeep responsibilities: structural repairs, external seepage, major plumbing, and whitewashing are the landlord's capital duty. Minor day-to-day upkeep (light bulbs, tap washers) is the tenant's responsibility.",
+        "summary": "Structural repairs, wall seepage, and main plumbing belong to the landlord. Tenants are only responsible for day-to-day minor consumables like light bulbs and tap washers.",
         "tag": "Property Law",
         "query": "Transfer of Property Act 1882 Section 108 landlord repair obligations"
     },
@@ -157,7 +157,7 @@ VERIFIED_LAWS_KNOWLEDGE_BASE = [
         "keywords": ["escalat", "rent increase", "revision", "hike", "increment"],
         "act_name": "Model Tenancy Act, 2021",
         "section": "Section 9 & 10 (Revision of Rent)",
-        "summary": "Rent cannot be increased arbitrarily mid-tenancy. Any rent revision requires a minimum of three months' prior notice in writing before the revised rent becomes payable.",
+        "summary": "Rent cannot be increased mid-tenancy or without advance notice. Landlords must give at least 3 months' written notice before any rent increase can take effect.",
         "tag": "Rent Regulation",
         "query": "Model Tenancy Act 2021 Section 9 10 revision of rent notice"
     },
@@ -449,10 +449,10 @@ def analyze_agreement_content(
             clause_name="Painting & Handover Deductions",
             original_text=paint_sent,
             concern_level="High" if is_fixed_month else "Medium",
-            simple_explanation="Requires you to pay for repainting the property upon moving out, or authorizes a fixed deduction from your security deposit.",
-            why_needs_attention="Under Indian tenancy doctrine, atmospheric paint fading, slight wall discoloration, and tiny nail holes constitute normal fair wear-and-tear. Automatic painting deductions without contractor receipts or proof of actual tenant damage violate principles under Section 74 of the Indian Contract Act, 1872.",
-            suggested_action="Request dated move-in vs move-out photos and an itemised GST invoice from an external painter before agreeing to any repainting deduction.",
-            legal_reference="Indian Contract Act, 1872 – Section 74 & Model Tenancy Act, 2021 Schedule II"
+            simple_explanation="Requires you to pay for repainting the entire flat or allows the landlord to deduct a fixed amount (like one month's rent) from your deposit when moving out.",
+            why_needs_attention="Normal paint fading, minor scuffs, and small nail holes are legally considered 'fair wear and tear' from everyday living. In India, owners are responsible for regular upkeep. Automatic deductions without proof of actual wall damage or GST contractor invoices are unjustified under Section 74 of the Indian Contract Act.",
+            suggested_action="Step 1: On your last day, take clear date-stamped photos and a video of all walls in bright light.\nStep 2: Inform the landlord that normal paint fading is fair wear-and-tear.\nStep 3: If they insist on a deduction, ask for an itemized GST bill and proof of damage caused by you.\nStep 4: Use our WhatsApp draft below to decline arbitrary painting deductions.",
+            legal_reference="Indian Contract Act, 1872 – Section 74 & Model Tenancy Act (Fair Wear & Tear)"
         ))
 
     # 2. Security Deposit & Refund Timeline Clause
@@ -463,10 +463,10 @@ def analyze_agreement_content(
             clause_name="Security Deposit Refund Terms",
             original_text=deposit_sent,
             concern_level="High" if is_delay else "Medium",
-            simple_explanation="Specifies how much deposit you pay and the conditions or timeframe under which the landlord must refund it when you hand over keys.",
-            why_needs_attention="The Model Tenancy Act, 2021 (Section 11) caps residential security deposits at a maximum of two months' rent and requires complete refund upon handover (or within 30 days maximum). Long refund delays or arbitrary deductions leave tenants vulnerable.",
-            suggested_action="Clarify in writing that the full deposit must be returned via bank transfer within 15–30 days of physical handover following a joint move-out inspection.",
-            legal_reference="Model Tenancy Act, 2021 – Section 11 & State Rent Control Rules"
+            simple_explanation="Sets how much security deposit you pay and when the landlord must transfer your money back after you hand over keys.",
+            why_needs_attention="Landlords often delay returning deposits for months or make unreasonable last-minute deductions. The Model Tenancy Act (Section 11) caps residential deposits at 2 months' rent and requires the full deposit to be refunded at the time of key handover (or within 30 days maximum).",
+            suggested_action="Step 1: Request a joint inspection walk-through 2 days before move-out so any issues are discussed upfront.\nStep 2: Pay all final electricity and water bills and keep payment receipts ready.\nStep 3: Hand over keys only against a written or WhatsApp handover receipt.\nStep 4: Demand the balance deposit transferred to your bank account within 7 to 14 days.",
+            legal_reference="Model Tenancy Act, 2021 – Section 11 (Mandatory Deposit Refund)"
         ))
 
     # 3. Lock-in Period & Early Exit Penalty Clause
@@ -478,20 +478,20 @@ def analyze_agreement_content(
                 clause_name="Expired Agreement & Early Exit Penalty Demand",
                 original_text=lockin_sent,
                 concern_level="High",
-                simple_explanation="The landlord is demanding an early exit or lock-in penalty on an agreement that has already expired by efflux of time and was not renewed.",
-                why_needs_attention="Under Section 111(a) of the Transfer of Property Act, 1882, a lease determines automatically upon expiry of its term. When an agreement expires, its lock-in covenants expire with it. Continuing occupancy creates a periodic month-to-month tenancy under Section 116, terminable with 15 days notice (Section 106). A landlord cannot legally enforce an expired lock-in penalty.",
-                suggested_action="Inform the landlord in writing that the lease expired, extinguishing prior lock-in covenants. Provide 15 days written notice and request full deposit return without penalty.",
-                legal_reference="Transfer of Property Act, 1882 – Section 111(a) & Section 116 (Determination of Lease & Holding Over)"
+                simple_explanation="Your original 11-month rental agreement has ended. Because it was never formally renewed, any lock-in period and early exit penalties expired with it. You are now free to vacate by giving standard notice without paying any penalty.",
+                why_needs_attention="Your landlord has NO legal right to charge a ₹10,000 penalty or deduct it from your deposit. Under Indian law (Transfer of Property Act, Sec 111 & 116), once a lease term ends, all penalty restrictions end. You only pay rent for the actual days you stay and give notice.",
+                suggested_action="Step 1: Do not agree to the ₹10,000 deduction on calls or texts.\nStep 2: Give 15 to 30 days written notice to vacate stating your official move-out date.\nStep 3: Send our pre-written response politely explaining that lock-in rules ended when the agreement expired.\nStep 4: Take move-out photos/videos and demand your full security deposit refund within 7–14 days of handing over keys.",
+                legal_reference="Transfer of Property Act, 1882 – Section 111(a) & Section 116 (Expired Agreement Protection)"
             ))
         else:
             clauses.append(ClauseFinding(
-                clause_name="Lock-in Period & Forfeiture Clause",
+                clause_name="Lock-in Period & Deposit Forfeiture Clause",
                 original_text=lockin_sent,
                 concern_level="High",
-                simple_explanation="Penalizes the tenant for vacating before a specified initial period, often stipulating forfeiture of the entire deposit.",
-                why_needs_attention="The Supreme Court of India (Kailash Nath Associates v. DDA, 2015) held that damages cannot be punitive. A landlord cannot automatically seize an entire security deposit unless they demonstrate actual, unmitigated financial vacancy loss despite reasonable efforts to re-let.",
-                suggested_action="Negotiate an early exit clause providing a reasonable 1-month notice period or the option to introduce a replacement tenant.",
-                legal_reference="Indian Contract Act, 1872 – Section 74 & Supreme Court Precedents on Mitigation of Loss"
+                simple_explanation="The agreement requires you to stay for a minimum lock-in period and threatens to forfeit your deposit or charge a penalty if you move out early.",
+                why_needs_attention="A landlord cannot arbitrarily confiscate your entire deposit or charge heavy penalties. The Supreme Court of India ruled that a landlord can only claim compensation if they suffer genuine financial loss (such as a vacant flat after making real efforts to find a replacement).",
+                suggested_action="Step 1: Give 30 days written notice explaining your genuine need to move (job transfer, emergency).\nStep 2: Offer to help find a replacement tenant (post on flatmate groups) to prevent any rent loss for the owner.\nStep 3: If a replacement is found, the landlord suffers zero loss and must return your deposit in full.\nStep 4: If the landlord still insists on keeping your deposit, send our formal legal letter citing Supreme Court loss mitigation rules.",
+                legal_reference="Indian Contract Act, 1872 – Section 74 & Supreme Court Precedents (Penalties Cannot Be Punitive)"
             ))
 
     # 4. Repairs & Routine Maintenance Clause
@@ -501,9 +501,9 @@ def analyze_agreement_content(
             clause_name="Maintenance & Repair Obligations",
             original_text=maint_sent,
             concern_level="Medium",
-            simple_explanation="Defines who pays for electrical, plumbing, structural, and ongoing building repairs during the lease.",
-            why_needs_attention="Agreements often unfairly push structural seepage, major plumbing breakdown, and building wear onto tenants. Under Section 108(m) of the Transfer of Property Act and the Model Tenancy Act, structural repairs remain the exclusive responsibility of the owner.",
-            suggested_action="Clarify the exact boundary: tenant handles minor consumables (bulbs, minor washers), while landlord remains responsible for structural repairs, plumbing lines, and wiring.",
+            simple_explanation="Defines who pays for electrical, plumbing, wall seepage, and structural building repairs during your stay.",
+            why_needs_attention="Agreements often try to force tenants to pay for heavy structural repairs, old pipe leaks, or seepage. Under Indian law, structural upkeep, external painting, and primary plumbing belong strictly to the property owner; tenants only handle minor routine items (like changing light bulbs).",
+            suggested_action="Step 1: Report any leakage, seepage, or electrical breakdown immediately in writing with photos/videos.\nStep 2: If the landlord delays repairs, remind them in writing that structural maintenance is the owner's responsibility under tenancy law.\nStep 3: If urgent repairs are ignored, you have the right to get it fixed and adjust the documented bill from the rent.",
             legal_reference="Transfer of Property Act, 1882 – Section 108 & Model Tenancy Act, 2021 – Section 15"
         ))
 
@@ -514,10 +514,10 @@ def analyze_agreement_content(
             clause_name="Rent Revision & Escalation Terms",
             original_text=rent_sent,
             concern_level="Low" if "notice" in rent_sent.lower() else "Medium",
-            simple_explanation="Sets the percentage and frequency by which the monthly rent will increase upon agreement renewal.",
-            why_needs_attention="Under the Model Tenancy Act, rent revisions cannot be unilateral or unexpected. Landlords must give at least three months' prior notice in writing before the revised rent can be enforced.",
-            suggested_action="Confirm that rent revisions require 3 months advance written notice and reflect reasonable local market adjustments.",
-            legal_reference="Model Tenancy Act, 2021 – Section 9 & 10"
+            simple_explanation="Specifies how much and how often the landlord can increase your monthly rent upon lease renewal.",
+            why_needs_attention="Landlords cannot arbitrarily raise rent without warning or mid-agreement. Under the Model Tenancy Act, landlords must provide at least 3 months' written notice before any revised rent can take effect.",
+            suggested_action="Step 1: Confirm that rent can only increase upon renewal, never mid-tenancy.\nStep 2: Require 3 months advance written notice before accepting any proposed increase.\nStep 3: Compare market rates for similar flats in your society before agreeing to high increases.",
+            legal_reference="Model Tenancy Act, 2021 – Section 9 & 10 (Mandatory 3 Months Notice)"
         ))
 
     # 6. Inspection, Entry & Tenant Privacy Clause
@@ -527,22 +527,22 @@ def analyze_agreement_content(
             clause_name="Landlord Entry & Privacy Rights",
             original_text=entry_sent,
             concern_level="High" if "without notice" in entry_sent.lower() else "Medium",
-            simple_explanation="Governs when and how the landlord or their representative can enter the rented home for inspection.",
-            why_needs_attention="Tenants have a fundamental right to quiet possession and privacy. Section 17 of the Model Tenancy Act strictly requires at least 24 hours' prior written or electronic notice, and visits must occur only between 7:00 AM and 8:00 PM.",
-            suggested_action="Ensure the clause specifies a mandatory 24-hour advance written notice and agreed appointment time for any inspection.",
-            legal_reference="Model Tenancy Act, 2021 – Section 17 & Bharatiya Nyaya Sanhita (Criminal Trespass)"
+            simple_explanation="Sets out the rules for when the landlord can enter your rented home for inspections or repairs.",
+            why_needs_attention="You are paying rent for peaceful possession and complete personal privacy. A landlord cannot drop in unannounced or demand entry whenever they like. Under Section 17 of the Model Tenancy Act, the landlord must give at least 24 hours prior written notice and visit only between 7:00 AM and 8:00 PM.",
+            suggested_action="Step 1: Insist on a mandatory 24-hour advance notice in writing before any visit.\nStep 2: Request that inspections be scheduled only at mutually agreed times when you or your family are home.\nStep 3: Keep entry records and decline unannounced drop-ins politely.",
+            legal_reference="Model Tenancy Act, 2021 – Section 17 (24-Hour Advance Written Notice Required)"
         ))
 
     # 7. Disconnection / Utilities Clause
     disc_sent = find_best_sentence(r'(?:disconnect|cut off|stop.*electricity|water.*supply|amenities|withhold.*service)')
     if disc_sent:
         clauses.append(ClauseFinding(
-            clause_name="Essential Utilities & Service Withholding",
+            clause_name="Essential Utilities & Disconnection Threat",
             original_text=disc_sent,
             concern_level="High",
-            simple_explanation="Purports to allow the landlord to cut off water, electricity, or amenities if there is a dispute or delay.",
-            why_needs_attention="Cutting off water or electricity is illegal in India. Section 20 of the Model Tenancy Act and Section 29 of the Maharashtra Rent Control Act expressly prohibit disconnecting essential services, treating it as an actionable offense.",
-            suggested_action="Demand the removal of any clause that threatens disconnection of essential amenities; disputes must be resolved through established legal channels.",
+            simple_explanation="Mentions cutting off electricity, water, or lift access if there is a dispute or rent delay.",
+            why_needs_attention="Cutting off water or electricity is strictly illegal under Indian law, even if rent is delayed. State Rent Control Acts empower rent authorities to order immediate reconnection and penalize landlords who cut essential utilities.",
+            suggested_action="Step 1: Immediately send a written message that withholding essential utilities is a punishable offense under state tenancy law.\nStep 2: Clear any undisputed utility bills and keep proof.\nStep 3: If utilities are cut, file an urgent complaint with the local Rent Authority or police station for immediate restoration.",
             legal_reference="Model Tenancy Act, 2021 – Section 20 & State Rent Control Acts"
         ))
 
@@ -550,13 +550,13 @@ def analyze_agreement_content(
     if not clauses:
         first_clean = text[:280].replace("\n", " ").strip()
         clauses.append(ClauseFinding(
-            clause_name="General Lease Terms & Handover Covenants",
-            original_text=first_clean or "Tenancy covenants governing security deposit, handover, and notice period.",
+            clause_name="General Lease Terms Review",
+            original_text=first_clean or "Tenancy agreement terms governing deposit, notice period, and handover.",
             concern_level="Low",
-            simple_explanation="Standard tenancy framework establishing lease tenure, handover rules, and mutual covenants.",
-            why_needs_attention="All verbal promises, maintenance covenants, and deposit return terms should be clearly recorded in writing before signing.",
-            suggested_action="Verify that all move-in conditions, inventory lists, and refund deadlines are explicitly documented.",
-            legal_reference="Indian Contract Act, 1872 – Section 10 & 73"
+            simple_explanation="We reviewed your situation and agreement text to check for common tenant dispute risks regarding deposits, notice periods, and move-out deductions.",
+            why_needs_attention="Tenancy disputes in India usually arise from verbal promises or unclear handover rules. Under the Indian Contract Act, any deposit deduction must be based on proven financial loss, not arbitrary penalties.",
+            suggested_action="Step 1: Ensure all agreements and move-out notices are communicated in writing (WhatsApp/Email).\nStep 2: Take clear date-stamped photos of the apartment before vacating.\nStep 3: Do not agree to verbal deductions; ask for written invoices for any claimed expense.",
+            legal_reference="Indian Contract Act, 1872 & Model Tenancy Act, 2021"
         ))
 
     # Calculate overall risk score
@@ -574,73 +574,120 @@ def analyze_agreement_content(
         concern_level = "INFORMATION CHECK"
         verdict_title = "Lease agreement appears standard with routine tenancy covenants."
 
-    overall_summary = (
-        f"ClauseShield analyzed your rental document ({document_name}). We identified {len(clauses)} specific clause(s) "
-        f"relating to security deposits, painting charges, repairs, and handover terms. "
-        "Review each highlighted clause below to understand where standard Indian tenancy practices and legal provisions protect your rights."
-    )
+    is_expired_case = bool(re.search(r'(?:expired|lapse|not renewed|unrenewed)', text, re.I))
+
+    if is_expired_case and any("Expired" in c.clause_name for c in clauses):
+        overall_summary = (
+            "Good news: Under Indian law, because your 11-month agreement already expired and was never formally renewed, "
+            "all lock-in periods and early exit penalties are completely void. You are legally free to move out by giving "
+            "standard notice (15 to 30 days), and your landlord has NO legal basis to deduct the early exit penalty."
+        )
+    else:
+        overall_summary = (
+            f"ClauseShield analyzed your rental document ({document_name}). We identified {len(clauses)} key area(s) "
+            "concerning security deposits, wear-and-tear deductions, repairs, and notice rules under Indian tenancy law. "
+            "Follow the clear step-by-step action plan below to protect your money."
+        )
 
     suggested_steps = [
-        "Review the exact quoted wording in each card below against your signed copy.",
-        "Request written invoices, contractor bills, and move-in comparison photos before accepting deductions.",
-        "Send the pre-drafted WhatsApp response or Formal Letter to the landlord requesting itemized accounting.",
-        "Check applicable state rules (e.g. Model Tenancy Act, Rent Control Acts) before accepting penalties."
+        "Do NOT verbally agree to penalties or arbitrary deductions from your deposit.",
+        "Give 15 to 30 days written notice to vacate via WhatsApp and email stating your move-out date.",
+        "Send the tailored WhatsApp response or Formal Letter below explaining why the penalty is invalid.",
+        "Take date-stamped 4K photos and video of all rooms and fixtures during your move-out inspection.",
+        "Demand your complete security deposit refund via bank transfer within 7 to 14 days of key handover."
     ]
 
     # Generate customized WhatsApp draft referencing the actual identified clauses
     clause_summaries = ", ".join(c.clause_name for c in clauses[:2])
-    dispute_display = f"₹{amount_in_dispute:,.0f}" if amount_in_dispute > 0 else (f"₹{security_deposit:,.0f}" if security_deposit > 0 else "the security deposit")
-    is_expired_case = bool(re.search(r'(?:expired|lapse|not renewed|unrenewed)', text, re.I))
+    deposit_display = f"₹{security_deposit:,.0f}" if security_deposit > 0 else "my full security deposit"
+    penalty_display = f"₹{amount_in_dispute:,.0f}" if amount_in_dispute > 0 else "the early exit penalty"
 
     if is_expired_case and any("Expired" in c.clause_name for c in clauses):
         whatsapp_draft = (
             f"{greeting}\n\n"
-            f"I am writing regarding the handover and security deposit refund for our rented flat at {loc}. "
-            f"Regarding the early exit penalty demanded: our 11-month agreement has already expired by efflux of time and was not formally renewed. "
-            f"Under Section 111(a) and Section 116 of the Transfer of Property Act, 1882, any prior lock-in period lapsed upon lease expiry, "
-            f"and continuing occupancy operates on a month-to-month basis terminable by 15 days notice (Section 106).\n\n"
-            f"I am providing written notice to vacate. Please confirm the complete refund of {dispute_display} within {reply_days} days so we can conclude the handover smoothly.\n\n"
+            f"I am writing regarding my move-out and the security deposit refund for the flat at {loc}.\n\n"
+            f"Regarding the {penalty_display}: Our 11-month rental agreement already expired and was not formally renewed. "
+            f"Under Indian law (Transfer of Property Act, Section 111 & 116), once an agreement expires, all lock-in periods and exit penalties end with it. "
+            f"Since there is no active contract, no early exit penalty applies.\n\n"
+            f"I am formally giving written notice to vacate on [Move-out Date]. I will hand over the flat clean and in good order.\n\n"
+            f"Please confirm that my complete security deposit of {deposit_display} will be refunded in full upon key handover. "
+            f"Let me know a convenient time for our final walk-through.\n\n"
             f"Thank you,\n[Your Name]"
         )
     else:
+        dispute_display = f"₹{amount_in_dispute:,.0f}" if amount_in_dispute > 0 else deposit_display
         whatsapp_draft = (
             f"{greeting}\n\n"
-            f"I am writing regarding the rental agreement and handover for our premises at {loc}. "
-            f"I have reviewed the agreement terms regarding {clause_summaries}. "
-            f"To ensure a smooth and transparent handover, could you please share an itemised accounting along with supporting bills "
-            f"for any proposed deductions beyond standard fair wear and tear?\n\n"
-            f"I would like to settle {dispute_display} amicably. Please let me know your thoughts within {reply_days} days so we can confirm the remaining refund.\n\n"
+            f"I am writing regarding our rental agreement and move-out handover for the flat at {loc}.\n\n"
+            f"Regarding our discussion on {clause_summaries}: I want to ensure a smooth, transparent handover. "
+            f"As per standard tenancy norms, regular paint fading and normal living wear are fair wear-and-tear. "
+            f"Could you please share an itemised accounting along with contractor receipts for any proposed deductions?\n\n"
+            f"I would like to settle {dispute_display} amicably and receive the balance refund upon key handover. "
+            f"Please let me know your thoughts within {reply_days} days.\n\n"
             f"Thank you,\n[Your Name]"
         )
 
     # Generate customized Formal Legal Letter referencing the actual quotes
     quoted_clauses_block = ""
     for idx, c in enumerate(clauses[:3], 1):
-        quoted_clauses_block += f"{idx}. {c.clause_name}: \"{c.original_text[:140]}...\"\n   -> Point for clarification: {c.suggested_action}\n"
+        first_line_action = c.suggested_action.split('\n')[0] if '\n' in c.suggested_action else c.suggested_action
+        quoted_clauses_block += f"{idx}. {c.clause_name}: \"{c.original_text[:140]}...\"\n   -> Point for clarification: {first_line_action}\n"
 
-    formal_letter = (
-        f"Date: [Insert Date]\n\n"
-        f"To,\n"
-        f"{landlord_ref}\n"
-        f"[Premises Address / Landlord Contact]\n\n"
-        f"Subject: Formal Request for Itemised Accounting and Refund of Security Deposit under Indian Tenancy Standards\n\n"
-        f"{formal_greeting}\n\n"
-        f"I am writing with respect to the tenancy agreement executed for the residential premises situated at {loc}. "
-        f"Following an audit of our lease agreement and handover communications, I wish to address the following specific clauses:\n\n"
-        f"{quoted_clauses_block}\n"
-        f"Under recognized Indian legal doctrines, particularly Section 74 of the Indian Contract Act, 1872 and the Model Tenancy Act, 2021, "
-        f"deductions from a tenant's security deposit cannot operate as arbitrary forfeiture or penalty. Deductions must represent actual, proven, "
-        f"and documented loss. Ordinary aging, sun fading, and normal wear and tear remain the landlord's capital maintenance duty.\n\n"
-        f"Accordingly, I formally request that you provide:\n"
-        f"1. Itemised receipts or GST invoices for all actual contractor expenses incurred.\n"
-        f"2. Move-in versus move-out comparative photographic evidence demonstrating tenant-inflicted damage.\n"
-        f"3. Immediate electronic transfer of the undisputed portion of the security deposit.\n\n"
-        f"Please provide your written accounting within {reply_days} days of receipt of this communication so that this matter may be concluded amicably.\n\n"
-        f"This communication is without prejudice to all rights and legal remedies available under applicable law.\n\n"
-        f"Yours sincerely,\n\n"
-        f"[Your Name]\n"
-        f"[Your Phone Number / Email Address]"
-    )
+    if is_expired_case and any("Expired" in c.clause_name for c in clauses):
+        formal_letter = (
+            f"Date: [Insert Date]\n\n"
+            f"To,\n"
+            f"{landlord_ref}\n"
+            f"[Premises Address / Landlord Contact]\n\n"
+            f"Subject: Formal Notice of Move-Out and Full Refund of Security Deposit (No Early Exit Penalty Applicable)\n\n"
+            f"{formal_greeting}\n\n"
+            f"I am writing to formally communicate my schedule to vacate the residential premises situated at {loc}, "
+            f"and to request the complete refund of my security deposit.\n\n"
+            f"1. Expiry of Agreement and Invalidity of Lock-in Penalty:\n"
+            f"Our 11-month rental agreement expired and was not formally renewed. Under Section 111(a) of the Transfer of Property Act, 1882, "
+            f"a lease determines automatically upon the expiry of its term. When an agreement expires, all special restrictions—including "
+            f"lock-in periods and early exit penalties—are legally extinguished. Occupancy thereafter operates on a month-to-month basis "
+            f"(Section 116), terminable by standard written notice (Section 106). Consequently, the proposed early termination penalty of "
+            f"{penalty_display} has no legal validity.\n\n"
+            f"2. Supreme Court Landmark Doctrine on Penalties:\n"
+            f"Under Section 74 of the Indian Contract Act, 1872 and landmark rulings of the Supreme Court of India "
+            f"(Kailash Nath Associates v. DDA, 2015), forfeiture and penalties cannot be punitive. A landlord cannot deduct or forfeit "
+            f"a tenant's security deposit without demonstrating actual, unmitigated financial loss.\n\n"
+            f"3. Handover and Refund Timeline:\n"
+            f"I am providing this formal written notice to vacate the premises on [Move-out Date]. I will hand over the flat clean "
+            f"and in good condition, and invite you for a joint walk-through inspection.\n\n"
+            f"Accordingly, I request that you:\n"
+            f"1. Confirm withdrawal of the proposed early exit penalty of {penalty_display}.\n"
+            f"2. Acknowledge this written notice of handover.\n"
+            f"3. Transfer the full security deposit of {deposit_display} to my bank account upon key handover.\n\n"
+            f"Please provide your written confirmation within {reply_days} days so that this matter may be concluded amicably.\n\n"
+            f"Yours sincerely,\n\n"
+            f"[Your Name]\n"
+            f"[Your Contact Number / Email Address]"
+        )
+    else:
+        formal_letter = (
+            f"Date: [Insert Date]\n\n"
+            f"To,\n"
+            f"{landlord_ref}\n"
+            f"[Premises Address / Landlord Contact]\n\n"
+            f"Subject: Formal Request for Itemised Accounting and Refund of Security Deposit under Indian Tenancy Standards\n\n"
+            f"{formal_greeting}\n\n"
+            f"I am writing with respect to the tenancy agreement executed for the residential premises situated at {loc}. "
+            f"Following an audit of our lease agreement and handover communications, I wish to address the following specific clauses:\n\n"
+            f"{quoted_clauses_block}\n"
+            f"Under recognized Indian legal doctrines, particularly Section 74 of the Indian Contract Act, 1872 and the Model Tenancy Act, 2021, "
+            f"deductions from a tenant's security deposit cannot operate as arbitrary forfeiture or penalty. Deductions must represent actual, proven, "
+            f"and documented loss. Ordinary aging, sun fading, and normal wear and tear remain the landlord's capital maintenance duty.\n\n"
+            f"Accordingly, I formally request that you provide:\n"
+            f"1. Itemised receipts or GST invoices for all actual contractor expenses incurred.\n"
+            f"2. Move-in versus move-out comparative photographic evidence demonstrating tenant-inflicted damage.\n"
+            f"3. Immediate electronic transfer of the undisputed portion of the security deposit.\n\n"
+            f"Please provide your written accounting within {reply_days} days of receipt of this communication so that this matter may be concluded amicably.\n\n"
+            f"Yours sincerely,\n\n"
+            f"[Your Name]\n"
+            f"[Your Phone Number / Email Address]"
+        )
 
     legal_refs = find_relevant_laws(text, state)
 
@@ -691,15 +738,15 @@ def analyze_with_gemini(
         client = genai.Client(api_key=gemini_key)
 
         system_instruction = (
-            "You are ClauseShield, an expert Indian legal technology auditor specialized in residential and commercial tenancy. "
+            "You are ClauseShield, an expert Indian tenancy advisor and legal auditor. "
             "Your task is to analyze actual rental agreements and tenant disputes under Indian Law. "
             "Follow these rules strictly: "
             "1. Identify clauses related to: security deposits, painting charges, maintenance, lock-in periods, early termination, penalties, rent increases, repairs, privacy/entry, and utilities. "
             "2. Identify clauses that may be unfair, unclear or worth reviewing. "
-            "3. Quote the EXACT relevant sentence from the uploaded agreement in 'original_text'. Do not fabricate or generalize quotes. "
-            "4. Explain the clause in simple, everyday English. "
-            "5. Explain why the clause may be concerning under Indian tenancy jurisprudence (e.g. fair wear-and-tear doctrine, liquidated damages vs penalty under Section 74 Indian Contract Act, Model Tenancy Act 2021). "
-            "6. Suggest what the tenant should clarify or request from the landlord. "
+            "3. Quote the EXACT relevant sentence from the uploaded agreement in 'original_text'. Do not fabricate quotes. "
+            "4. Explain the clause in simple, everyday conversational English that any tenant can easily understand without needing a lawyer. Avoid dense legal jargon like 'efflux of time', 'covenants', 'holding over', or 'liquidated damages'. "
+            "5. In 'why_needs_attention', explain the direct financial impact on the tenant's wallet and why the landlord has no legal right to arbitrarily keep their money. "
+            "6. In 'suggested_action', provide an empowering, concrete, step-by-step numbered action plan (Step 1: ..., Step 2: ..., Step 3: ...) giving the tenant exact words and actions to protect their deposit and resolve the dispute. "
             "7. Assign Concern Level: 'High', 'Medium', or 'Low'. Do not label a clause illegal automatically; state that final legal position depends on the agreement and applicable law. "
             "8. Provide relevant, verified Indian legal references and sections. "
             f"9. Incorporate state context for {state}: {STATE_CONTEXTS.get(state, STATE_CONTEXTS['All-India'])}. "
