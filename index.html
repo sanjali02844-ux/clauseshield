@@ -84,7 +84,10 @@
       <div class="panel">
         <div class="tabs"><button class="tab active" data-tab="whatsapp">WhatsApp message</button><button class="tab" data-tab="formal">Formal letter</button></div>
         <div id="whatsappPane"><div class="form-grid"><div><label for="landlordName">Landlord's name (optional)</label><input id="landlordName" placeholder="Landlord name"></div><div><label for="deadline">Reply timeline (days)</label><input id="deadline" type="number" min="1" value="7"></div></div><label for="whatsappText">Editable message</label><textarea id="whatsappText" rows="7"></textarea><div class="actions"><button class="btn primary" id="copyMessage">Copy text</button><a class="btn secondary" id="whatsappLink" target="_blank" rel="noopener">Open WhatsApp</a></div></div>
-        <div id="formalPane" hidden><label for="formalText">Editable formal letter</label><textarea id="formalText" rows="12"></textarea><div class="actions"><button class="btn primary" id="printLetter">Print / Save as PDF</button><button class="btn secondary" id="copyLetter">Copy letter</button></div></div>
+        <div id="formalPane" hidden><label for="formalText">Editable formal letter</label><textarea id="formalText" rows="12"></textarea><div class="actions"><button class="btn primary" id="printLetter<!-- Find your letter container and add id="printable-letter" -->
+<div id="printable-letter">
+    <!-- your letter content / textarea here -->
+</div>"><button onclick="window.print()">Print / Save as PDF</button><button class="btn secondary" id="copyLetter">Copy letter</button></div></div>
       </div>
     </section>
 
