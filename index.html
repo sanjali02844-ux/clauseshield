@@ -33,23 +33,60 @@
       <a href="#calculator">Dispute Calculator</a>
       <a href="#lawyers">Find a Lawyer</a>
       
-      <!-- Guest Action: Login / Sign Up -->
-      <button class="btn primary nav-cta" id="authNavBtn">Login / Sign Up</button>
+      <!-- Guest Actions: Sign In & Get Started -->
+      <div class="nav-auth-group" id="navAuthGroup">
+        <button type="button" class="nav-auth-link" id="navSignInBtn">Sign In</button>
+        <button type="button" class="btn primary nav-cta" id="authNavBtn">Get Started</button>
+      </div>
       
       <!-- Authenticated User Menu Dropdown (Initially Hidden) -->
       <div class="user-menu-wrapper" id="userMenuWrapper" style="display:none;">
-        <div class="user-pill" id="userPill" title="Open profile menu">
+        <button type="button" class="user-pill" id="userPill" aria-haspopup="true" aria-expanded="false" title="Open account profile menu">
           <img src="https://ui-avatars.com/api/?name=User&background=315ee8&color=fff" alt="User avatar" class="user-avatar-tiny" id="navUserAvatar">
-          <span id="navUserName">My Account</span>
-          <span class="user-role-badge badge-tenant" id="navUserRole">Tenant</span>
-        </div>
+          <span class="user-pill-name" id="navUserName">My Account</span>
+          <span class="user-role-badge badge-tenant" id="navUserRole">TENANT</span>
+          <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
         <div class="user-dropdown" id="userDropdown">
-          <a href="#tenant-dashboard" id="navDashboardLink">📋 Dashboard</a>
-          <a href="#complaint-generator">📝 Generate Complaint</a>
-          <a href="#complaints-board">⚖️ Free Lawyer Board</a>
-          <a href="javascript:void(0)" id="navOpenSupabaseConfig">⚙️ Supabase Settings</a>
-          <hr>
-          <button type="button" class="logout-btn" id="logoutBtn">🚪 Log Out</button>
+          <div class="user-dropdown-header">
+            <img src="https://ui-avatars.com/api/?name=User&background=315ee8&color=fff" alt="User Avatar" class="user-dropdown-avatar" id="dropdownUserAvatar">
+            <div class="user-dropdown-info">
+              <div class="user-dropdown-name" id="dropdownUserName">My Account</div>
+              <div class="user-dropdown-email" id="dropdownUserEmail">user@example.com</div>
+              <div class="user-dropdown-badge-row">
+                <span class="user-status-dot"></span>
+                <span class="user-status-text" id="dropdownUserStatus">Active Session</span>
+              </div>
+            </div>
+          </div>
+          <div class="user-dropdown-menu">
+            <a href="#tenant-dashboard" id="navDashboardLink">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              <span>Personal Dashboard</span>
+            </a>
+            <a href="#complaint-generator">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Generate Complaint</span>
+            </a>
+            <a href="#complaints-board">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
+              <span>Free Lawyer Board</span>
+            </a>
+            <a href="#audit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>AI Lease Audit</span>
+            </a>
+            <a href="javascript:void(0)" id="navOpenSupabaseConfig">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Platform Settings</span>
+            </a>
+          </div>
+          <div class="user-dropdown-footer">
+            <button type="button" class="logout-btn" id="logoutBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
@@ -1174,156 +1211,397 @@
        MODALS & DIALOGS
        ============================================================================== -->
 
-  <!-- 1. AUTHENTICATION MODAL -->
+  <!-- 1. AUTHENTICATION MODAL (REFINED EXECUTIVE EDITION) -->
   <div class="cs-modal-backdrop" id="authModal">
     <div class="cs-modal">
-      <div class="modal-header">
-        <div>
-          <h3 id="authModalTitle" style="margin:0 0 4px;">Welcome to ClauseShield</h3>
-          <p id="authModalSubtitle" style="font-size:.85rem;color:var(--muted);margin:0;">Access tenant legal assistance, free lawyer advice, and complaint tracking.</p>
+      <div class="modal-header auth-modal-header">
+        <div class="auth-header-left">
+          <div class="auth-logo-badge">
+            <span class="brand-mark small">C</span>
+            <span class="auth-security-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Secure Auth
+            </span>
+          </div>
+          <h3 id="authModalTitle">Sign In to ClauseShield</h3>
+          <p id="authModalSubtitle">Access tenant legal assistance, lease audits, and verified advocate advice.</p>
         </div>
-        <button type="button" class="modal-close-btn" data-close="authModal" aria-label="Close dialog">×</button>
+        <button type="button" class="modal-close-btn" data-close="authModal" aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
+
       <div class="modal-body">
-        <!-- Quick Demo Login Bar -->
-        <div class="quick-demo-banner">
-          <span style="font-size:.8rem;font-weight:700;color:var(--navy);">⚡ Instant 1-Click Demo Logins:</span>
-          <div class="quick-demo-buttons">
-            <button type="button" class="btn secondary demo-login-btn" data-email="tenant@example.com" data-pass="password123">👤 Tenant Demo (Arjun)</button>
-            <button type="button" class="btn secondary demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123">⚖️ Free Lawyer Demo (Adv. Rajesh)</button>
-            <button type="button" class="btn secondary demo-login-btn" data-email="admin@clauseshield.com" data-pass="password123">🛡️ Admin Demo</button>
+        <!-- Instant 1-Click Demo Sandbox Personas -->
+        <div class="auth-demo-bar">
+          <div class="auth-demo-label">
+            <span class="demo-live-dot"></span>
+            <span>⚡ Instant 1-Click Demo Personas:</span>
+          </div>
+          <div class="auth-demo-chips">
+            <button type="button" class="demo-chip demo-login-btn" data-email="tenant@example.com" data-pass="password123" title="Log in as Arjun (Tenant)">
+              <span class="chip-icon">👤</span>
+              <span class="chip-text">Tenant (Arjun)</span>
+            </button>
+            <button type="button" class="demo-chip demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123" title="Log in as Adv. Rajesh (Advocate)">
+              <span class="chip-icon">⚖️</span>
+              <span class="chip-text">Advocate (Rajesh)</span>
+            </button>
+            <button type="button" class="demo-chip demo-login-btn" data-email="admin@clauseshield.com" data-pass="password123" title="Log in as Platform Admin">
+              <span class="chip-icon">🛡️</span>
+              <span class="chip-text">Admin</span>
+            </button>
           </div>
         </div>
 
-        <!-- Mode Toggle Tabs (Sign In vs Create Account) -->
+        <!-- Mode Toggle Segmented Tabs -->
         <div class="auth-tabs-segmented" role="tablist">
-          <button type="button" class="auth-tab-btn active" id="tabSignInBtn">🔑 Sign In</button>
-          <button type="button" class="auth-tab-btn" id="tabSignUpBtn">✨ Create New Account</button>
+          <button type="button" class="auth-tab-btn active" id="tabSignInBtn" role="tab" aria-selected="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span>Sign In</span>
+          </button>
+          <button type="button" class="auth-tab-btn" id="tabSignUpBtn" role="tab" aria-selected="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            <span>Create Account</span>
+          </button>
         </div>
 
         <!-- Sign In Form Pane -->
         <div id="authSignInPane">
+          <!-- Google 1-Click SSO -->
+          <div class="auth-social-row">
+            <button type="button" class="btn-social-oauth" id="googleSignInBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" class="oauth-icon">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.97 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span>Continue with Google</span>
+            </button>
+          </div>
+
+          <div class="auth-divider">
+            <span>or sign in with email</span>
+          </div>
+
           <form id="signInForm">
-            <label for="loginEmail">Email Address *</label>
-            <input type="email" id="loginEmail" placeholder="your.name@example.com" required autocomplete="email">
+            <div class="form-field-group">
+              <label for="loginEmail">Email Address <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <input type="email" id="loginEmail" placeholder="your.name@example.com" required autocomplete="email">
+              </div>
+            </div>
 
-            <label for="loginPassword">Password *</label>
-            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            <div class="form-field-group">
+              <div class="field-label-row">
+                <label for="loginPassword">Password <span class="req">*</span></label>
+                <a href="javascript:void(0)" class="forgot-pwd-link" id="forgotPasswordBtn">Forgot password?</a>
+              </div>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                <button type="button" class="pwd-toggle-btn" data-target="loginPassword" aria-label="Toggle password visibility">
+                  <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M2 2l20 20"/></svg>
+                </button>
+              </div>
+            </div>
 
-            <div id="signInErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
+            <div class="auth-aux-row">
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="loginRememberMe" checked>
+                <span class="checkbox-text">Keep me signed in</span>
+              </label>
+            </div>
 
-            <button type="submit" class="btn primary full" id="signInSubmitBtn">Sign In</button>
+            <div id="signInErrorBox" class="auth-alert-box error" style="display:none;"></div>
 
-            <div style="text-align:center;margin-top:16px;font-size:.85rem;color:var(--muted);">
+            <button type="submit" class="btn primary full auth-submit-btn" id="signInSubmitBtn">
+              <span>Sign In to ClauseShield</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <div class="auth-footer-prompt">
               Don't have an account yet? 
-              <a href="javascript:void(0)" id="switchRegisterLink" style="color:var(--blue);font-weight:700;text-decoration:none;">Create New Account here &rarr;</a>
+              <a href="javascript:void(0)" id="switchRegisterLink">Create New Account here &rarr;</a>
             </div>
           </form>
         </div>
 
         <!-- Create Account Form Pane -->
         <div id="authSignUpPane" style="display:none;">
-          <div style="margin-bottom:16px;">
-            <label style="font-size:.84rem;font-weight:700;color:var(--navy);display:block;margin-bottom:8px;">Choose Account Type *</label>
-            <div class="auth-role-cards">
-              <label class="auth-role-card active" id="roleCardTenant">
+          <div class="auth-role-selection">
+            <span class="auth-role-heading">Choose Account Type</span>
+            <div class="auth-role-cards-v2">
+              <label class="auth-role-card-v2 active" id="roleCardTenant">
                 <input type="radio" name="signupRole" value="tenant" checked style="display:none;">
-                <span class="role-icon">👤</span>
-                <span class="role-title">Tenant Account</span>
-                <span class="role-sub">File complaints &amp; get free legal aid</span>
+                <div class="role-check-indicator">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="role-icon-circle tenant-circle">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="role-card-details">
+                  <span class="role-card-name">Tenant / Renter</span>
+                  <span class="role-card-sub">File complaints &amp; get free legal aid</span>
+                </div>
               </label>
-              <label class="auth-role-card" id="roleCardLawyer">
+
+              <label class="auth-role-card-v2" id="roleCardLawyer">
                 <input type="radio" name="signupRole" value="lawyer" style="display:none;">
-                <span class="role-icon">⚖️</span>
-                <span class="role-title">Free Lawyer / Advocate</span>
-                <span class="role-sub">Review complaints &amp; advise tenants</span>
+                <div class="role-check-indicator">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="role-icon-circle lawyer-circle">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
+                </div>
+                <div class="role-card-details">
+                  <span class="role-card-name">Advocate / Lawyer</span>
+                  <span class="role-card-sub">Review grievances &amp; advise tenants</span>
+                </div>
               </label>
             </div>
           </div>
 
           <!-- Tenant Registration Form -->
           <form id="tenantRegisterForm">
-            <label for="tenantFullName">Full Name *</label>
-            <input type="text" id="tenantFullName" placeholder="e.g. Arjun Mehra" required autocomplete="name">
+            <div class="form-field-group">
+              <label for="tenantFullName">Full Name <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="tenantFullName" placeholder="e.g. Arjun Mehra" required autocomplete="name">
+              </div>
+            </div>
 
-            <label for="tenantRegEmail">Email Address *</label>
-            <input type="email" id="tenantRegEmail" placeholder="arjun.mehra@example.com" required autocomplete="email">
+            <div class="form-field-group">
+              <label for="tenantRegEmail">Email Address <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <input type="email" id="tenantRegEmail" placeholder="arjun.mehra@example.com" required autocomplete="email">
+              </div>
+            </div>
 
-            <label for="tenantRegPassword">Password *</label>
-            <input type="password" id="tenantRegPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+            <div class="form-field-group">
+              <label for="tenantRegPassword">Create Password <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="tenantRegPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+                <button type="button" class="pwd-toggle-btn" data-target="tenantRegPassword" aria-label="Toggle password visibility">
+                  <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M2 2l20 20"/></svg>
+                </button>
+              </div>
+              <!-- Password Strength Meter -->
+              <div class="pwd-strength-container" id="tenantPwdStrengthBox" style="display:none;">
+                <div class="pwd-strength-bar" id="tenantPwdBar">
+                  <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+                </div>
+                <div class="pwd-strength-feedback">
+                  <span class="pwd-strength-text" id="tenantPwdText">Too Short</span>
+                  <span class="pwd-strength-hint" id="tenantPwdHint">At least 6 characters required</span>
+                </div>
+              </div>
+            </div>
 
-            <label for="tenantRegPhone">Phone Number <small style="font-weight:normal;color:var(--muted);">(Optional)</small></label>
-            <input type="tel" id="tenantRegPhone" placeholder="+91 98765 43210">
+            <div class="form-field-group">
+              <label for="tenantRegPhone">Phone Number <small style="font-weight:normal;color:#64748b;">(Optional for SMS/WhatsApp updates)</small></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <input type="tel" id="tenantRegPhone" placeholder="+91 98765 43210">
+              </div>
+            </div>
 
-            <div id="tenantRegErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
+            <div class="auth-aux-row">
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="tenantTermsCheck" checked required>
+                <span class="checkbox-text">I agree to ClauseShield's Terms of Legal Aid &amp; Privacy Policy</span>
+              </label>
+            </div>
 
-            <button type="submit" class="btn primary full" id="tenantRegisterSubmitBtn">Create Tenant Account &amp; Log In</button>
+            <div id="tenantRegErrorBox" class="auth-alert-box error" style="display:none;"></div>
+
+            <button type="submit" class="btn primary full auth-submit-btn" id="tenantRegisterSubmitBtn">
+              <span>Create Tenant Account &amp; Log In</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </form>
 
           <!-- Lawyer Registration Form -->
           <form id="lawyerRegisterForm" style="display:none;">
-            <label for="lawyerFullName">Advocate Full Name *</label>
-            <input type="text" id="lawyerFullName" placeholder="e.g. Adv. Rohit Deshmukh" required autocomplete="name">
-
-            <div class="form-grid">
-              <div>
-                <label for="lawyerRegEmail">Email Address *</label>
-                <input type="email" id="lawyerRegEmail" placeholder="adv.rohit@lawchambers.in" required autocomplete="email">
-              </div>
-              <div>
-                <label for="lawyerRegPassword">Password *</label>
-                <input type="password" id="lawyerRegPassword" placeholder="Create password" required autocomplete="new-password">
+            <div class="form-field-group">
+              <label for="lawyerFullName">Advocate Full Name <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="lawyerFullName" placeholder="e.g. Adv. Rohit Deshmukh" required autocomplete="name">
               </div>
             </div>
 
             <div class="form-grid">
-              <div>
-                <label for="lawyerBarNumber">Bar Council Enrolment No. *</label>
-                <input type="text" id="lawyerBarNumber" placeholder="e.g. MAH/5821/2020" value="MAH/5821/2020" required>
+              <div class="form-field-group">
+                <label for="lawyerRegEmail">Email Address <span class="req">*</span></label>
+                <div class="input-with-icon">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  <input type="email" id="lawyerRegEmail" placeholder="adv.rohit@lawchambers.in" required autocomplete="email">
+                </div>
               </div>
-              <div>
-                <label for="lawyerStateBar">State Bar Council *</label>
-                <select id="lawyerStateBar" required>
-                  <option value="Bar Council of Maharashtra & Goa">Bar Council of Maharashtra &amp; Goa</option>
-                  <option value="Karnataka State Bar Council">Karnataka State Bar Council</option>
-                  <option value="Bar Council of Delhi">Bar Council of Delhi</option>
-                  <option value="Bar Council of Tamil Nadu">Bar Council of Tamil Nadu</option>
-                  <option value="Bar Council of Telangana">Bar Council of Telangana</option>
-                  <option value="Bar Council of West Bengal">Bar Council of West Bengal</option>
-                  <option value="Other State Bar Council">Other State Bar Council</option>
-                </select>
+              <div class="form-field-group">
+                <label for="lawyerRegPassword">Password <span class="req">*</span></label>
+                <div class="input-with-icon">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <input type="password" id="lawyerRegPassword" placeholder="Create password" required autocomplete="new-password">
+                  <button type="button" class="pwd-toggle-btn" data-target="lawyerRegPassword" aria-label="Toggle password visibility">
+                    <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="eye-closed" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M2 2l20 20"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
 
             <div class="form-grid">
-              <div>
-                <label for="lawyerSpecialty">Legal Specialisation *</label>
-                <select id="lawyerSpecialty" required>
-                  <option value="Tenancy Disputes & Deposit Recovery">Tenancy Disputes &amp; Deposit Recovery</option>
-                  <option value="Rental Agreements & Eviction Defense">Rental Agreements &amp; Eviction Defense</option>
-                  <option value="Landlord Harassment & Utility Rights">Landlord Harassment &amp; Utility Rights</option>
-                  <option value="Unfair Charges & Move-out Repairs">Unfair Charges &amp; Move-out Repairs</option>
-                  <option value="Civil & Consumer Tenancy Law">Civil &amp; Consumer Tenancy Law</option>
-                </select>
+              <div class="form-field-group">
+                <label for="lawyerBarNumber">Bar Council Enrolment No. <span class="req">*</span></label>
+                <div class="input-with-icon">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
+                  <input type="text" id="lawyerBarNumber" placeholder="e.g. MAH/5821/2020" value="MAH/5821/2020" required>
+                </div>
               </div>
-              <div>
-                <label for="lawyerFee">Consultation Mode *</label>
-                <select id="lawyerFee">
-                  <option value="0" selected>Pro Bono / Free Legal Aid (₹0)</option>
-                  <option value="500">Standard Consultation (₹500)</option>
-                </select>
+              <div class="form-field-group">
+                <label for="lawyerStateBar">State Bar Council <span class="req">*</span></label>
+                <div class="input-with-icon">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <select id="lawyerStateBar" required>
+                    <option value="Bar Council of Maharashtra & Goa">Bar Council of Maharashtra &amp; Goa</option>
+                    <option value="Karnataka State Bar Council">Karnataka State Bar Council</option>
+                    <option value="Bar Council of Delhi">Bar Council of Delhi</option>
+                    <option value="Bar Council of Tamil Nadu">Bar Council of Tamil Nadu</option>
+                    <option value="Bar Council of Telangana">Bar Council of Telangana</option>
+                    <option value="Bar Council of West Bengal">Bar Council of West Bengal</option>
+                    <option value="Other State Bar Council">Other State Bar Council</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div id="lawyerRegErrorBox" style="display:none;background:#fdf2f2;border:1px solid #f8b4b4;color:#9b1c1c;padding:12px;border-radius:8px;font-size:.85rem;margin-bottom:14px;"></div>
+            <div class="form-grid">
+              <div class="form-field-group">
+                <label for="lawyerSpecialty">Legal Specialisation <span class="req">*</span></label>
+                <div class="input-with-icon">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <select id="lawyerSpecialty" required>
+                    <option value="Tenancy Disputes & Deposit Recovery">Tenancy Disputes &amp; Deposit Recovery</option>
+                    <option value="Rental Agreements & Eviction Defense">Rental Agreements &amp; Eviction Defense</option>
+                    <option value="Landlord Harassment & Utility Rights">Landlord Harassment &amp; Utility Rights</option>
+                    <option value="Unfair Charges & Move-out Repairs">Unfair Charges &amp; Move-out Repairs</option>
+                    <option value="Civil & Consumer Tenancy Law">Civil &amp; Consumer Tenancy Law</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-field-group">
+                <label for="lawyerFee">Consultation Mode <span class="req">*</span></label>
+                <div class="input-with-icon">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+                  <select id="lawyerFee">
+                    <option value="0" selected>Pro Bono / Free Legal Aid (₹0)</option>
+                    <option value="500">Standard Consultation (₹500)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 
-            <button type="submit" class="btn primary full" id="lawyerRegisterSubmitBtn">Create Advocate Account &amp; Access Board</button>
+            <!-- Lawyer Verification Callout -->
+            <div class="lawyer-verification-callout">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Instant Verification Active: Auto-verified under Bar Council of India pro bono demonstration rules.</span>
+            </div>
+
+            <div class="auth-aux-row">
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="lawyerTermsCheck" checked required>
+                <span class="checkbox-text">I confirm active Bar Council enrolment &amp; agree to pro bono guidelines</span>
+              </label>
+            </div>
+
+            <div id="lawyerRegErrorBox" class="auth-alert-box error" style="display:none;"></div>
+
+            <button type="submit" class="btn primary full auth-submit-btn" id="lawyerRegisterSubmitBtn">
+              <span>Create Advocate Account &amp; Access Board</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </form>
 
-          <div style="text-align:center;margin-top:16px;font-size:.85rem;color:var(--muted);">
+          <div class="auth-footer-prompt">
             Already have an account? 
-            <a href="javascript:void(0)" id="switchSignInLink" style="color:var(--blue);font-weight:700;text-decoration:none;">Sign In here &rarr;</a>
+            <a href="javascript:void(0)" id="switchSignInLink">Sign In here &rarr;</a>
           </div>
+        </div>
+
+        <!-- Forgot Password Form Pane -->
+        <div id="authForgotPane" style="display:none;">
+          <form id="forgotPasswordForm">
+            <div class="form-field-group">
+              <label for="forgotEmail">Registered Email Address <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <input type="email" id="forgotEmail" placeholder="your.name@example.com" required autocomplete="email">
+              </div>
+            </div>
+
+            <div class="form-field-group">
+              <label for="resetNewPassword">Create New Password <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="resetNewPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+                <button type="button" class="pwd-toggle-btn" data-target="resetNewPassword" aria-label="Toggle password visibility">
+                  <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M2 2l20 20"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-field-group">
+              <label for="resetConfirmPassword">Confirm New Password <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="resetConfirmPassword" placeholder="Re-enter password" required autocomplete="new-password">
+                <button type="button" class="pwd-toggle-btn" data-target="resetConfirmPassword" aria-label="Toggle password visibility">
+                  <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M2 2l20 20"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div id="forgotAlertBox" class="auth-alert-box error" style="display:none;"></div>
+
+            <button type="submit" class="btn primary full auth-submit-btn" id="forgotSubmitBtn">
+              <span>Reset Password &amp; Sign In</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <div class="auth-footer-prompt">
+              Remember your password? 
+              <a href="javascript:void(0)" id="backToSignInLink">&larr; Back to Sign In</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Trust & Security Signals Footer -->
+        <div class="auth-trust-footer">
+          <span class="trust-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            256-Bit SSL Encrypted
+          </span>
+          <span class="trust-divider">•</span>
+          <span class="trust-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Indian Tenancy Laws
+          </span>
+          <span class="trust-divider">•</span>
+          <span class="trust-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            BCI Pro Bono Aligned
+          </span>
         </div>
       </div>
     </div>

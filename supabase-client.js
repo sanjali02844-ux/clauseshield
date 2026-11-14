@@ -707,6 +707,54 @@
         }
       },
 
+      async resetPassword({ email, newPassword }) {
+        if (!email || !newPassword) {
+          throw new Error('Please enter both your email address and new password.');
+        }
+        if (newPassword.length < 6) {
+          throw new Error('New password must be at least 6 characters long.');
+        }
+        const profiles = getStorage(STORAGE_KEYS.PROFILES, []);
+        const normalizedEmail = email.toLowerCase().trim();
+        const userIndex = profiles.findIndex(p => p.email.toLowerCase() === normalizedEmail);
+        if (userIndex === -1) {
+          throw new Error(`No account found registered to ${normalizedEmail}. Please check the email or sign up.`);
+        }
+        profiles[userIndex].password = newPassword;
+        setStorage(STORAGE_KEYS.PROFILES, profiles);
+        return { success: true, email: normalizedEmail, user: profiles[userIndex] };
+      },
+
+      async signInWithGoogle() {
+        const email = 'arjun.mehra@gmail.com';
+        const profiles = getStorage(STORAGE_KEYS.PROFILES, []);
+        let user = profiles.find(p => p.email.toLowerCase() === email);
+        if (!user) {
+          user = {
+            id: generateId('usr'),
+            email: email,
+            password: 'google_oauth_session_verified',
+            full_name: 'Arjun Mehra',
+            phone: '+91 98190 12345',
+            role: 'tenant',
+            avatar_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+            created_at: new Date().toISOString()
+          };
+          profiles.push(user);
+          setStorage(STORAGE_KEYS.PROFILES, profiles);
+        }
+        const sessionUser = {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+          phone: user.phone,
+          role: user.role,
+          avatar_url: user.avatar_url
+        };
+        setStorage(STORAGE_KEYS.CURRENT_USER, sessionUser);
+        return sessionUser;
+      },
+
       signOut() {
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
         return true;

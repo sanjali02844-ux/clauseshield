@@ -1811,17 +1811,31 @@ let currentBookingContext = { lawyer: null, issue: null, initiatedBy: 'tenant' }
 function updateNavUserState() {
   const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
   const authNavBtn = $('authNavBtn');
+  const navAuthGroup = $('navAuthGroup');
   const userMenuWrapper = $('userMenuWrapper');
   const navUserName = $('navUserName');
   const navUserRole = $('navUserRole');
   const navUserAvatar = $('navUserAvatar');
+  const dropdownUserName = $('dropdownUserName');
+  const dropdownUserEmail = $('dropdownUserEmail');
+  const dropdownUserAvatar = $('dropdownUserAvatar');
+  const dropdownUserStatus = $('dropdownUserStatus');
   const navDashboardLink = $('navDashboardLink');
 
   if (user) {
+    if (navAuthGroup) navAuthGroup.style.display = 'none';
     if (authNavBtn) authNavBtn.style.display = 'none';
     if (userMenuWrapper) userMenuWrapper.style.display = 'inline-flex';
     if (navUserName) navUserName.textContent = user.full_name || 'My Account';
     if (navUserAvatar && user.avatar_url) navUserAvatar.src = user.avatar_url;
+    if (dropdownUserAvatar && user.avatar_url) dropdownUserAvatar.src = user.avatar_url;
+    if (dropdownUserName) dropdownUserName.textContent = user.full_name || 'My Account';
+    if (dropdownUserEmail) dropdownUserEmail.textContent = user.email || '';
+    if (dropdownUserStatus) {
+      if (user.role === 'lawyer') dropdownUserStatus.textContent = 'Verified Advocate';
+      else if (user.role === 'admin') dropdownUserStatus.textContent = 'Administrator';
+      else dropdownUserStatus.textContent = 'Active Tenant Member';
+    }
 
     if (navUserRole) {
       navUserRole.textContent = user.role.toUpperCase();
@@ -1839,6 +1853,7 @@ function updateNavUserState() {
     else if (user.role === 'lawyer') loadLawyerDashboard();
     else if (user.role === 'admin') loadAdminDashboard();
   } else {
+    if (navAuthGroup) navAuthGroup.style.display = 'inline-flex';
     if (authNavBtn) authNavBtn.style.display = 'inline-block';
     if (userMenuWrapper) userMenuWrapper.style.display = 'none';
     hideAllDashboards();
@@ -1899,11 +1914,22 @@ const userDropdown = $('userDropdown');
 if (userPill && userDropdown) {
   userPill.addEventListener('click', (e) => {
     e.stopPropagation();
-    userDropdown.classList.toggle('show');
+    const isShowing = userDropdown.classList.toggle('show');
+    userPill.setAttribute('aria-expanded', isShowing ? 'true' : 'false');
   });
 
-  document.addEventListener('click', () => {
-    userDropdown.classList.remove('show');
+  document.addEventListener('click', (e) => {
+    if (!userDropdown.contains(e.target) && !userPill.contains(e.target)) {
+      userDropdown.classList.remove('show');
+      userPill.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  userDropdown.querySelectorAll('a, button').forEach(item => {
+    item.addEventListener('click', () => {
+      userDropdown.classList.remove('show');
+      userPill.setAttribute('aria-expanded', 'false');
+    });
   });
 }
 
@@ -1956,47 +1982,94 @@ document.querySelectorAll('.cs-modal-backdrop').forEach(backdrop => {
 });
 
 // ------------------------------------------------------------------------------
-// Streamlined & Resilient Authentication Management
+// Streamlined & Resilient Authentication Management (Executive Polish)
 // ------------------------------------------------------------------------------
 
 let activeSignUpRole = 'tenant';
+let authModalInitialized = false;
 
 function initAuthModal() {
+  if (authModalInitialized) return;
+  authModalInitialized = true;
+
   const authNavBtn = $('authNavBtn');
+  const navSignInBtn = $('navSignInBtn');
+
   if (authNavBtn) {
     authNavBtn.addEventListener('click', () => {
+      openModal('authModal');
+      switchAuthTab('register');
+    });
+  }
+
+  if (navSignInBtn) {
+    navSignInBtn.addEventListener('click', () => {
       openModal('authModal');
       switchAuthTab('login');
     });
   }
 
-  // Segmented Mode Tabs: Sign In vs Create Account
+  // Segmented Mode Tabs: Sign In vs Create Account vs Forgot Password
   const tabSignInBtn = $('tabSignInBtn');
   const tabSignUpBtn = $('tabSignUpBtn');
   const authSignInPane = $('authSignInPane');
   const authSignUpPane = $('authSignUpPane');
+  const authForgotPane = $('authForgotPane');
   const authModalTitle = $('authModalTitle');
+  const authModalSubtitle = $('authModalSubtitle');
 
   function switchAuthTab(mode) {
     const errBox1 = $('signInErrorBox');
     const errBox2 = $('tenantRegErrorBox');
     const errBox3 = $('lawyerRegErrorBox');
+    const errBox4 = $('forgotAlertBox');
     if (errBox1) errBox1.style.display = 'none';
     if (errBox2) errBox2.style.display = 'none';
     if (errBox3) errBox3.style.display = 'none';
+    if (errBox4) errBox4.style.display = 'none';
 
     if (mode === 'login') {
-      if (tabSignInBtn) tabSignInBtn.classList.add('active');
-      if (tabSignUpBtn) tabSignUpBtn.classList.remove('active');
+      if (tabSignInBtn) {
+        tabSignInBtn.classList.add('active');
+        tabSignInBtn.setAttribute('aria-selected', 'true');
+      }
+      if (tabSignUpBtn) {
+        tabSignUpBtn.classList.remove('active');
+        tabSignUpBtn.setAttribute('aria-selected', 'false');
+      }
       if (authSignInPane) authSignInPane.style.display = 'block';
       if (authSignUpPane) authSignUpPane.style.display = 'none';
+      if (authForgotPane) authForgotPane.style.display = 'none';
       if (authModalTitle) authModalTitle.textContent = 'Sign In to ClauseShield';
-    } else {
-      if (tabSignUpBtn) tabSignUpBtn.classList.add('active');
-      if (tabSignInBtn) tabSignInBtn.classList.remove('active');
+      if (authModalSubtitle) authModalSubtitle.textContent = 'Access tenant legal assistance, lease audits, and verified advocate advice.';
+    } else if (mode === 'register') {
+      if (tabSignUpBtn) {
+        tabSignUpBtn.classList.add('active');
+        tabSignUpBtn.setAttribute('aria-selected', 'true');
+      }
+      if (tabSignInBtn) {
+        tabSignInBtn.classList.remove('active');
+        tabSignInBtn.setAttribute('aria-selected', 'false');
+      }
       if (authSignInPane) authSignInPane.style.display = 'none';
       if (authSignUpPane) authSignUpPane.style.display = 'block';
-      if (authModalTitle) authModalTitle.textContent = 'Create Your Free Account';
+      if (authForgotPane) authForgotPane.style.display = 'none';
+      if (authModalTitle) authModalTitle.textContent = 'Create Free ClauseShield Account';
+      if (authModalSubtitle) authModalSubtitle.textContent = 'Select your role to file disputes, audit agreements, or advise tenants.';
+    } else if (mode === 'forgot') {
+      if (tabSignUpBtn) {
+        tabSignUpBtn.classList.remove('active');
+        tabSignUpBtn.setAttribute('aria-selected', 'false');
+      }
+      if (tabSignInBtn) {
+        tabSignInBtn.classList.remove('active');
+        tabSignInBtn.setAttribute('aria-selected', 'false');
+      }
+      if (authSignInPane) authSignInPane.style.display = 'none';
+      if (authSignUpPane) authSignUpPane.style.display = 'none';
+      if (authForgotPane) authForgotPane.style.display = 'block';
+      if (authModalTitle) authModalTitle.textContent = 'Reset Account Password';
+      if (authModalSubtitle) authModalSubtitle.textContent = 'Enter your email to verify and choose a new secure password.';
     }
   }
 
@@ -2016,6 +2089,143 @@ function initAuthModal() {
     switchSignInLink.addEventListener('click', (e) => {
       e.preventDefault();
       switchAuthTab('login');
+    });
+  }
+
+  // Password Visibility Toggles
+  document.querySelectorAll('.pwd-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = btn.getAttribute('data-target');
+      const input = $(targetId);
+      if (!input) return;
+      const eyeOpen = btn.querySelector('.eye-open');
+      const eyeClosed = btn.querySelector('.eye-closed');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (eyeOpen) eyeOpen.style.display = 'none';
+        if (eyeClosed) eyeClosed.style.display = 'inline-block';
+      } else {
+        input.type = 'password';
+        if (eyeOpen) eyeOpen.style.display = 'inline-block';
+        if (eyeClosed) eyeClosed.style.display = 'none';
+      }
+    });
+  });
+
+  // Password Strength Meter for Tenant Sign Up
+  const tenantPwdInput = $('tenantRegPassword');
+  const tenantPwdStrengthBox = $('tenantPwdStrengthBox');
+  const tenantPwdBar = $('tenantPwdBar');
+  const tenantPwdText = $('tenantPwdText');
+  const tenantPwdHint = $('tenantPwdHint');
+
+  if (tenantPwdInput && tenantPwdStrengthBox) {
+    tenantPwdInput.addEventListener('input', () => {
+      const val = tenantPwdInput.value;
+      if (!val) {
+        tenantPwdStrengthBox.style.display = 'none';
+        return;
+      }
+      tenantPwdStrengthBox.style.display = 'block';
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val) || /[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      tenantPwdBar.className = 'pwd-strength-bar';
+      if (score <= 1) {
+        tenantPwdBar.classList.add('weak');
+        tenantPwdText.textContent = 'Weak';
+        tenantPwdHint.textContent = 'Minimum 6 characters needed';
+      } else if (score === 2) {
+        tenantPwdBar.classList.add('medium');
+        tenantPwdText.textContent = 'Moderate';
+        tenantPwdHint.textContent = 'Add uppercase or numbers';
+      } else if (score === 3) {
+        tenantPwdBar.classList.add('strong');
+        tenantPwdText.textContent = 'Strong';
+        tenantPwdHint.textContent = 'Solid password security';
+      } else {
+        tenantPwdBar.classList.add('very-strong');
+        tenantPwdText.textContent = 'Very Strong';
+        tenantPwdHint.textContent = 'Optimal protection';
+      }
+    });
+  }
+
+  // Google Single Sign-On Simulation
+  const googleSignInBtn = $('googleSignInBtn');
+  if (googleSignInBtn) {
+    googleSignInBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const user = await ClauseShieldDB.auth.signInWithGoogle();
+        toast(`✓ Signed in with Google as ${user.full_name}`);
+        closeModal('authModal');
+        updateNavUserState();
+        if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+      } catch (err) {
+        toast(err.message || 'Google Sign In failed');
+      }
+    });
+  }
+
+  // Forgot Password Link & Form
+  const forgotPasswordBtn = $('forgotPasswordBtn');
+  if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('forgot');
+      const curEmail = $('loginEmail') ? $('loginEmail').value.trim() : '';
+      if (curEmail && $('forgotEmail')) $('forgotEmail').value = curEmail;
+    });
+  }
+
+  const backToSignInLink = $('backToSignInLink');
+  if (backToSignInLink) {
+    backToSignInLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('login');
+    });
+  }
+
+  const forgotPasswordForm = $('forgotPasswordForm');
+  if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = $('forgotEmail').value.trim();
+      const newPassword = $('resetNewPassword').value;
+      const confirmPassword = $('resetConfirmPassword').value;
+      const alertBox = $('forgotAlertBox');
+      if (alertBox) alertBox.style.display = 'none';
+
+      if (newPassword !== confirmPassword) {
+        if (alertBox) {
+          alertBox.className = 'auth-alert-box error';
+          alertBox.style.display = 'block';
+          alertBox.textContent = 'Passwords do not match. Please ensure both fields are identical.';
+        }
+        return;
+      }
+
+      try {
+        await ClauseShieldDB.auth.resetPassword({ email, newPassword });
+        toast('✓ Password updated successfully! Signing you in...');
+        const user = await ClauseShieldDB.auth.signIn({ email, password: newPassword });
+        closeModal('authModal');
+        updateNavUserState();
+        if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+      } catch (err) {
+        if (alertBox) {
+          alertBox.className = 'auth-alert-box error';
+          alertBox.style.display = 'block';
+          alertBox.textContent = err.message || 'Could not reset password.';
+        } else {
+          toast(err.message || 'Could not reset password.');
+        }
+      }
     });
   }
 
