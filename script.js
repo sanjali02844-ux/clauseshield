@@ -1959,8 +1959,32 @@ let currentBookingContext = { lawyer: null, issue: null, initiatedBy: 'tenant' }
 
 function updateNavUserState() {
   const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+  const isAdvocate = user && (user.role === 'advocate' || user.role === 'lawyer');
+
+  const tenantCont = $('tenantAppContainer');
+  const advShell = $('advocateAppShell');
+
+  if (isAdvocate) {
+    // Hide all tenant consumer elements
+    if (tenantCont) tenantCont.style.display = 'none';
+    if (advShell) advShell.style.display = 'flex';
+    hideAllDashboards();
+
+    if (window.ClauseShieldAdvocateUI) {
+      ClauseShieldAdvocateUI.init();
+      const currentAdvView = (window.location.hash || '').startsWith('#advocate/') ? 
+        window.location.hash.replace('#advocate/', '') : 'overview';
+      ClauseShieldAdvocateUI.renderWorkspace(user, currentAdvView);
+    }
+    return;
+  }
+
+  // Tenant / Guest mode: Hide advocate shell, show tenant consumer container
+  if (advShell) advShell.style.display = 'none';
+  if (tenantCont) tenantCont.style.display = 'block';
+
   const authNavBtn = $('authNavBtn');
-  const navAuthGroup = $('navAuthGroup') || $('guestAuthGroup');
+  const guestAuthGroup = $('guestAuthGroup');
   const userMenuWrapper = $('userMenuWrapper');
   const navUserName = $('navUserName');
   const navUserRole = $('navUserRole');
@@ -1972,7 +1996,7 @@ function updateNavUserState() {
   const navDashboardLink = $('navDashboardLink');
 
   if (user) {
-    if (navAuthGroup) navAuthGroup.style.display = 'none';
+    if (guestAuthGroup) guestAuthGroup.style.display = 'none';
     if (authNavBtn) authNavBtn.style.display = 'none';
     if (userMenuWrapper) userMenuWrapper.style.display = 'inline-flex';
     if (navUserName) navUserName.textContent = user.full_name || 'My Account';
@@ -1981,8 +2005,7 @@ function updateNavUserState() {
     if (dropdownUserName) dropdownUserName.textContent = user.full_name || 'My Account';
     if (dropdownUserEmail) dropdownUserEmail.textContent = user.email || '';
     if (dropdownUserStatus) {
-      if (user.role === 'lawyer') dropdownUserStatus.textContent = 'Verified Advocate';
-      else if (user.role === 'admin') dropdownUserStatus.textContent = 'Administrator';
+      if (user.role === 'admin') dropdownUserStatus.textContent = 'Administrator';
       else dropdownUserStatus.textContent = 'Active Tenant Member';
     }
 
@@ -1993,17 +2016,14 @@ function updateNavUserState() {
 
     if (navDashboardLink) {
       if (user.role === 'tenant') navDashboardLink.href = '#tenant-dashboard';
-      else if (user.role === 'lawyer') navDashboardLink.href = '#lawyer-dashboard';
       else if (user.role === 'admin') navDashboardLink.href = '#admin-dashboard';
     }
 
-    // Refresh whichever dashboard corresponds to the user role
     if (user.role === 'tenant') loadTenantDashboard();
-    else if (user.role === 'lawyer') loadLawyerDashboard();
     else if (user.role === 'admin') loadAdminDashboard();
   } else {
-    if (navAuthGroup) navAuthGroup.style.display = 'inline-flex';
-    if (authNavBtn) authNavBtn.style.display = 'inline-block';
+    if (guestAuthGroup) guestAuthGroup.style.display = 'inline-flex';
+    if (authNavBtn) authNavBtn.style.display = 'none';
     if (userMenuWrapper) userMenuWrapper.style.display = 'none';
     hideAllDashboards();
   }
@@ -2021,6 +2041,45 @@ function hideAllDashboards() {
 function handleHashNavigation() {
   const hash = window.location.hash || '#home';
   const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+  const isAdvocate = user && (user.role === 'advocate' || user.role === 'lawyer');
+
+  if (isAdvocate) {
+    const tenantCont = $('tenantAppContainer');
+    const advShell = $('advocateAppShell');
+    if (tenantCont) tenantCont.style.display = 'none';
+    if (advShell) advShell.style.display = 'flex';
+    hideAllDashboards();
+
+    if (!hash.startsWith('#advocate')) {
+      window.location.hash = '#advocate/overview';
+      return;
+    }
+
+    const viewName = hash.replace('#advocate/', '') || 'overview';
+    if (window.ClauseShieldAdvocateUI) {
+      ClauseShieldAdvocateUI.renderWorkspace(user, viewName);
+    }
+    return;
+  }
+
+  // Unauthorized attempt to access advocate routes by URL manipulation
+  if (hash.startsWith('#advocate')) {
+    if (user && user.role === 'tenant') {
+      toast('The Advocate Workspace is restricted to licensed legal practitioners.');
+      window.location.hash = '#tenant-dashboard';
+    } else {
+      toast('Please sign in as an Advocate to access this legal workspace.');
+      window.location.hash = '#home';
+      openModal('authModal');
+    }
+    return;
+  }
+
+  // Non-advocate view handling
+  const tenantCont = $('tenantAppContainer');
+  const advShell = $('advocateAppShell');
+  if (advShell) advShell.style.display = 'none';
+  if (tenantCont) tenantCont.style.display = 'block';
 
   hideAllDashboards();
 
@@ -2031,15 +2090,6 @@ function handleHashNavigation() {
       loadTenantDashboard();
     } else {
       toast('Please log in as a Tenant to access this dashboard.');
-      openModal('authModal');
-    }
-  } else if (hash === '#lawyer-dashboard') {
-    if (user && user.role === 'lawyer') {
-      const ld = $('lawyer-dashboard');
-      if (ld) ld.style.display = 'block';
-      loadLawyerDashboard();
-    } else {
-      toast('Please log in as a Lawyer to access the Advocate Portal.');
       openModal('authModal');
     }
   } else if (hash === '#admin-dashboard') {
@@ -2336,6 +2386,13 @@ function initAuthModal() {
         closeModal('authModal');
         updateNavUserState();
         if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+        if (user.role === 'advocate' || user.role === 'lawyer') {
+          window.location.hash = '#advocate/overview';
+        } else if (user.role === 'tenant') {
+          window.location.hash = '#tenant-dashboard';
+        } else if (user.role === 'admin') {
+          window.location.hash = '#admin-dashboard';
+        }
       } catch (err) {
         toast(err.message || 'Google Sign In failed');
       }
@@ -2387,6 +2444,13 @@ function initAuthModal() {
         closeModal('authModal');
         updateNavUserState();
         if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+        if (user.role === 'advocate' || user.role === 'lawyer') {
+          window.location.hash = '#advocate/overview';
+        } else if (user.role === 'tenant') {
+          window.location.hash = '#tenant-dashboard';
+        } else if (user.role === 'admin') {
+          window.location.hash = '#admin-dashboard';
+        }
       } catch (err) {
         if (alertBox) {
           alertBox.className = 'auth-alert-box error';
@@ -2411,6 +2475,13 @@ function initAuthModal() {
         closeModal('authModal');
         updateNavUserState();
         if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+        if (user.role === 'advocate' || user.role === 'lawyer') {
+          window.location.hash = '#advocate/overview';
+        } else if (user.role === 'tenant') {
+          window.location.hash = '#tenant-dashboard';
+        } else if (user.role === 'admin') {
+          window.location.hash = '#admin-dashboard';
+        }
       } catch (err) {
         toast(err.message || 'Demo login failed');
       }
@@ -2457,11 +2528,18 @@ function initAuthModal() {
         closeModal('authModal');
         updateNavUserState();
         if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+        if (user.role === 'advocate' || user.role === 'lawyer') {
+          window.location.hash = '#advocate/overview';
+        } else if (user.role === 'tenant') {
+          window.location.hash = '#tenant-dashboard';
+        } else if (user.role === 'admin') {
+          window.location.hash = '#admin-dashboard';
+        }
 
-        if (user.role === 'tenant') {
-          window.location.hash = '#complaint-generator';
-        } else if (user.role === 'lawyer') {
-          window.location.hash = '#complaints-board';
+        if (user.role === 'advocate' || user.role === 'lawyer') {
+          window.location.hash = '#advocate/overview';
+        } else if (user.role === 'tenant') {
+          window.location.hash = '#tenant-dashboard';
         } else if (user.role === 'admin') {
           window.location.hash = '#admin-dashboard';
         }
@@ -2529,6 +2607,13 @@ function initAuthModal() {
         closeModal('authModal');
         updateNavUserState();
         if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
+        if (user.role === 'advocate' || user.role === 'lawyer') {
+          window.location.hash = '#advocate/overview';
+        } else if (user.role === 'tenant') {
+          window.location.hash = '#tenant-dashboard';
+        } else if (user.role === 'admin') {
+          window.location.hash = '#admin-dashboard';
+        }
         window.location.hash = '#complaint-generator';
       } catch (err) {
         if (errBox) {
@@ -2547,11 +2632,19 @@ function initAuthModal() {
       e.preventDefault();
       const full_name = $('lawyerFullName').value.trim();
       const email = $('lawyerRegEmail').value.trim();
+      const phone = $('lawyerPhone') ? $('lawyerPhone').value.trim() : '';
       const password = $('lawyerRegPassword').value;
       const bar_council_number = $('lawyerBarNumber') ? $('lawyerBarNumber').value.trim() : 'PENDING';
       const state_bar_council = $('lawyerStateBar') ? $('lawyerStateBar').value : 'Bar Council of Maharashtra & Goa';
-      const specialisation = $('lawyerSpecialty') ? $('lawyerSpecialty').value : 'Tenancy Law';
-      const consultation_fee = $('lawyerFee') ? Number($('lawyerFee').value) : 0;
+      const state_of_practice = $('lawyerStatePractice') ? $('lawyerStatePractice').value.trim() : 'Maharashtra';
+      const city_of_practice = $('lawyerCityPractice') ? $('lawyerCityPractice').value.trim() : 'Mumbai';
+      const years_experience = $('lawyerExperience') ? Number($('lawyerExperience').value) : 1;
+      const profile_photo = $('lawyerPhotoUrl') ? $('lawyerPhotoUrl').value.trim() : '';
+      const bio = $('lawyerBio') ? $('lawyerBio').value.trim() : '';
+
+      const practice_areas = [];
+      document.querySelectorAll('input[name="advPracticeArea"]:checked').forEach(cb => practice_areas.push(cb.value));
+
       const errBox = $('lawyerRegErrorBox');
       if (errBox) errBox.style.display = 'none';
 
@@ -2560,19 +2653,23 @@ function initAuthModal() {
           email,
           password,
           full_name,
-          role: 'lawyer',
-          lawyerDetails: {
+          phone,
+          role: 'advocate',
+          advocateDetails: {
             bar_council_number,
             state_bar_council,
-            specialisation,
-            consultation_fee
+            state_of_practice,
+            city_of_practice,
+            years_experience,
+            practice_areas: practice_areas.length ? practice_areas : ['Rental and tenancy disputes'],
+            profile_photo,
+            bio
           }
         });
-        toast(`✓ Advocate Account active! Welcome, ${user.full_name}`);
+        toast(`✓ Advocate registered! Credentials submitted for Bar Council verification.`);
         closeModal('authModal');
         updateNavUserState();
-        if (typeof renderComplaintsFeed === 'function') renderComplaintsFeed();
-        window.location.hash = '#complaints-board';
+        window.location.hash = '#advocate/overview';
       } catch (err) {
         if (errBox) {
           errBox.style.display = 'block';

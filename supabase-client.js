@@ -635,28 +635,47 @@
         profiles.push(newProfile);
         setStorage(STORAGE_KEYS.PROFILES, profiles);
 
-        // If registering as a lawyer:
-        if (userRole === 'lawyer') {
-          const lawyerProfiles = getStorage(STORAGE_KEYS.LAWYER_PROFILES, []);
-          const details = lawyerDetails || {};
-          const newLawyerProfile = {
-            id: generateId('lp'),
+                // If registering as an advocate / lawyer:
+        if (userRole === 'advocate' || userRole === 'lawyer') {
+          const advProfiles = getStorage('clauseshield_advocate_profiles', []);
+          const details = advocateDetails || lawyerDetails || {};
+          const newAdvProfile = {
+            id: generateId('ap'),
             user_id: userId,
             bar_council_number: details.bar_council_number || `BAR/${Math.floor(1000 + Math.random() * 9000)}/2026`,
             state_bar_council: details.state_bar_council || 'Bar Council of Maharashtra & Goa',
-            specialisation: details.specialisation || 'Tenancy Disputes & Deposit Recovery',
-            years_experience: Number(details.years_experience) || 5,
-            bio: details.bio || 'Advocate offering free legal guidance and legal aid to tenants.',
-            consultation_fee: Number(details.consultation_fee) || 0,
-            availability: details.availability || 'Mon - Fri: 5:00 PM – 8:00 PM',
-            document_url: details.document_name || 'bar_council_certificate.pdf',
-            verification_status: 'verified', // Verified so lawyer can immediately test and advise!
-            verified_at: new Date().toISOString(),
-            verified_by: 'usr_admin_001',
-            rating: 5.0,
-            total_reviews: 1
+            state_of_practice: details.state_of_practice || 'Maharashtra',
+            city_of_practice: details.city_of_practice || 'Mumbai',
+            years_experience: Number(details.years_experience) || 1,
+            practice_areas: details.practice_areas || ['Rental and tenancy disputes'],
+            bio: details.bio || 'Registered advocate practicing Indian tenancy law.',
+            profile_photo: details.profile_photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(resolvedName)}&background=1e293b&color=fff`,
+            // Strict Product Requirement: newly registered advocates default to pending_verification!
+            verification_status: 'pending_verification',
+            verified_at: null,
+            verified_by: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           };
-          lawyerProfiles.push(newLawyerProfile);
+          advProfiles.push(newAdvProfile);
+          setStorage('clauseshield_advocate_profiles', advProfiles);
+
+          // Legacy sync
+          const lawyerProfiles = getStorage(STORAGE_KEYS.LAWYER_PROFILES, []);
+          lawyerProfiles.push({
+            id: generateId('lp'),
+            user_id: userId,
+            bar_council_number: newAdvProfile.bar_council_number,
+            state_bar_council: newAdvProfile.state_bar_council,
+            specialisation: (newAdvProfile.practice_areas || []).join(', '),
+            years_experience: newAdvProfile.years_experience,
+            bio: newAdvProfile.bio,
+            consultation_fee: 0,
+            availability: 'Mon - Fri: 5:00 PM - 8:00 PM',
+            verification_status: 'pending',
+            rating: 5.0,
+            total_reviews: 0
+          });
           setStorage(STORAGE_KEYS.LAWYER_PROFILES, lawyerProfiles);
         }
 
@@ -666,7 +685,7 @@
           email: newProfile.email,
           full_name: newProfile.full_name,
           phone: newProfile.phone,
-          role: newProfile.role,
+          role: (userRole === 'lawyer' || userRole === 'advocate') ? 'advocate' : userRole,
           avatar_url: newProfile.avatar_url
         };
         setStorage(STORAGE_KEYS.CURRENT_USER, sessionUser);
@@ -698,7 +717,7 @@
           email: user.email,
           full_name: user.full_name,
           phone: user.phone,
-          role: user.role,
+          role: (user.role === 'lawyer' || user.role === 'advocate') ? 'advocate' : user.role,
           avatar_url: user.avatar_url
         };
         setStorage(STORAGE_KEYS.CURRENT_USER, sessionUser);
@@ -758,7 +777,7 @@
           email: user.email,
           full_name: user.full_name,
           phone: user.phone,
-          role: user.role,
+          role: (user.role === 'lawyer' || user.role === 'advocate') ? 'advocate' : user.role,
           avatar_url: user.avatar_url
         };
         setStorage(STORAGE_KEYS.CURRENT_USER, sessionUser);
@@ -1180,11 +1199,23 @@ c/o ClauseShield Legal Assistance Directorate
         const idx = lawyerProfiles.findIndex(lp => lp.id === lawyerProfileId || lp.user_id === lawyerProfileId);
         if (idx === -1) throw new Error('Lawyer profile not found');
 
+        const userId = lawyerProfiles[idx].user_id;
         lawyerProfiles[idx].verification_status = 'verified';
         lawyerProfiles[idx].verified_at = new Date().toISOString();
         lawyerProfiles[idx].verified_by = adminId;
         lawyerProfiles[idx].rejection_reason = null;
         setStorage(STORAGE_KEYS.LAWYER_PROFILES, lawyerProfiles);
+
+        // Sync with advocate_profiles
+        const advProfiles = getStorage('clauseshield_advocate_profiles', []);
+        const apIdx = advProfiles.findIndex(ap => ap.user_id === userId || ap.id === lawyerProfileId);
+        if (apIdx !== -1) {
+          advProfiles[apIdx].verification_status = 'verified';
+          advProfiles[apIdx].verified_at = new Date().toISOString();
+          advProfiles[apIdx].verified_by = adminId;
+          advProfiles[apIdx].rejection_reason = null;
+          setStorage('clauseshield_advocate_profiles', advProfiles);
+        }
         return lawyerProfiles[idx];
       },
 
@@ -1193,10 +1224,22 @@ c/o ClauseShield Legal Assistance Directorate
         const idx = lawyerProfiles.findIndex(lp => lp.id === lawyerProfileId || lp.user_id === lawyerProfileId);
         if (idx === -1) throw new Error('Lawyer profile not found');
 
+        const userId = lawyerProfiles[idx].user_id;
+        const finalReason = reason || 'Professional credentials could not be verified with State Bar Council records.';
         lawyerProfiles[idx].verification_status = 'rejected';
-        lawyerProfiles[idx].rejection_reason = reason || 'Professional credentials could not be verified with State Bar Council records.';
+        lawyerProfiles[idx].rejection_reason = finalReason;
         lawyerProfiles[idx].verified_by = adminId;
         setStorage(STORAGE_KEYS.LAWYER_PROFILES, lawyerProfiles);
+
+        // Sync with advocate_profiles
+        const advProfiles = getStorage('clauseshield_advocate_profiles', []);
+        const apIdx = advProfiles.findIndex(ap => ap.user_id === userId || ap.id === lawyerProfileId);
+        if (apIdx !== -1) {
+          advProfiles[apIdx].verification_status = 'rejected';
+          advProfiles[apIdx].rejection_reason = finalReason;
+          advProfiles[apIdx].verified_by = adminId;
+          setStorage('clauseshield_advocate_profiles', advProfiles);
+        }
         return lawyerProfiles[idx];
       }
     },
@@ -1555,6 +1598,17 @@ c/o ClauseShield Legal Assistance Directorate
       }
     }
   };
+
+  // Expose on global window object
+  // Expose advocate sub-modules on ClauseShieldDB for unified API
+  if (window.ClauseShieldAdvocateDB) {
+    ClauseShieldDB.advocate = window.ClauseShieldAdvocateDB.profile;
+    ClauseShieldDB.cases = window.ClauseShieldAdvocateDB.cases;
+    ClauseShieldDB.clients = window.ClauseShieldAdvocateDB.clients;
+    ClauseShieldDB.appointments = window.ClauseShieldAdvocateDB.appointments;
+    ClauseShieldDB.audits = window.ClauseShieldAdvocateDB.audits;
+    ClauseShieldDB.rebuttals = window.ClauseShieldAdvocateDB.rebuttals;
+  }
 
   // Expose on global window object
   window.ClauseShieldDB = ClauseShieldDB;

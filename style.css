@@ -2925,3 +2925,175 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ==============================================================================
+   ADVOCATE PORTAL — GRIEVANCE BOARD & MINIMAL-FEE CONSULTATION STYLES
+   ============================================================================== */
+
+.adv-grievance-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+  position: relative;
+}
+.adv-grievance-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.adv-grievance-card.accepted {
+  border-left: 4px solid #10b981;
+  background: #fcfdfd;
+}
+.adv-grievance-card.ignored {
+  border-left: 4px solid #94a3b8;
+  opacity: 0.75;
+  background: #f8fafc;
+}
+.adv-grievance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.adv-grievance-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.adv-grievance-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+.adv-grievance-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.84rem;
+  color: #64748b;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.adv-grievance-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.adv-grievance-desc {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #334155;
+  margin: 0 0 14px 0;
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 6px;
+}
+.adv-grievance-relief {
+  font-size: 0.84rem;
+  color: #475569;
+  margin-bottom: 16px;
+}
+.adv-grievance-relief strong {
+  color: #0f172a;
+}
+.adv-grievance-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+  flex-wrap: wrap;
+}
+.adv-grievance-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Minimal Fee Selector in Modal */
+.adv-fee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 8px 0 14px 0;
+}
+.adv-fee-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 10px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+.adv-fee-chip:hover {
+  border-color: #2563eb;
+  background: #f8fafc;
+}
+.adv-fee-chip.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.adv-fee-amount {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+.adv-fee-chip.active .adv-fee-amount {
+  color: #1d4ed8;
+}
+.adv-fee-label {
+  font-size: 0.74rem;
+  color: #64748b;
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+/* Tab Pills in Grievance Board */
+.adv-tab-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #e2e8f0;
+  padding: 4px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  width: fit-content;
+  flex-wrap: wrap;
+}
+.adv-tab-pill {
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.adv-tab-pill:hover {
+  color: #0f172a;
+}
+.adv-tab-pill.active {
+  background: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}

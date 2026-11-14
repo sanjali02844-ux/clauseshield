@@ -22,7 +22,9 @@
   <!-- ==============================================================================
        TOP NAVIGATION BAR
        ============================================================================== -->
-  <header class="site-header">
+    <!-- TENANT & GUEST INTERFACE CONTAINER (Hidden for Advocates) -->
+  <div id="tenantAppContainer">
+<header class="site-header">
     <a class="brand" href="#home"><span class="brand-mark">C</span><span>ClauseShield</span></a>
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
     <nav id="mainNav">
@@ -1333,6 +1335,1306 @@
       <span>Built for Tenant Empowerment</span>
     </div>
   </footer>
+  </div>
+
+  <!-- ==============================================================================
+       ADVOCATE PORTAL — DEDICATED LEGAL SAAS WORKSPACE (Hidden for Tenants)
+       ============================================================================== -->
+  <div id="advocateAppShell" class="adv-shell" style="display:none;">
+    
+    <!-- ADVOCATE SIDEBAR NAVIGATION -->
+    <aside class="adv-sidebar" id="advSidebar">
+      <div class="adv-sidebar-header">
+        <a href="#advocate/overview" class="adv-sidebar-brand">
+          <div class="adv-brand-icon">⚖️</div>
+          <div>
+            <div>ClauseShield</div>
+            <div style="font-size:0.75rem;font-weight:normal;color:#94a3b8;">Legal Chambers</div>
+          </div>
+        </a>
+        <span class="adv-workspace-tag">ADVOCATE</span>
+      </div>
+
+      <!-- Professional Profile Snippet -->
+      <div class="adv-sidebar-profile">
+        <div class="adv-profile-row">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=256&q=80" alt="Advocate Avatar" class="adv-profile-avatar" id="advSideAvatar">
+          <div class="adv-profile-meta">
+            <div class="adv-profile-name" id="advSideName">Adv. Rajesh Sharma</div>
+            <div class="adv-profile-bar" id="advSideBar">MAH/4921/2014</div>
+          </div>
+        </div>
+        <div class="adv-profile-status">
+          <span class="adv-badge adv-badge-verified" id="advSideStatusBadge">
+            <span>🛡️</span> <span id="advSideStatusText">Verified Advocate</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Main Navigation Menu -->
+      <nav class="adv-nav" id="advSidebarNav">
+        <a class="adv-nav-item active" data-adv-view="overview" id="navAdvOverview">
+          <span class="adv-nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="grievances" id="navAdvGrievances">
+          <span class="adv-nav-icon">📋</span>
+          <span>Grievance Board</span>
+          <span class="adv-nav-badge" id="advBadgeGrievances">8</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="cases" id="navAdvCases">
+          <span class="adv-nav-icon">💼</span>
+          <span>My Cases</span>
+          <span class="adv-nav-badge" id="advBadgeCases">3</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="clients" id="navAdvClients">
+          <span class="adv-nav-icon">👥</span>
+          <span>Clients</span>
+          <span class="adv-nav-badge" id="advBadgeClients">3</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="documents" id="navAdvDocuments">
+          <span class="adv-nav-icon">📁</span>
+          <span>Documents</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="audit" id="navAdvAudit">
+          <span class="adv-nav-icon">🔍</span>
+          <span>Agreement Audit</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="rebuttal" id="navAdvRebuttal">
+          <span class="adv-nav-icon">⚖️</span>
+          <span>Rebuttal Workspace</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="references" id="navAdvReferences">
+          <span class="adv-nav-icon">📚</span>
+          <span>Legal References</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="appointments" id="navAdvAppointments">
+          <span class="adv-nav-icon">📅</span>
+          <span>Appointments</span>
+          <span class="adv-nav-badge" id="advBadgeApts">2</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="profile" id="navAdvProfile">
+          <span class="adv-nav-icon">👤</span>
+          <span>My Profile</span>
+        </a>
+        <a class="adv-nav-item" data-adv-view="settings" id="navAdvSettings">
+          <span class="adv-nav-icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="adv-sidebar-footer">
+        <button type="button" class="adv-btn-logout" id="advLogoutBtn">
+          <span>🚪</span>
+          <span>Sign Out of Chambers</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ADVOCATE MAIN CONTENT WRAPPER -->
+    <main class="adv-main" id="advMainContent">
+      
+      <!-- Top Bar -->
+      <header class="adv-topbar">
+        <div class="adv-topbar-left">
+          <h1 class="adv-view-heading" id="advViewHeading">Workload &amp; Chamber Overview</h1>
+        </div>
+        <div class="adv-topbar-actions">
+          <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="advBtnQuickAddClient">
+            <span>+ Add Client</span>
+          </button>
+          <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="advBtnQuickAddApt">
+            <span>+ Appointment</span>
+          </button>
+          <button type="button" class="adv-btn adv-btn-primary adv-btn-sm" id="advBtnQuickNewCase">
+            <span>+ Create Case</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Global Verification Notice Banner -->
+      <div id="advGlobalVerifBanner" style="padding:14px 28px 0 28px;display:none;"></div>
+
+      <!-- VIEW 1: OVERVIEW -->
+      <section class="adv-view-content" id="advViewOverview">
+        <!-- Metric Cards -->
+        <div class="adv-metrics-grid">
+          <div class="adv-metric-card">
+            <div class="adv-metric-label">Total Active Cases</div>
+            <div class="adv-metric-num" id="advMetricActiveCases">3</div>
+            <div class="adv-metric-sub">Under active legal representation</div>
+          </div>
+          <div class="adv-metric-card">
+            <div class="adv-metric-label">Client Roster</div>
+            <div class="adv-metric-num" id="advMetricTotalClients">3</div>
+            <div class="adv-metric-sub">Confidential client profiles</div>
+          </div>
+          <div class="adv-metric-card">
+            <div class="adv-metric-label">Pending Client Responses</div>
+            <div class="adv-metric-num" id="advMetricPendingResponses">1</div>
+            <div class="adv-metric-sub">Awaiting evidence / documents</div>
+          </div>
+          <div class="adv-metric-card">
+            <div class="adv-metric-label">Upcoming Consultations</div>
+            <div class="adv-metric-num" id="advMetricUpcomingApts">2</div>
+            <div class="adv-metric-sub">Scheduled next 7 days</div>
+          </div>
+        </div>
+
+        <!-- Verification Status Summary Card -->
+        <div class="adv-card" style="margin-bottom:24px;">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Professional Enrolment &amp; Verification Status</h3>
+            <span id="advOverviewVerifPill"></span>
+          </div>
+          <div style="padding:18px 20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+              <div>
+                <div style="font-weight:700;font-size:1rem;color:#0f172a;" id="advOverviewBarNumber">MAH/4921/2014</div>
+                <div style="font-size:0.86rem;color:#64748b;" id="advOverviewBarCouncil">Bar Council of Maharashtra &amp; Goa · Practice: Mumbai, Maharashtra</div>
+              </div>
+              <div id="advOverviewVerifAction">
+                <a href="#advocate/profile" class="adv-btn adv-btn-secondary adv-btn-sm">View Verification Records &rarr;</a>
+              </div>
+            </div>
+            <div id="advOverviewVerifNote" style="margin-top:12px;font-size:0.84rem;color:#475569;background:#f8fafc;padding:10px 14px;border-radius:6px;border-left:3px solid #2563eb;"></div>
+          </div>
+        </div>
+
+        <!-- Recently Accessed Cases Table -->
+        <div class="adv-card">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Recently Accessed Cases</h3>
+            <a href="#advocate/cases" class="adv-btn adv-btn-secondary adv-btn-sm">View All Cases &rarr;</a>
+          </div>
+          <div class="adv-table-wrap">
+            <table class="adv-table">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Case Title</th>
+                  <th>Client</th>
+                  <th>Dispute Nature</th>
+                  <th>Deposit At Stake</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="advOverviewCasesTable">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Upcoming Consultations Schedule -->
+        <div class="adv-card">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Upcoming Client Appointments</h3>
+            <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="advOverviewAddAptBtn">+ New Appointment</button>
+          </div>
+          <div class="adv-table-wrap">
+            <table class="adv-table">
+              <thead>
+                <tr>
+                  <th>Client Name</th>
+                  <th>Associated Case</th>
+                  <th>Date &amp; Time</th>
+                  <th>Mode</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="advOverviewAptsTable">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: TENANT GRIEVANCE BOARD & INQUIRIES -->
+      <section class="adv-view-content" id="advViewGrievances" style="display:none;">
+        <div class="adv-card" style="margin-bottom:20px;">
+          <div class="adv-card-header">
+            <div>
+              <h3 class="adv-card-title">Tenant Grievance Board &amp; Public Legal Inquiries</h3>
+              <p style="font-size:0.86rem;color:#64748b;margin:3px 0 0 0;">
+                Review tenancy disputes submitted by tenants across India. Accept cases, offer online video consultations at minimal legal aid rates, or ignore inquiries.
+              </p>
+            </div>
+            <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="advBtnReloadSampleGrievances" title="Reload sample grievances for testing">
+              <span>🔄 Reset Sample Inquiries</span>
+            </button>
+          </div>
+          <div style="padding:16px 20px;">
+            <!-- Segmented Status Filter Tabs -->
+            <div class="adv-tab-pills" id="advGrievanceStatusTabs">
+              <button type="button" class="adv-tab-pill active" data-tab="available">Available Inquiries (<span id="advCountAvail">8</span>)</button>
+              <button type="button" class="adv-tab-pill" data-tab="accepted">Accepted by You (<span id="advCountAccepted">0</span>)</button>
+              <button type="button" class="adv-tab-pill" data-tab="ignored">Ignored (<span id="advCountIgnored">0</span>)</button>
+              <button type="button" class="adv-tab-pill" data-tab="all">All Inquiries (<span id="advCountAll">8</span>)</button>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="adv-action-bar" style="margin-bottom:0;">
+              <div class="adv-filter-group" style="width:100%;">
+                <input type="text" id="advGrievanceSearchInput" class="adv-search-input" style="flex:1;" placeholder="Search grievances by keywords, city, tenant name, or reference ID...">
+                <select id="advGrievanceCategoryFilter" class="adv-select-filter">
+                  <option value="all">All Dispute Categories</option>
+                  <option value="security_deposit">Security Deposit Withholding</option>
+                  <option value="lease_breach">Unfair Lease Terms &amp; Lock-in</option>
+                  <option value="harassment">Landlord Harassment &amp; Privacy</option>
+                  <option value="rent_hike">Arbitrary Mid-Term Rent Hike</option>
+                  <option value="unfair_charges">Unfair Move-out Charges</option>
+                  <option value="maintenance">Maintenance &amp; Structural Repairs</option>
+                  <option value="eviction">Eviction Notice</option>
+                </select>
+                <select id="advGrievanceStateFilter" class="adv-select-filter">
+                  <option value="all">All States</option>
+                  <option value="Karnataka">Karnataka (Bengaluru)</option>
+                  <option value="Maharashtra">Maharashtra (Mumbai/Pune)</option>
+                  <option value="Telangana">Telangana (Hyderabad)</option>
+                  <option value="Tamil Nadu">Tamil Nadu (Chennai)</option>
+                  <option value="West Bengal">West Bengal (Kolkata)</option>
+                  <option value="Gujarat">Gujarat (Ahmedabad)</option>
+                  <option value="Delhi">Delhi NCR</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grievance Cards Stream -->
+        <div id="advGrievanceCardsStream">
+          <!-- Dynamically Populated -->
+        </div>
+
+        <div id="advGrievancesEmptyState" class="adv-empty-state" style="display:none;">
+          <div class="adv-empty-icon">📋</div>
+          <h4 class="adv-empty-title">No Grievances Found</h4>
+          <p class="adv-empty-desc">No tenant inquiries match the selected filters or status.</p>
+          <button type="button" class="adv-btn adv-btn-secondary" id="advBtnResetGrievanceFilters">Clear Filters</button>
+        </div>
+      </section>
+
+      <!-- VIEW 2: CASE MANAGEMENT -->
+      <section class="adv-view-content" id="advViewCases" style="display:none;">
+        <div class="adv-action-bar">
+          <div class="adv-filter-group">
+            <input type="text" id="advCaseSearchInput" class="adv-search-input" placeholder="Search by client, title, ID, location...">
+            <select id="advCaseStatusFilter" class="adv-select-filter">
+              <option value="all">All Case Statuses</option>
+              <option value="new">New</option>
+              <option value="under_review">Under Review</option>
+              <option value="awaiting_client_info">Awaiting Client Info</option>
+              <option value="in_progress">In Progress</option>
+              <option value="resolved">Resolved</option>
+              <option value="closed">Closed</option>
+            </select>
+            <select id="advCaseNatureFilter" class="adv-select-filter">
+              <option value="all">All Dispute Categories</option>
+              <option value="deposit_dispute">Security Deposit Dispute</option>
+              <option value="rental_dispute">Rental &amp; Agreement Dispute</option>
+              <option value="civil_litigation">Civil Litigation / Eviction</option>
+              <option value="consumer_dispute">Consumer Dispute</option>
+              <option value="contract_law">Contract Breach</option>
+            </select>
+          </div>
+          <button type="button" class="adv-btn adv-btn-primary" id="advBtnCreateCase">
+            <span>+ Create New Case</span>
+          </button>
+        </div>
+
+        <!-- Cases Table -->
+        <div class="adv-card" id="advCasesTableCard">
+          <div class="adv-table-wrap">
+            <table class="adv-table">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Case Title</th>
+                  <th>Client</th>
+                  <th>Location</th>
+                  <th>Deposit / Rent</th>
+                  <th>Status</th>
+                  <th>Last Updated</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="advCasesListTbody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+          <div id="advCasesEmptyState" class="adv-empty-state" style="display:none;">
+            <div class="adv-empty-icon">📁</div>
+            <h4 class="adv-empty-title">No Cases Found</h4>
+            <p class="adv-empty-desc">Create your first case or adjust your search filters to view active case files.</p>
+            <button type="button" class="adv-btn adv-btn-primary" id="advEmptyCreateCaseBtn">+ Create New Case</button>
+          </div>
+        </div>
+
+        <!-- CASE DETAILS DRAWER (Shown when opening a case) -->
+        <div class="adv-drawer" id="advCaseDetailsDrawer" style="display:none;">
+          <div class="adv-drawer-header">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <span class="adv-badge adv-badge-info" id="drawerCaseRef">CS-CAS-2026-1049</span>
+                <span class="adv-badge" id="drawerCaseStatusBadge">In Progress</span>
+              </div>
+              <h2 style="margin:0;font-size:1.35rem;font-weight:700;color:#0f172a;" id="drawerCaseTitle">Illegal 3-Month Lock-in Deduction &amp; Deposit Withholding</h2>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="advBtnCloseCaseDrawer">✕ Close Case Details</button>
+            </div>
+          </div>
+
+          <!-- Case Info Grid -->
+          <div class="adv-form-grid" style="margin-bottom:24px;">
+            <div class="adv-card" style="padding:16px;margin:0;">
+              <div style="font-size:0.78rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px;">Client Information</div>
+              <div style="font-size:1.05rem;font-weight:700;color:#0f172a;" id="drawerClientName">Kavita Nair</div>
+              <div style="font-size:0.86rem;color:#475569;margin-top:4px;">📞 <span id="drawerClientPhone">+91 98200 44112</span></div>
+              <div style="font-size:0.86rem;color:#475569;margin-top:2px;">✉️ <span id="drawerClientEmail">kavita.nair@techcorp.in</span></div>
+            </div>
+
+            <div class="adv-card" style="padding:16px;margin:0;">
+              <div style="font-size:0.78rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px;">Dispute &amp; Financials</div>
+              <div style="font-size:0.88rem;color:#334155;"><strong>Property:</strong> <span id="drawerPropertyLocation">Bandra West, Mumbai</span></div>
+              <div style="font-size:0.88rem;color:#334155;margin-top:4px;"><strong>Deposit in Dispute:</strong> ₹<span id="drawerDepositAmount">80,000</span></div>
+              <div style="font-size:0.88rem;color:#334155;margin-top:4px;"><strong>Monthly Rent:</strong> ₹<span id="drawerRentAmount">40,000</span></div>
+            </div>
+
+            <div class="adv-form-full adv-card" style="padding:16px;margin:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="font-size:0.78rem;font-weight:700;color:#64748b;text-transform:uppercase;">Case Description &amp; Legal Strategy</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <label style="font-size:0.8rem;font-weight:700;color:#475569;">Update Status:</label>
+                  <select id="drawerStatusSelect" class="adv-select-filter" style="padding:4px 8px;font-size:0.82rem;">
+                    <option value="new">New</option>
+                    <option value="under_review">Under Review</option>
+                    <option value="awaiting_client_info">Awaiting Client Info</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+              </div>
+              <p style="font-size:0.9rem;line-height:1.55;color:#334155;margin:0;" id="drawerDescription">Full case description...</p>
+            </div>
+          </div>
+
+          <!-- Quick Case Actions Bar -->
+          <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+            <button type="button" class="adv-btn adv-btn-primary adv-btn-sm" id="drawerBtnAuditLease">
+              <span>🔍 Run Lease Audit for this Case</span>
+            </button>
+            <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="drawerBtnDraftRebuttal">
+              <span>⚖️ Generate Rebuttal for this Case</span>
+            </button>
+            <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="drawerBtnScheduleApt">
+              <span>📅 Schedule Consultation</span>
+            </button>
+          </div>
+
+          <!-- Case Documents & Notes Tabs -->
+          <div class="adv-form-grid">
+            <!-- Documents Sub-Section -->
+            <div class="adv-card" style="padding:18px;margin:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <h4 style="margin:0;font-size:0.95rem;font-weight:700;color:#0f172a;">Case Documents</h4>
+                <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="drawerBtnUploadDoc">+ Upload Document</button>
+              </div>
+              <div id="drawerDocsList">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+
+            <!-- Notes Sub-Section -->
+            <div class="adv-card" style="padding:18px;margin:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <h4 style="margin:0;font-size:0.95rem;font-weight:700;color:#0f172a;">Private Case Notes</h4>
+                <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="drawerBtnAddNote">+ Add Note</button>
+              </div>
+              <div id="drawerNotesList" style="max-height:280px;overflow-y:auto;">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: CLIENT MANAGEMENT -->
+      <section class="adv-view-content" id="advViewClients" style="display:none;">
+        <div class="adv-action-bar">
+          <div class="adv-filter-group">
+            <input type="text" id="advClientSearchInput" class="adv-search-input" placeholder="Search clients by name, phone, city...">
+          </div>
+          <button type="button" class="adv-btn adv-btn-primary" id="advBtnCreateClient">
+            <span>+ Add New Client</span>
+          </button>
+        </div>
+
+        <div class="adv-card">
+          <div class="adv-table-wrap">
+            <table class="adv-table">
+              <thead>
+                <tr>
+                  <th>Client Name</th>
+                  <th>Contact Phone</th>
+                  <th>Email</th>
+                  <th>Location</th>
+                  <th>Active Cases</th>
+                  <th>Total Cases</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="advClientsListTbody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+          <div id="advClientsEmptyState" class="adv-empty-state" style="display:none;">
+            <div class="adv-empty-icon">👥</div>
+            <h4 class="adv-empty-title">No Clients Found</h4>
+            <p class="adv-empty-desc">Add clients to maintain confidential case history and communication notes.</p>
+            <button type="button" class="adv-btn adv-btn-primary" id="advEmptyCreateClientBtn">+ Add Client</button>
+          </div>
+        </div>
+
+        <!-- Client Profile Details Drawer / Modal -->
+        <div class="adv-drawer" id="advClientDetailsDrawer" style="display:none;">
+          <div class="adv-drawer-header">
+            <div>
+              <h2 style="margin:0;font-size:1.3rem;font-weight:700;color:#0f172a;" id="drawerClientProfileName">Client Profile</h2>
+              <div style="font-size:0.86rem;color:#64748b;margin-top:2px;" id="drawerClientProfileMeta">Client since Nov 2026</div>
+            </div>
+            <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="advBtnCloseClientDrawer">✕ Close</button>
+          </div>
+
+          <div class="adv-form-grid" style="margin-bottom:20px;">
+            <div class="adv-card" style="padding:16px;margin:0;">
+              <div class="adv-label">Contact Details</div>
+              <div style="font-size:0.88rem;color:#334155;"><strong>Phone:</strong> <span id="cliDetailPhone"></span></div>
+              <div style="font-size:0.88rem;color:#334155;margin-top:4px;"><strong>Email:</strong> <span id="cliDetailEmail"></span></div>
+              <div style="font-size:0.88rem;color:#334155;margin-top:4px;"><strong>Jurisdiction:</strong> <span id="cliDetailLocation"></span></div>
+            </div>
+            <div class="adv-card" style="padding:16px;margin:0;">
+              <div class="adv-label">Private Advocate Notes (Confidential)</div>
+              <p style="font-size:0.88rem;color:#475569;margin:0;" id="cliDetailNotes"></p>
+            </div>
+          </div>
+
+          <div class="adv-card">
+            <div class="adv-card-header">
+              <h4 class="adv-card-title">Cases Associated with this Client</h4>
+              <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="cliDetailNewCaseBtn">+ New Case for Client</button>
+            </div>
+            <div class="adv-table-wrap">
+              <table class="adv-table">
+                <thead>
+                  <tr>
+                    <th>Case ID</th>
+                    <th>Title</th>
+                    <th>Dispute Nature</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="cliDetailCasesTbody">
+                  <!-- Dynamically Populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: LEGAL DOCUMENT WORKSPACE -->
+      <section class="adv-view-content" id="advViewDocuments" style="display:none;">
+        <div class="shield-notice" style="margin-bottom:20px;">
+          <span class="shield-icon">🔒</span>
+          <div>
+            <strong>Advocate-Client Privilege Protected Storage:</strong>
+            Uploaded rental agreements, legal notices, and evidentiary files are stored in your private advocate partition. Files are strictly accessible only to your account and shielded from public viewers or other practitioners.
+          </div>
+        </div>
+
+        <div class="adv-action-bar">
+          <div class="adv-filter-group">
+            <select id="advDocCaseFilter" class="adv-select-filter">
+              <option value="all">All Cases</option>
+            </select>
+            <select id="advDocTypeFilter" class="adv-select-filter">
+              <option value="all">All Document Types</option>
+              <option value="rental_agreement">Rental Agreement</option>
+              <option value="landlord_notice">Landlord Notice</option>
+              <option value="supporting_evidence">Supporting Evidence</option>
+              <option value="legal_notice">Formal Legal Notice</option>
+              <option value="other">Other Documents</option>
+            </select>
+          </div>
+          <button type="button" class="adv-btn adv-btn-primary" id="advBtnOpenUploadDocModal">
+            <span>+ Upload Document (Max 15MB)</span>
+          </button>
+        </div>
+
+        <div class="adv-card">
+          <div class="adv-table-wrap">
+            <table class="adv-table">
+              <thead>
+                <tr>
+                  <th>Document Name</th>
+                  <th>Category</th>
+                  <th>Associated Case</th>
+                  <th>File Size</th>
+                  <th>Uploaded Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="advAllDocsTbody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+          <div id="advDocsEmptyState" class="adv-empty-state" style="display:none;">
+            <div class="adv-empty-icon">📄</div>
+            <h4 class="adv-empty-title">No Documents Uploaded</h4>
+            <p class="adv-empty-desc">Upload rental agreements (.pdf, .docx) or photographic evidence (.jpg, .png) to your case repository.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: RENTAL AGREEMENT ANALYSIS (Integrated with Backend) -->
+      <section class="adv-view-content" id="advViewAudit" style="display:none;">
+        <div class="adv-card" style="margin-bottom:24px;">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Professional Lease Agreement Audit Engine</h3>
+            <span class="adv-badge adv-badge-info">Indian Tenancy Law Powered</span>
+          </div>
+          <div style="padding:20px;">
+            <p style="font-size:0.88rem;color:#475569;margin-top:0;">
+              Upload an agreement to detect unilateral painting deductions, excessive security deposit caps, punitive lock-in clauses, and utility interference under Indian statutory protections.
+            </p>
+
+            <form id="advAuditForm">
+              <div class="adv-form-grid">
+                <div>
+                  <label class="adv-label">Associate with Case (Optional)</label>
+                  <select id="advAuditCaseSelect" class="adv-select">
+                    <option value="">-- Standalone Audit (Not Linked) --</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="adv-label">Jurisdiction State <span class="req">*</span></label>
+                  <select id="advAuditStateSelect" class="adv-select" required>
+                    <option value="Maharashtra" selected>Maharashtra (MRCA 1999)</option>
+                    <option value="Karnataka">Karnataka (KRA 1999)</option>
+                    <option value="Delhi">Delhi NCR (DRCA 1958)</option>
+                    <option value="Tamil Nadu">Tamil Nadu (TNRRRL 2017)</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="All-India">All-India General Standard</option>
+                  </select>
+                </div>
+                <div class="adv-form-full">
+                  <label class="adv-label">Upload Rental Agreement (.pdf, .docx, or .txt) <span class="req">*</span></label>
+                  <input type="file" id="advAuditFileInput" accept=".pdf,.docx,.txt" class="adv-input">
+                  <small style="color:#64748b;">Or paste agreement text below if digital file is unavailable.</small>
+                </div>
+                <div class="adv-form-full">
+                  <label class="adv-label">Agreement Text Extract</label>
+                  <textarea id="advAuditTextInput" rows="5" class="adv-textarea" placeholder="Paste relevant agreement clauses here..."></textarea>
+                </div>
+              </div>
+
+              <div style="margin-top:16px;display:flex;align-items:center;gap:12px;">
+                <button type="submit" class="adv-btn adv-btn-primary" id="advBtnRunAudit">
+                  <span>🚀 Run Professional Lease Audit</span>
+                </button>
+                <button type="button" class="adv-btn adv-btn-secondary" id="advBtnAuditSample">
+                  <span>Load Sample Mumbai Agreement</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Audit Results Box -->
+        <div id="advAuditResultsBox" style="display:none;">
+          <div class="adv-card">
+            <div class="adv-card-header">
+              <div>
+                <h3 class="adv-card-title" id="advAuditResultTitle">Audit Findings &amp; Clause Analysis</h3>
+                <div style="font-size:0.84rem;color:#64748b;margin-top:3px;" id="advAuditResultDocName">Document: Lease.pdf</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span class="adv-badge" id="advAuditRiskBadge">Risk Score: 68/100</span>
+                <button type="button" class="adv-btn adv-btn-primary adv-btn-sm" id="advBtnSaveAuditToCase" style="display:none;">
+                  <span>💾 Save Audit to Selected Case</span>
+                </button>
+              </div>
+            </div>
+
+            <div style="padding:20px;">
+              <div id="advAuditSummaryCallout" class="shield-notice" style="margin-bottom:20px;">
+                <span class="shield-icon">⚖️</span>
+                <div id="advAuditSummaryText">Overall summary...</div>
+              </div>
+
+              <h4 style="font-size:0.95rem;font-weight:700;color:#0f172a;margin-bottom:12px;">Detected Clauses Requiring Legal Review</h4>
+              <div id="advAuditClausesContainer">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: LEGAL REBUTTAL WORKSPACE (Integrated) -->
+      <section class="adv-view-content" id="advViewRebuttal" style="display:none;">
+        <div class="adv-card" style="margin-bottom:24px;">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Statutory Legal Rebuttal &amp; Notice Generator</h3>
+            <span class="adv-badge adv-badge-info">Section 106 &amp; 108 TPA Compliant</span>
+          </div>
+          <div style="padding:20px;">
+            <p style="font-size:0.88rem;color:#475569;margin-top:0;">
+              Draft formal statutory demand letters or rejoinders citing enacted tenancy legislation and binding Supreme Court contract principles.
+            </p>
+
+            <form id="advRebuttalForm">
+              <div class="adv-form-grid">
+                <div>
+                  <label class="adv-label">Associate with Case (Optional)</label>
+                  <select id="advRebuttalCaseSelect" class="adv-select">
+                    <option value="">-- Standalone Rebuttal (Not Linked) --</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="adv-label">Dispute Category <span class="req">*</span></label>
+                  <select id="advRebuttalCategorySelect" class="adv-select" required>
+                    <option value="security_deposit_withholding" selected>Security Deposit Withholding (Painting / Cleaning)</option>
+                    <option value="punitive_lockin">Punitive Lock-in Penalty Forfeiture</option>
+                    <option value="utility_disconnection">Illegal Water / Power Disconnection</option>
+                    <option value="unlawful_eviction">Unlawful Eviction Notice &lt; 15 Days</option>
+                    <option value="arbitrary_rent_hike">Mid-term Arbitrary Rent Hike</option>
+                  </select>
+                </div>
+                <div class="adv-form-full">
+                  <label class="adv-label">Landlord's Unlawful Notice / Demand Message <span class="req">*</span></label>
+                  <textarea id="advRebuttalLandlordNotice" rows="3" class="adv-textarea" placeholder="Paste landlord's demand or WhatsApp message withholding deposit..." required></textarea>
+                </div>
+                <div class="adv-form-full">
+                  <label class="adv-label">Client's Factual Defense &amp; Evidence Points <span class="req">*</span></label>
+                  <textarea id="advRebuttalClientDefense" rows="3" class="adv-textarea" placeholder="Detail move-out handover status, lack of contractor invoices, 30 days notice served..." required></textarea>
+                </div>
+              </div>
+
+              <div style="margin-top:16px;display:flex;align-items:center;gap:12px;">
+                <button type="submit" class="adv-btn adv-btn-primary" id="advBtnGenerateRebuttal">
+                  <span>📝 Generate Structured Statutory Rebuttal</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Generated Draft Box -->
+        <div id="advRebuttalDraftBox" style="display:none;">
+          <div class="adv-card">
+            <div class="adv-card-header">
+              <div>
+                <h3 class="adv-card-title">Structured Statutory Legal Draft</h3>
+                <small style="color:#d97706;font-weight:600;">⚠️ Professional Draft — Review and customize before formal dispatch.</small>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="advBtnCopyRebuttal">📋 Copy Draft</button>
+                <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm" id="advBtnDownloadRebuttal">💾 Download Notice (.txt)</button>
+                <button type="button" class="adv-btn adv-btn-primary adv-btn-sm" id="advBtnSaveRebuttalToCase" style="display:none;">📁 Save to Case</button>
+              </div>
+            </div>
+            <div style="padding:20px;">
+              <textarea id="advRebuttalDraftText" rows="16" class="adv-textarea" style="font-family:monospace;font-size:0.86rem;line-height:1.6;"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: LEGAL RESEARCH & REFERENCES -->
+      <section class="adv-view-content" id="advViewReferences" style="display:none;">
+        <div class="adv-card" style="margin-bottom:20px;">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Indian Tenancy Statutes &amp; Legal Reference Library</h3>
+            <span class="adv-badge adv-badge-verified">Verified Official Citations</span>
+          </div>
+          <div style="padding:18px 20px;">
+            <p style="font-size:0.88rem;color:#475569;margin-top:0;">
+              Search authoritative statutory provisions governing lease agreements, wear-and-tear exceptions, deposit refunds, and essential supply protections.
+            </p>
+            <div class="adv-action-bar" style="margin-bottom:0;">
+              <div class="adv-filter-group" style="width:100%;">
+                <input type="text" id="advRefSearchInput" class="adv-search-input" style="flex:1;" placeholder="Search by section, act name, keywords (e.g. wear and tear, 108m, lock-in, Maharashtra)...">
+                <select id="advRefCategoryFilter" class="adv-select-filter">
+                  <option value="all">All Legal Categories</option>
+                  <option value="central_legislation">Central Property Law (Transfer of Property Act)</option>
+                  <option value="contract_law">Contract Law (Indian Contract Act 1872)</option>
+                  <option value="state_legislation">State Rent Enactments (Maharashtra, Karnataka, etc.)</option>
+                  <option value="model_legislation">Model Tenancy Act, 2021 (Framework)</option>
+                  <option value="consumer_protection">Consumer Protection Act 2019</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statutory Jurisdiction Alert -->
+        <div class="shield-notice" style="margin-bottom:20px;background:#f8fafc;border-color:#cbd5e1;">
+          <span class="shield-icon">🏛️</span>
+          <div>
+            <strong>Jurisdiction Specificity Note for Advocates:</strong>
+            Under Entry 18 of the State List (Seventh Schedule, Constitution of India), tenancy and rent control is a State Subject. The Model Tenancy Act, 2021 is a guidance framework and is <em>not automatically enacted pan-India</em> unless adopted by specific state legislation. Always check local enacted statutes.
+          </div>
+        </div>
+
+        <div id="advReferencesListContainer">
+          <!-- Dynamically Populated from legal-references-data.js -->
+        </div>
+      </section>
+
+      <!-- VIEW 8: APPOINTMENTS & CONSULTATION MANAGEMENT -->
+      <section class="adv-view-content" id="advViewAppointments" style="display:none;">
+        <div class="adv-action-bar">
+          <div class="adv-filter-group">
+            <select id="advAptStatusFilter" class="adv-select-filter">
+              <option value="all">All Consultation Statuses</option>
+              <option value="scheduled" selected>Scheduled Only</option>
+              <option value="completed">Completed</option>
+              <option value="rescheduled">Rescheduled</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <button type="button" class="adv-btn adv-btn-primary" id="advBtnOpenScheduleModal">
+            <span>+ Schedule New Consultation</span>
+          </button>
+        </div>
+
+        <div class="adv-card">
+          <div class="adv-table-wrap">
+            <table class="adv-table">
+              <thead>
+                <tr>
+                  <th>Client Name</th>
+                  <th>Case Association</th>
+                  <th>Scheduled Date &amp; Time</th>
+                  <th>Duration</th>
+                  <th>Mode</th>
+                  <th>Status</th>
+                  <th>Meeting Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="advAptsListTbody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+          <div id="advAptsEmptyState" class="adv-empty-state" style="display:none;">
+            <div class="adv-empty-icon">📅</div>
+            <h4 class="adv-empty-title">No Appointments Found</h4>
+            <p class="adv-empty-desc">Schedule client conferences or video consultations to keep your calendar organized.</p>
+            <button type="button" class="adv-btn adv-btn-primary" id="advEmptyScheduleBtn">+ Schedule Appointment</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 9: ADVOCATE PROFESSIONAL PROFILE -->
+      <section class="adv-view-content" id="advViewProfile" style="display:none;">
+        <!-- Verification Audit Card -->
+        <div class="adv-card" style="margin-bottom:24px;">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Bar Council Credential &amp; Verification State</h3>
+            <span id="advProfileStatusBadge"></span>
+          </div>
+          <div style="padding:20px;">
+            <div id="advProfileVerifCallout" class="adv-verif-alert pending">
+              <span style="font-size:1.4rem;">⏳</span>
+              <div>
+                <strong id="advProfileVerifTitle">Verification Under Review:</strong>
+                <span id="advProfileVerifDesc">Your advocate profile is registered. Official verification is conducted exclusively by authorized administrators upon authentication with the respective State Bar Council.</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:0.86rem;color:#475569;">
+              <div><strong>Bar Council Number:</strong> <span id="advProfDispBar">MAH/4921/2014</span></div>
+              <div><strong>State Bar Council:</strong> <span id="advProfDispStateBar">Bar Council of Maharashtra &amp; Goa</span></div>
+              <div><strong>Audit Timestamp:</strong> <span id="advProfDispAuditTime">Pending review</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Edit Form -->
+        <div class="adv-card">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Professional Practice Details</h3>
+          </div>
+          <div style="padding:24px;">
+            <form id="advProfileEditForm">
+              <div class="adv-form-grid">
+                <div>
+                  <label class="adv-label">Full Legal Name <span class="req">*</span></label>
+                  <input type="text" id="advProfNameInput" class="adv-input" required>
+                </div>
+                <div>
+                  <label class="adv-label">Contact Phone <span class="req">*</span></label>
+                  <input type="tel" id="advProfPhoneInput" class="adv-input" required>
+                </div>
+                <div>
+                  <label class="adv-label">Bar Council Enrolment Number <span class="req">*</span></label>
+                  <input type="text" id="advProfBarInput" class="adv-input" required>
+                </div>
+                <div>
+                  <label class="adv-label">State Bar Council <span class="req">*</span></label>
+                  <select id="advProfStateBarSelect" class="adv-select" required>
+                    <option value="Bar Council of Maharashtra & Goa">Bar Council of Maharashtra &amp; Goa</option>
+                    <option value="Karnataka State Bar Council">Karnataka State Bar Council</option>
+                    <option value="Bar Council of Delhi">Bar Council of Delhi</option>
+                    <option value="Bar Council of Tamil Nadu">Bar Council of Tamil Nadu</option>
+                    <option value="Bar Council of Telangana">Bar Council of Telangana</option>
+                    <option value="Bar Council of West Bengal">Bar Council of West Bengal</option>
+                    <option value="Other State Bar Council">Other State Bar Council</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="adv-label">State of Practice <span class="req">*</span></label>
+                  <input type="text" id="advProfStateInput" class="adv-input" required>
+                </div>
+                <div>
+                  <label class="adv-label">City of Practice <span class="req">*</span></label>
+                  <input type="text" id="advProfCityInput" class="adv-input" required>
+                </div>
+                <div>
+                  <label class="adv-label">Years of Experience <span class="req">*</span></label>
+                  <input type="number" id="advProfExpInput" class="adv-input" min="0" max="60" required>
+                </div>
+                <div>
+                  <label class="adv-label">Profile Photo URL</label>
+                  <input type="url" id="advProfPhotoInput" class="adv-input" placeholder="https://...">
+                </div>
+
+                <div class="adv-form-full">
+                  <label class="adv-label">Areas of Legal Practice</label>
+                  <div class="adv-practice-grid" id="advProfPracticeAreasGrid">
+                    <label class="adv-checkbox-label">
+                      <input type="checkbox" name="advProfArea" value="Rental and tenancy disputes">
+                      <span>Rental &amp; Tenancy Disputes</span>
+                    </label>
+                    <label class="adv-checkbox-label">
+                      <input type="checkbox" name="advProfArea" value="Property law">
+                      <span>Property Law</span>
+                    </label>
+                    <label class="adv-checkbox-label">
+                      <input type="checkbox" name="advProfArea" value="Civil litigation">
+                      <span>Civil Litigation</span>
+                    </label>
+                    <label class="adv-checkbox-label">
+                      <input type="checkbox" name="advProfArea" value="Contract law">
+                      <span>Contract Law</span>
+                    </label>
+                    <label class="adv-checkbox-label">
+                      <input type="checkbox" name="advProfArea" value="Consumer disputes">
+                      <span>Consumer Disputes</span>
+                    </label>
+                    <label class="adv-checkbox-label">
+                      <input type="checkbox" name="advProfArea" value="Security deposit disputes">
+                      <span>Security Deposit Disputes</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="adv-form-full">
+                  <label class="adv-label">Professional Biography &amp; Standing</label>
+                  <textarea id="advProfBioInput" rows="4" class="adv-textarea" placeholder="Detail your court standing, chamber background, and tenancy advisory practice..."></textarea>
+                </div>
+              </div>
+
+              <div style="margin-top:20px;display:flex;align-items:center;gap:12px;">
+                <button type="submit" class="adv-btn adv-btn-primary" id="advBtnSaveProfile">
+                  <span>💾 Save Profile Updates</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 10: SETTINGS -->
+      <section class="adv-view-content" id="advViewSettings" style="display:none;">
+        <div class="adv-card">
+          <div class="adv-card-header">
+            <h3 class="adv-card-title">Chamber Workspace Configuration</h3>
+          </div>
+          <div style="padding:24px;">
+            <div style="margin-bottom:20px;">
+              <h4 style="margin:0 0 6px 0;font-size:0.95rem;color:#0f172a;">Persistent Database Storage</h4>
+              <p style="font-size:0.86rem;color:#64748b;margin:0 0 12px 0;">ClauseShield operates with self-healing local persistent storage and synchronizes with Supabase cloud instances.</p>
+              <button type="button" class="adv-btn adv-btn-secondary" id="advBtnOpenSupabaseModal">
+                <span>⚙️ Configure Supabase Credentials</span>
+              </button>
+            </div>
+            <hr style="border:0;border-top:1px solid #e2e8f0;margin:20px 0;">
+            <div>
+              <h4 style="margin:0 0 6px 0;font-size:0.95rem;color:#0f172a;">Data Export &amp; Backup</h4>
+              <p style="font-size:0.86rem;color:#64748b;margin:0 0 12px 0;">Export your case records, client rosters, and consultation notes in JSON format.</p>
+              <button type="button" class="adv-btn adv-btn-secondary" id="advBtnExportData">
+                <span>📥 Export Chamber Data</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==============================================================================
+       ADVOCATE PORTAL MODALS
+       ============================================================================== -->
+
+  <!-- Modal: Accept Grievance & Offer Video Consultation -->
+  <div class="adv-modal-backdrop" id="modalOfferConsultation" style="display:none;">
+    <div class="adv-modal" style="max-width:620px;">
+      <div class="adv-modal-header">
+        <div>
+          <h3 class="adv-modal-title">Offer Video Call Assistance &amp; Accept Grievance</h3>
+          <div style="font-size:0.82rem;color:#64748b;margin-top:2px;" id="modalOfferGrievanceRef">Reference: CS-CMP-2026-7819</div>
+        </div>
+        <button type="button" class="adv-modal-close" data-close="modalOfferConsultation">&times;</button>
+      </div>
+      <form id="advFormOfferConsultation">
+        <input type="hidden" id="offerTargetIssueId">
+        <div class="adv-modal-body">
+          <!-- Grievance Summary Box -->
+          <div class="adv-card" style="padding:14px;margin-bottom:18px;background:#f8fafc;">
+            <div style="font-size:0.88rem;font-weight:700;color:#0f172a;" id="offerTenantTitle">Landlord withholding deposit</div>
+            <div style="font-size:0.8rem;color:#64748b;margin-top:3px;" id="offerTenantMeta">Tenant: Arjun Mehra · Bengaluru · ₹55,000 at stake</div>
+          </div>
+
+          <!-- Video Call Consultation Fee Selector (Minimal Rates) -->
+          <div class="form-field-group">
+            <label class="adv-label">
+              Video Call Consultation Rate (Minimal Fee) <span class="req">*</span>
+              <small style="font-weight:normal;color:#64748b;">— Advocates offer minimal rates per Bar Council legal aid standards</small>
+            </label>
+            <div class="adv-fee-grid" id="offerFeeChipsGrid">
+              <div class="adv-fee-chip active" data-fee="0">
+                <div class="adv-fee-amount">₹0</div>
+                <div class="adv-fee-label">Free Pro Bono</div>
+              </div>
+              <div class="adv-fee-chip" data-fee="149">
+                <div class="adv-fee-amount">₹149</div>
+                <div class="adv-fee-label">Nominal Fee</div>
+              </div>
+              <div class="adv-fee-chip" data-fee="299">
+                <div class="adv-fee-amount">₹299</div>
+                <div class="adv-fee-label">Standard Minimal</div>
+              </div>
+              <div class="adv-fee-chip" data-fee="499">
+                <div class="adv-fee-amount">₹499</div>
+                <div class="adv-fee-label">Comprehensive</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+              <label style="font-size:0.8rem;color:#475569;white-space:nowrap;">Custom Fee (₹):</label>
+              <input type="number" id="offerCustomFeeInput" class="adv-input" style="width:130px;padding:6px 10px;" value="0" min="0" max="2000">
+              <small style="color:#64748b;font-size:0.78rem;">Minimal rates ensure prompt tenant acceptance</small>
+            </div>
+          </div>
+
+          <!-- Proposed Date & Time -->
+          <div class="adv-form-grid" style="margin-top:16px;">
+            <div>
+              <label class="adv-label">Proposed Consultation Date &amp; Time <span class="req">*</span></label>
+              <input type="datetime-local" id="offerConsultationDateTime" class="adv-input" required>
+            </div>
+            <div>
+              <label class="adv-label">Consultation Duration</label>
+              <select id="offerConsultationDuration" class="adv-select">
+                <option value="30" selected>30 Minutes (Recommended)</option>
+                <option value="45">45 Minutes</option>
+                <option value="60">60 Minutes</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Legal Advice & Action Message -->
+          <div class="form-field-group" style="margin-top:16px;">
+            <label class="adv-label">Initial Legal Advice &amp; Statutory Guidance to Tenant <span class="req">*</span></label>
+            <textarea id="offerAdviceMessage" rows="4" class="adv-textarea" placeholder="Detail your statutory assessment (e.g. Section 108(m) TPA on wear and tear, Section 74 Contract Act on liquidated damages)..." required></textarea>
+          </div>
+
+          <!-- Case & Client Management Auto-Link Checkbox -->
+          <div style="margin-top:16px;background:#f0fdf4;border:1px solid #bbf7d0;padding:12px 14px;border-radius:8px;">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.86rem;color:#166534;margin:0;">
+              <input type="checkbox" id="offerAutoCreateCaseCheck" checked style="margin-top:2px;width:auto;">
+              <div>
+                <strong>Automatically add to My Cases &amp; My Clients:</strong>
+                Creates an active case file in your chamber workspace, records the tenant in your client roster, and schedules the consultation on your calendar.
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="adv-modal-footer">
+          <button type="button" class="adv-btn adv-btn-secondary" data-close="modalOfferConsultation">Cancel</button>
+          <button type="submit" class="adv-btn adv-btn-primary" id="btnSubmitConsultationOffer">
+            <span>🚀 Accept Grievance &amp; Send Video Offer</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Create New Case -->
+  <div class="adv-modal-backdrop" id="modalCreateCase" style="display:none;">
+    <div class="adv-modal">
+      <div class="adv-modal-header">
+        <h3 class="adv-modal-title">Create New Legal Case</h3>
+        <button type="button" class="adv-modal-close" data-close="modalCreateCase">&times;</button>
+      </div>
+      <form id="advFormNewCase">
+        <div class="adv-modal-body">
+          <div class="adv-form-grid">
+            <div class="adv-form-full">
+              <label class="adv-label">Case Title <span class="req">*</span></label>
+              <input type="text" id="newCaseTitle" class="adv-input" placeholder="e.g. Unlawful 3-Month Lock-in Deduction &amp; Deposit Retention" required>
+            </div>
+            <div>
+              <label class="adv-label">Client <span class="req">*</span></label>
+              <select id="newCaseClientSelect" class="adv-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label class="adv-label">Nature of Dispute <span class="req">*</span></label>
+              <select id="newCaseNatureSelect" class="adv-select" required>
+                <option value="deposit_dispute" selected>Security Deposit Dispute</option>
+                <option value="rental_dispute">Rental &amp; Agreement Dispute</option>
+                <option value="civil_litigation">Civil Litigation / Eviction</option>
+                <option value="contract_law">Contract Law &amp; Lock-in</option>
+                <option value="consumer_dispute">Consumer Dispute</option>
+                <option value="other">Other Dispute</option>
+              </select>
+            </div>
+            <div class="adv-form-full">
+              <label class="adv-label">Property Location <span class="req">*</span></label>
+              <input type="text" id="newCaseLocation" class="adv-input" placeholder="e.g. Flat 402, Sea View Apts, Bandra West, Mumbai" required>
+            </div>
+            <div>
+              <label class="adv-label">Security Deposit Amount (₹)</label>
+              <input type="number" id="newCaseDeposit" class="adv-input" placeholder="e.g. 80000" min="0">
+            </div>
+            <div>
+              <label class="adv-label">Monthly Rent Amount (₹)</label>
+              <input type="number" id="newCaseRent" class="adv-input" placeholder="e.g. 40000" min="0">
+            </div>
+            <div class="adv-form-full">
+              <label class="adv-label">Case Description &amp; Facts <span class="req">*</span></label>
+              <textarea id="newCaseDesc" rows="4" class="adv-textarea" placeholder="Detail the tenant's move-out status, landlord claims, statutory notice dates, and relief sought..." required></textarea>
+            </div>
+            <div>
+              <label class="adv-label">Initial Status</label>
+              <select id="newCaseStatus" class="adv-select">
+                <option value="new" selected>New</option>
+                <option value="under_review">Under Review</option>
+                <option value="awaiting_client_info">Awaiting Client Info</option>
+                <option value="in_progress">In Progress</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="adv-modal-footer">
+          <button type="button" class="adv-btn adv-btn-secondary" data-close="modalCreateCase">Cancel</button>
+          <button type="submit" class="adv-btn adv-btn-primary">Create Case File</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Client -->
+  <div class="adv-modal-backdrop" id="modalAddClient" style="display:none;">
+    <div class="adv-modal">
+      <div class="adv-modal-header">
+        <h3 class="adv-modal-title">Add Client Record</h3>
+        <button type="button" class="adv-modal-close" data-close="modalAddClient">&times;</button>
+      </div>
+      <form id="advFormNewClient">
+        <div class="adv-modal-body">
+          <div class="adv-form-grid">
+            <div class="adv-form-full">
+              <label class="adv-label">Client Full Name <span class="req">*</span></label>
+              <input type="text" id="newClientName" class="adv-input" placeholder="e.g. Kavita Nair" required>
+            </div>
+            <div>
+              <label class="adv-label">Mobile Number <span class="req">*</span></label>
+              <input type="tel" id="newClientPhone" class="adv-input" placeholder="+91 98200 44112" required>
+            </div>
+            <div>
+              <label class="adv-label">Email Address</label>
+              <input type="email" id="newClientEmail" class="adv-input" placeholder="client@example.com">
+            </div>
+            <div>
+              <label class="adv-label">City Location <span class="req">*</span></label>
+              <input type="text" id="newClientCity" class="adv-input" placeholder="e.g. Mumbai" required>
+            </div>
+            <div>
+              <label class="adv-label">State <span class="req">*</span></label>
+              <input type="text" id="newClientState" class="adv-input" value="Maharashtra" required>
+            </div>
+            <div class="adv-form-full">
+              <label class="adv-label">Private Client Notes (Confidential)</label>
+              <textarea id="newClientNotes" rows="3" class="adv-textarea" placeholder="Privileged intake notes, background facts, landlord details..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="adv-modal-footer">
+          <button type="button" class="adv-btn adv-btn-secondary" data-close="modalAddClient">Cancel</button>
+          <button type="submit" class="adv-btn adv-btn-primary">Save Client</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Schedule Appointment -->
+  <div class="adv-modal-backdrop" id="modalScheduleApt" style="display:none;">
+    <div class="adv-modal">
+      <div class="adv-modal-header">
+        <h3 class="adv-modal-title">Schedule Client Consultation</h3>
+        <button type="button" class="adv-modal-close" data-close="modalScheduleApt">&times;</button>
+      </div>
+      <form id="advFormScheduleApt">
+        <div class="adv-modal-body">
+          <div class="adv-form-grid">
+            <div>
+              <label class="adv-label">Select Client <span class="req">*</span></label>
+              <select id="newAptClientSelect" class="adv-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label class="adv-label">Associated Case</label>
+              <select id="newAptCaseSelect" class="adv-select">
+                <option value="">-- General Consultation --</option>
+              </select>
+            </div>
+            <div>
+              <label class="adv-label">Date &amp; Time <span class="req">*</span></label>
+              <input type="datetime-local" id="newAptDateTime" class="adv-input" required>
+            </div>
+            <div>
+              <label class="adv-label">Duration</label>
+              <select id="newAptDuration" class="adv-select">
+                <option value="30" selected>30 Minutes</option>
+                <option value="45">45 Minutes</option>
+                <option value="60">60 Minutes</option>
+              </select>
+            </div>
+            <div class="adv-form-full">
+              <label class="adv-label">Consultation Mode</label>
+              <select id="newAptMode" class="adv-select">
+                <option value="office_consultation" selected>In-Office Chambers Consultation</option>
+                <option value="video_conference">Online Video Consultation</option>
+                <option value="phone_call">Telephone Conference</option>
+              </select>
+            </div>
+            <div class="adv-form-full">
+              <label class="adv-label">Consultation Agenda &amp; Meeting Notes</label>
+              <textarea id="newAptNotes" rows="3" class="adv-textarea" placeholder="Agenda points, evidence to review, rejoinder preparation..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="adv-modal-footer">
+          <button type="button" class="adv-btn adv-btn-secondary" data-close="modalScheduleApt">Cancel</button>
+          <button type="submit" class="adv-btn adv-btn-primary">Schedule Appointment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Upload Case Document -->
+  <div class="adv-modal-backdrop" id="modalUploadDoc" style="display:none;">
+    <div class="adv-modal">
+      <div class="adv-modal-header">
+        <h3 class="adv-modal-title">Upload Confidential Document</h3>
+        <button type="button" class="adv-modal-close" data-close="modalUploadDoc">&times;</button>
+      </div>
+      <form id="advFormUploadDoc">
+        <div class="adv-modal-body">
+          <div class="shield-notice" style="margin-bottom:16px;">
+            <span class="shield-icon">🛡️</span>
+            <div>
+              <strong>File Restrictions &amp; Confidentiality:</strong>
+              Allowed formats: <code>.pdf</code>, <code>.docx</code>, <code>.png</code>, <code>.jpg</code>. Maximum file size: <strong>15MB</strong>. Encrypted in private advocate workspace.
+            </div>
+          </div>
+
+          <div class="adv-form-grid">
+            <div class="adv-form-full">
+              <label class="adv-label">Associated Case <span class="req">*</span></label>
+              <select id="uploadDocCaseSelect" class="adv-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label class="adv-label">Document Title <span class="req">*</span></label>
+              <input type="text" id="uploadDocName" class="adv-input" placeholder="e.g. Registered Leave and License Agreement" required>
+            </div>
+            <div>
+              <label class="adv-label">Document Category <span class="req">*</span></label>
+              <select id="uploadDocCategory" class="adv-select" required>
+                <option value="rental_agreement" selected>Rental Agreement / Lease</option>
+                <option value="landlord_notice">Landlord Notice / WhatsApp Demand</option>
+                <option value="supporting_evidence">Supporting Evidence / Handover Photos</option>
+                <option value="legal_notice">Formal Legal Demand Notice</option>
+                <option value="other">Other Document</option>
+              </select>
+            </div>
+            <div class="adv-form-full">
+              <label class="adv-label">Select File <span class="req">*</span></label>
+              <input type="file" id="uploadDocFile" accept=".pdf,.docx,.png,.jpg,.jpeg" class="adv-input" required>
+            </div>
+          </div>
+        </div>
+        <div class="adv-modal-footer">
+          <button type="button" class="adv-btn adv-btn-secondary" data-close="modalUploadDoc">Cancel</button>
+          <button type="submit" class="adv-btn adv-btn-primary">Upload Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Case Note -->
+  <div class="adv-modal-backdrop" id="modalAddCaseNote" style="display:none;">
+    <div class="adv-modal">
+      <div class="adv-modal-header">
+        <h3 class="adv-modal-title">Add Case Note</h3>
+        <button type="button" class="adv-modal-close" data-close="modalAddCaseNote">&times;</button>
+      </div>
+      <form id="advFormAddNote">
+        <div class="adv-modal-body">
+          <div class="adv-form-grid">
+            <div class="adv-form-full">
+              <label class="adv-label">Note Content (Confidential Work-Product) <span class="req">*</span></label>
+              <textarea id="newCaseNoteText" rows="5" class="adv-textarea" placeholder="Record legal reasoning, speed post tracking numbers, court hearing takeaways..." required></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="adv-modal-footer">
+          <button type="button" class="adv-btn adv-btn-secondary" data-close="modalAddCaseNote">Cancel</button>
+          <button type="submit" class="adv-btn adv-btn-primary">Add Note to Case</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- ==============================================================================
        MODALS & DIALOGS
@@ -1370,9 +2672,13 @@
               <span class="chip-icon">👤</span>
               <span class="chip-text">Tenant (Arjun Mehra)</span>
             </button>
-            <button type="button" class="demo-chip demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123" title="Log in as Adv. Rajesh (Free Lawyer)">
+            <button type="button" class="demo-chip demo-login-btn" data-email="rajesh.sharma@advocates.in" data-pass="password123" title="Log in as Adv. Rajesh (Verified Advocate)">
               <span class="chip-icon">⚖️</span>
-              <span class="chip-text">Advocate (Rajesh)</span>
+              <span class="chip-text">Adv. Rajesh (Verified)</span>
+            </button>
+            <button type="button" class="demo-chip demo-login-btn" data-email="advocate.pending@legalchambers.in" data-pass="password123" title="Log in as Adv. Meenakshi (Pending Verification)">
+              <span class="chip-icon">⏳</span>
+              <span class="chip-text">Adv. Meenakshi (Pending)</span>
             </button>
             <button type="button" class="demo-chip demo-login-btn" data-email="admin@clauseshield.com" data-pass="password123" title="Log in as Platform Admin">
               <span class="chip-icon">🛡️</span>
@@ -1556,9 +2862,10 @@
           </form>
 
           <!-- Lawyer Registration Form -->
-          <form id="lawyerRegisterForm" style="display:none;">
+                    <!-- Dedicated Advocate Registration Form -->
+          <form id="lawyerRegisterForm" style="display:none;" class="advocate-reg-form">
             <div class="form-field-group">
-              <label for="lawyerFullName">Advocate Full Name <span class="req">*</span></label>
+              <label for="lawyerFullName">Full Legal Name <span class="req">*</span></label>
               <div class="input-with-icon">
                 <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 <input type="text" id="lawyerFullName" placeholder="e.g. Adv. Rohit Deshmukh" required autocomplete="name">
@@ -1567,22 +2874,30 @@
 
             <div class="form-grid">
               <div class="form-field-group">
-                <label for="lawyerRegEmail">Email Address <span class="req">*</span></label>
+                <label for="lawyerRegEmail">Official Email Address <span class="req">*</span></label>
                 <div class="input-with-icon">
                   <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                   <input type="email" id="lawyerRegEmail" placeholder="adv.rohit@lawchambers.in" required autocomplete="email">
                 </div>
               </div>
               <div class="form-field-group">
-                <label for="lawyerRegPassword">Password <span class="req">*</span></label>
+                <label for="lawyerPhone">Mobile Number <span class="req">*</span></label>
                 <div class="input-with-icon">
-                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <input type="password" id="lawyerRegPassword" placeholder="Create password" required autocomplete="new-password">
-                  <button type="button" class="pwd-toggle-btn" data-target="lawyerRegPassword" aria-label="Toggle password visibility">
-                    <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <svg class="eye-closed" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M2 2l20 20"/></svg>
-                  </button>
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  <input type="tel" id="lawyerPhone" placeholder="+91 98210 55443" required autocomplete="tel">
                 </div>
+              </div>
+            </div>
+
+            <div class="form-field-group">
+              <label for="lawyerRegPassword">Account Password <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="lawyerRegPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+                <button type="button" class="pwd-toggle-btn" data-target="lawyerRegPassword" aria-label="Toggle password visibility">
+                  <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M2 2l20 20"/></svg>
+                </button>
               </div>
             </div>
 
@@ -1591,7 +2906,7 @@
                 <label for="lawyerBarNumber">Bar Council Enrolment No. <span class="req">*</span></label>
                 <div class="input-with-icon">
                   <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
-                  <input type="text" id="lawyerBarNumber" placeholder="e.g. MAH/5821/2020" value="MAH/5821/2020" required>
+                  <input type="text" id="lawyerBarNumber" placeholder="e.g. MAH/5821/2020" required>
                 </div>
               </div>
               <div class="form-field-group">
@@ -1605,6 +2920,8 @@
                     <option value="Bar Council of Tamil Nadu">Bar Council of Tamil Nadu</option>
                     <option value="Bar Council of Telangana">Bar Council of Telangana</option>
                     <option value="Bar Council of West Bengal">Bar Council of West Bengal</option>
+                    <option value="Bar Council of Gujarat">Bar Council of Gujarat</option>
+                    <option value="Bar Council of Uttar Pradesh">Bar Council of Uttar Pradesh</option>
                     <option value="Other State Bar Council">Other State Bar Council</option>
                   </select>
                 </div>
@@ -1613,47 +2930,94 @@
 
             <div class="form-grid">
               <div class="form-field-group">
-                <label for="lawyerSpecialty">Legal Specialisation <span class="req">*</span></label>
+                <label for="lawyerStatePractice">State of Practice <span class="req">*</span></label>
                 <div class="input-with-icon">
-                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                  <select id="lawyerSpecialty" required>
-                    <option value="Tenancy Disputes & Deposit Recovery">Tenancy Disputes &amp; Deposit Recovery</option>
-                    <option value="Rental Agreements & Eviction Defense">Rental Agreements &amp; Eviction Defense</option>
-                    <option value="Landlord Harassment & Utility Rights">Landlord Harassment &amp; Utility Rights</option>
-                    <option value="Unfair Charges & Move-out Repairs">Unfair Charges &amp; Move-out Repairs</option>
-                    <option value="Civil & Consumer Tenancy Law">Civil &amp; Consumer Tenancy Law</option>
-                  </select>
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <input type="text" id="lawyerStatePractice" placeholder="e.g. Maharashtra" required>
                 </div>
               </div>
               <div class="form-field-group">
-                <label for="lawyerFee">Consultation Mode <span class="req">*</span></label>
+                <label for="lawyerCityPractice">City of Practice <span class="req">*</span></label>
                 <div class="input-with-icon">
-                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
-                  <select id="lawyerFee">
-                    <option value="0" selected>Pro Bono / Free Legal Aid (₹0)</option>
-                    <option value="500">Standard Consultation (₹500)</option>
-                  </select>
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg>
+                  <input type="text" id="lawyerCityPractice" placeholder="e.g. Mumbai / Pune" required>
                 </div>
               </div>
             </div>
 
-            <!-- Lawyer Verification Callout -->
-            <div class="lawyer-verification-callout">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Instant Verification Active: Auto-verified under Bar Council of India pro bono demonstration rules.</span>
+            <div class="form-grid">
+              <div class="form-field-group">
+                <label for="lawyerExperience">Years of Legal Experience <span class="req">*</span></label>
+                <div class="input-with-icon">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+                  <input type="number" id="lawyerExperience" placeholder="e.g. 8" min="0" max="60" required>
+                </div>
+              </div>
+              <div class="form-field-group">
+                <label for="lawyerPhotoUrl">Profile Photograph URL <small style="color:#64748b;">(Optional)</small></label>
+                <div class="input-with-icon">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <input type="url" id="lawyerPhotoUrl" placeholder="https://example.com/photo.jpg">
+                </div>
+              </div>
+            </div>
+
+            <!-- Areas of Legal Practice (Multi-select Checkboxes) -->
+            <div class="form-field-group" style="margin-top:4px;">
+              <label>Areas of Legal Practice <span class="req">*</span></label>
+              <div class="adv-practice-grid">
+                <label class="adv-checkbox-label">
+                  <input type="checkbox" name="advPracticeArea" value="Rental and tenancy disputes" checked>
+                  <span>Rental &amp; Tenancy Disputes</span>
+                </label>
+                <label class="adv-checkbox-label">
+                  <input type="checkbox" name="advPracticeArea" value="Property law" checked>
+                  <span>Property Law</span>
+                </label>
+                <label class="adv-checkbox-label">
+                  <input type="checkbox" name="advPracticeArea" value="Civil litigation">
+                  <span>Civil Litigation</span>
+                </label>
+                <label class="adv-checkbox-label">
+                  <input type="checkbox" name="advPracticeArea" value="Contract law" checked>
+                  <span>Contract Law</span>
+                </label>
+                <label class="adv-checkbox-label">
+                  <input type="checkbox" name="advPracticeArea" value="Consumer disputes">
+                  <span>Consumer Disputes</span>
+                </label>
+                <label class="adv-checkbox-label">
+                  <input type="checkbox" name="advPracticeArea" value="Security deposit disputes" checked>
+                  <span>Security Deposit Disputes</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-field-group" style="margin-top:12px;">
+              <label for="lawyerBio">Professional Profile Description <small style="color:#64748b;">(Optional)</small></label>
+              <textarea id="lawyerBio" rows="2" class="adv-textarea" placeholder="Brief summary of your legal background, court appearances, and tenancy dispute advisory experience..."></textarea>
+            </div>
+
+            <!-- Mandatory Verification Disclaimer Callout -->
+            <div class="shield-notice" style="margin:16px 0;border-color:#fde68a;background:#fffbeb;color:#92400e;">
+              <span class="shield-icon">🛡️</span>
+              <div>
+                <strong>Advocate Verification State:</strong>
+                Submitting your Bar Council enrolment initiates the <strong>Pending Verification</strong> status. Per Bar Council of India guidelines, advocates cannot claim or display a verified badge until credentials are confirmed by an authorized administrator.
+              </div>
             </div>
 
             <div class="auth-aux-row">
               <label class="custom-checkbox-label">
                 <input type="checkbox" id="lawyerTermsCheck" checked required>
-                <span class="checkbox-text">I confirm active Bar Council enrolment &amp; agree to pro bono guidelines</span>
+                <span class="checkbox-text">I certify that the Bar Council enrolment details provided are genuine and accurate.</span>
               </label>
             </div>
 
             <div id="lawyerRegErrorBox" class="auth-alert-box error" style="display:none;"></div>
 
             <button type="submit" class="btn primary full auth-submit-btn" id="lawyerRegisterSubmitBtn">
-              <span>Create Advocate Account &amp; Access Board</span>
+              <span>Register as Advocate &amp; Access Legal Workspace</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </form>
@@ -1928,6 +3292,9 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- APPLICATION JAVASCRIPT -->
+    <!-- ADVOCATE WORKSPACE MODULES -->
+  <script src="legal-references-data.js?v=2.4"></script>
+  <script src="advocate-portal.js?v=2.4"></script>
   <script src="supabase-client.js?v=2.3"></script>
   <script src="script.js?v=2.3"></script>
 </body>
