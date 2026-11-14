@@ -1,24 +1,28 @@
 # ClauseShield AI Backend 🛡️
 
 Backend service for **ClauseShield: AI-Assisted Tenant Support (India)**.
-Built with **FastAPI**, **Gemini 1.5 Flash**, and **Indian Tenancy Legal Rules**.
+Built with **FastAPI**, **Gemini 1.5 Flash**, **python-docx**, **pypdf**, and **Indian Tenancy Legal Rules**.
 
 ---
 
 ## Features
 
-1. **AI Clause Auditing (`POST /api/audit-clause`)**:
-   - Analyzes rental agreements, landlord WhatsApp messages, and deduction demands.
-   - Computes a nuanced Risk Score (0-100) and Concern Level (`NEEDS REVIEW`, `HIGHER CONCERN`, `INFORMATION CHECK`).
-   - Cites applicable Indian legal provisions (Section 74 of Indian Contract Act 1872, Model Tenancy Act 2021, State Rent Control Acts).
-   - Generates customized WhatsApp dispute responses and print-ready formal letters.
+1. **Full Rental Agreement Analysis (`POST /api/analyze-agreement`)**:
+   - Accepts uploaded PDF and DOCX agreements (or raw agreement text).
+   - Extracts readable document content without hardcoded text or demo scenarios.
+   - Automatically detects financial entities: monthly rent, security deposit amount, and landlord/lessor name.
+   - Identifies specific clauses: painting charges, security deposit caps & refund timelines, lock-in periods, maintenance obligations, rent escalation, entry/privacy, and utility disconnections.
+   - **Quotes the exact relevant sentence** directly from the uploaded document.
+   - Assigns a **Concern Level** (`High`, `Medium`, `Low`) without falsely claiming illegal status.
+   - Explains the clause in plain English, why it needs attention, and what the tenant should clarify.
+   - Generates customized WhatsApp messages and formal letters referencing the actual clauses identified.
 
-2. **Lease Agreement PDF Parser (`POST /api/upload-lease`)**:
-   - Parses multi-page PDF lease agreements with `pypdf`.
-   - Automatically detects and flags suspicious clauses (painting deductions, lock-in forfeitures, excessive advance deposits).
+2. **Live Internet Legal Research (`GET /api/search-laws`)**:
+   - Surfs and matches Indian tenancy statutes, sections, and High Court / Supreme Court precedents for any user query or problem.
+   - Provides direct, verified search links to **India Code** and **Indian Kanoon**.
 
 3. **Hybrid Architecture (Fail-Safe)**:
-   - When `GEMINI_API_KEY` is present, uses Google's latest **Gemini 1.5 Flash** for deep reasoning.
+   - When `GEMINI_API_KEY` is present, uses Google's latest **Gemini 1.5 Flash** with search grounding for live deep legal AI reasoning.
    - If the API key is not configured or network fails, automatically falls back to the **ClauseShield Indian Tenancy Rule Engine** with zero downtime and zero 500 errors.
 
 ---
@@ -30,7 +34,7 @@ Built with **FastAPI**, **Gemini 1.5 Flash**, and **Indian Tenancy Legal Rules**
 cd backend
 
 # On Windows
-python -m venv venv
+py -3.12 -m venv venv
 venv\Scripts\activate
 
 # On macOS / Linux
@@ -43,8 +47,8 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Configure Gemini API Key
-Create a `.env` file (or set environment variable):
+### 3. Configure Gemini API Key (Optional)
+Create a `.env` file or set environment variable:
 ```bash
 # Windows PowerShell
 $env:GEMINI_API_KEY="your-gemini-api-key"
@@ -52,7 +56,7 @@ $env:GEMINI_API_KEY="your-gemini-api-key"
 # macOS / Linux
 export GEMINI_API_KEY="your-gemini-api-key"
 ```
-*(Get a free key at [Google AI Studio](https://aistudio.google.com/))*.
+*(Get a free key at [Google AI Studio](https://aistudio.google.com/))*. Note: If omitted, ClauseShield automatically operates with the comprehensive offline Indian Tenancy Legal Engine.
 
 ### 4. Run the Server
 ```bash
@@ -62,62 +66,29 @@ uvicorn main:app --reload --port 8000
 - Interactive Swagger UI: `http://localhost:8000/docs`
 - Health Check: `http://localhost:8000/health`
 
----
-
-## Deploying for Free (Hackathon Ready)
-
-### Option A: Render.com (Recommended)
-1. Push your repository to GitHub.
-2. Sign in to [Render](https://render.com/) and click **New + > Web Service**.
-3. Connect your GitHub repository.
-4. Set the following settings:
-   - **Root Directory**: `backend`
-   - **Runtime**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-5. In **Environment Variables**, add:
-   - `GEMINI_API_KEY`: your Google AI Studio API key.
-6. Click **Deploy**. Your API URL will be: `https://<your-service>.onrender.com`.
-
-### Option B: Railway.app
-1. Go to [Railway.app](https://railway.app/).
-2. Select **Deploy from GitHub repo**, choose the `backend` folder.
-3. Add `GEMINI_API_KEY` in variables and deploy.
+### 5. Run the Automated Tests
+```bash
+python test_full_workflow.py
+python test_api.py
+```
 
 ---
 
 ## API Endpoints
 
-### 1. `POST /api/audit-clause`
-**Request Payload (JSON or Form-Data):**
-```json
-{
-  "message": "Landlord says 1 month rent will be deducted for painting.",
-  "state": "Maharashtra",
-  "city": "Pune",
-  "monthly_rent": 18000,
-  "security_deposit": 50000,
-  "amount_in_dispute": 18000,
-  "landlord_name": "Mr. Sharma",
-  "reply_days": 7
-}
-```
+### 1. `POST /api/analyze-agreement`
+**Payload (Multipart Form):**
+- `file`: Uploaded `.pdf`, `.docx`, or `.txt` file (Max 15MB).
+- `agreement_text`: Alternative raw text input.
+- `state`: State or jurisdiction (e.g. `Maharashtra`, `Karnataka`, `Delhi`, `All-India`).
+- `city`: City name (e.g. `Pune`, `Bengaluru`).
+- `monthly_rent`: Optional monthly rent figure.
+- `security_deposit`: Optional deposit amount.
+- `landlord_name`: Landlord or agency name.
+- `reply_days`: Response deadline (default 7 days).
 
-**Response:**
-```json
-{
-  "title": "Fixed painting deduction deserves closer review.",
-  "risk_score": 74,
-  "concern_level": "NEEDS REVIEW",
-  "reasoning": "Under Indian tenancy jurisprudence, routine wall wear...",
-  "legal_references": ["Indian Contract Act, 1872 – Section 74"],
-  "state_note": "In Maharashtra (Mumbai, Pune)...",
-  "suggested_steps": ["Check your rental agreement...", "Request dated photos..."],
-  "whatsapp_draft": "Hi Mr. Sharma, I am writing regarding...",
-  "formal_letter": "Date: ...\nTo,\nMr. Sharma\n...",
-  "engine_used": "Gemini 1.5 Flash (Live Legal AI)"
-}
-```
+### 2. `GET /api/search-laws?query=<query>&state=<state>`
+Surfs and returns matching Indian acts, sections, plain English summaries, and verified Indian Kanoon URLs.
 
-### 2. `POST /api/upload-lease`
-Accepts a `.pdf` file in multipart/form-data. Returns extracted text and flagged suspicious clauses.
+### 3. `POST /api/audit-clause`
+Single clause / problem audit endpoint with backward compatibility.

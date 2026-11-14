@@ -7,6 +7,7 @@
   <title>ClauseShield | Tenant Support, Made Clear</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script>
     if (window.pdfjsLib) {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -68,30 +69,38 @@
           </div>
 
           <div class="input-mode-tabs">
-            <button type="button" class="mode-tab active" data-mode="text">✏️ Text / Clause</button>
-            <button type="button" class="mode-tab" data-mode="file">📄 Upload Lease (PDF)</button>
+            <button type="button" class="mode-tab active" data-mode="file">📄 Upload Agreement (PDF / DOCX)</button>
+            <button type="button" class="mode-tab" data-mode="text">✏️ Type Problem / Clause</button>
           </div>
 
-          <div id="fileUploadContainer" class="upload-dropzone" hidden>
-            <input type="file" id="leaseFileInput" accept=".pdf,.txt" class="dropzone-input" aria-label="Upload rental lease">
+          <div id="fileUploadContainer" class="upload-dropzone">
+            <input type="file" id="leaseFileInput" accept=".pdf,.docx,.doc,.txt" class="dropzone-input" aria-label="Upload rental agreement">
             <div class="dropzone-content" id="dropzonePrompt">
               <span class="dropzone-icon">📁</span>
               <div>
-                <strong>Drop your Lease Agreement PDF here</strong>
-                <p>or click to browse from your device</p>
+                <strong>Upload Your Rental Agreement</strong>
+                <p>Drop your PDF or DOCX agreement here, or click to browse</p>
+                <small class="fine" style="display:block;margin-top:4px;">Supports PDF, DOCX, TXT · Up to 15MB</small>
               </div>
             </div>
             <div id="fileUploadStatus" class="upload-status" hidden>
               <span class="status-icon">✓</span>
               <div class="status-meta">
-                <strong id="fileNameDisplay" class="file-name">lease.pdf</strong>
+                <strong id="fileNameDisplay" class="file-name">agreement.pdf</strong>
                 <span id="filePageDisplay" class="file-pages">Extracted</span>
               </div>
               <button type="button" id="removeFileBtn" class="remove-file-btn" title="Remove file">×</button>
             </div>
+            <div id="extractedPreviewBox" class="extracted-preview-box" hidden>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span><strong>Document Text Extracted</strong> (<span id="extractedCharCount">0</span> characters)</span>
+                <button type="button" id="togglePreviewTextBtn" class="api-settings-btn" style="padding:2px 6px;">Hide Preview</button>
+              </div>
+              <div id="extractedPreviewText" class="extracted-preview-text"></div>
+            </div>
           </div>
 
-          <div id="textInputContainer">
+          <div id="textInputContainer" hidden>
             <label for="scenario">Choose a demo scenario</label>
             <select id="scenario">
               <option value="">Select a situation…</option>
@@ -99,8 +108,8 @@
               <option value="lockin">Early move-out / lock-in penalty</option>
               <option value="deposit">Large advance security deposit</option>
             </select>
-            <label for="messageInput">Or paste your landlord's message / lease clause</label>
-            <textarea id="messageInput" rows="5" placeholder="Example: Landlord says one month's rent will be deducted for painting when I move out."></textarea>
+            <label for="messageInput">Or type your rental problem / paste lease clause</label>
+            <textarea id="messageInput" rows="5" placeholder="Example: Landlord is deducting 1 month rent for painting and cutting electricity supply..."></textarea>
           </div>
 
           <div class="form-grid">
@@ -126,7 +135,14 @@
             <div class="full-grid-span"><label for="deduction">Amount in dispute (₹)</label><input id="deduction" type="number" min="0" placeholder="25000"></div>
           </div>
           <button class="btn primary full" id="runAudit">Review my situation</button>
-          <p class="fine">The demo uses illustrative rules and sample logic. It does not determine whether a deduction is lawful.</p>
+          
+          <div id="loadingIndicator" class="loading-indicator" hidden>
+            <div class="spinner"></div>
+            <strong id="loadingTitle">Analyzing Rental Agreement...</strong>
+            <p id="loadingSubtitle">Extracting clauses and evaluating Indian legal protections...</p>
+          </div>
+
+          <p class="fine">Informational analysis based on uploaded document and Indian tenancy doctrines. Does not constitute legal advice.</p>
         </div>
         <aside class="panel demo-panel">
           <p class="eyebrow">QUICK START</p><h3>Try a sample case</h3>
@@ -152,24 +168,37 @@
         <div class="panel verdict-panel"><span class="status" id="riskLabel">NEEDS REVIEW</span><h3 id="verdictTitle">This clause may need a closer look.</h3><p id="verdictReason"></p><div class="money" id="moneyValue">₹0</div><small>Amount entered for review — not a guaranteed recovery</small></div>
         <div class="panel"><h3>Suggested next steps</h3><ul id="nextSteps"><li>Keep a copy of your agreement.</li><li>Ask for an itemised explanation and supporting bills.</li><li>Compare the wording with applicable state rules.</li></ul><div class="risk-meter"><div id="riskBar"></div></div><small>Illustrative concern indicator: <b id="riskScore">—</b>/100</small></div>
       </div>
+
+      <!-- Individual Clause Analysis Cards Section -->
+      <div class="clause-section" id="clauseAnalysisSection">
+        <div class="section-heading left" style="margin-top: 30px; margin-bottom: 16px;">
+          <p class="eyebrow">DETAILED CLAUSE BREAKDOWN</p>
+          <h2>Identified Clauses &amp; Document Audit</h2>
+          <p>Each clause identified in your agreement evaluated under Indian tenancy rules:</p>
+        </div>
+        <div class="clause-filter-bar" id="clauseFilterBar">
+          <button type="button" class="clause-filter-btn active" data-filter="all">All Clauses (<span id="countAll">0</span>)</button>
+          <button type="button" class="clause-filter-btn" data-filter="High">High Concern (<span id="countHigh">0</span>)</button>
+          <button type="button" class="clause-filter-btn" data-filter="Medium">Medium Concern (<span id="countMedium">0</span>)</button>
+          <button type="button" class="clause-filter-btn" data-filter="Low">Low Concern (<span id="countLow">0</span>)</button>
+        </div>
+        <div class="clause-cards-grid" id="clauseCardsContainer">
+          <!-- Dynamic Clause Cards Injected Here -->
+        </div>
+      </div>
+
       <div class="panel legal-panel"><button class="disclosure" id="legalToggle" aria-expanded="false">＋ Want to see the legal references?</button><div id="legalDetails" hidden>
         <p class="legal-intro">Potentially relevant legal provisions to verify for your state and situation:</p>
-        <div class="legal-grid">
-          <div class="legal-card">
-            <span class="legal-tag">Model Framework</span>
-            <h3>Model Tenancy Act, 2021</h3>
-            <p>Provides guidelines for renting houses and settling problems between landlords and tenants. It covers tenancy agreements, security deposit caps (typically up to two months' rent for residential premises), and return of deposits upon handover.</p>
+        <div class="internet-law-search-box">
+          <h4>🌐 Live Legal Research (India Code &amp; Indian Kanoon)</h4>
+          <p>Type any specific tenancy problem or keyword to search relevant Indian Acts, High Court &amp; Supreme Court rulings:</p>
+          <div class="search-law-row">
+            <input type="text" id="liveLawQueryInput" placeholder="e.g. landlord cut electricity, 10 month deposit bangalore, eviction notice">
+            <button type="button" class="btn primary" id="liveLawSearchBtn">Search Laws</button>
           </div>
-          <div class="legal-card">
-            <span class="legal-tag">Contract Law</span>
-            <h3>Indian Contract Act, 1872 – Section 74</h3>
-            <p>When you sign a rental agreement, both you and your landlord are expected to follow its terms. If the agreement mentions a penalty or forfeiture, the landlord cannot automatically forfeit any arbitrary amount without demonstrating reasonable compensation for actual loss.</p>
-          </div>
-          <div class="legal-card">
-            <span class="legal-tag">Consumer Protection</span>
-            <h3>Consumer Protection Act, 2019</h3>
-            <p>Protects consumers against unfair trade practices and deficiency in service. In managed rentals, student housing, PG accommodations, or platform-based leasing services, tenants can seek redressal for arbitrary withholdings.</p>
-          </div>
+        </div>
+        <div class="legal-grid" id="dynamicLegalCards">
+          <!-- Dynamic Legal Cards Injected Here -->
         </div>
         <div class="legal-disclaimer">
           <h3>Important Note</h3>

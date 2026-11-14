@@ -141,3 +141,293 @@
     word-break: break-word !important;
   }
 }
+
+/* ===================================================
+   CLAUSE AUDIT CARDS & DOCUMENT ANALYSIS STYLES
+   =================================================== */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  background: var(--pale);
+  border: 1px dashed var(--blue);
+  border-radius: 12px;
+  margin-top: 18px;
+  text-align: center;
+}
+.spinner {
+  width: 38px;
+  height: 38px;
+  border: 4px solid #dfe5ef;
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loading-indicator strong {
+  color: var(--navy);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+.loading-indicator p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+/* Extracted text preview disclosure */
+.extracted-preview-box {
+  background: #fdfdfd;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--navy);
+}
+.extracted-preview-text {
+  max-height: 140px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--pale);
+  padding: 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.78rem;
+  margin-top: 8px;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+/* Clause Cards Grid & Individual Card */
+.clause-section {
+  max-width: 1100px;
+  margin: 30px auto;
+}
+.clause-filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.clause-filter-btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: 0.2s;
+}
+.clause-filter-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.clause-filter-btn.active {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.clause-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.clause-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 5px solid #64748b;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 4px 16px rgba(27, 49, 80, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.clause-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(27, 49, 80, 0.08);
+}
+.clause-card.concern-high {
+  border-left-color: var(--red);
+}
+.clause-card.concern-medium {
+  border-left-color: var(--amber);
+}
+.clause-card.concern-low {
+  border-left-color: var(--green);
+}
+.clause-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.clause-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+}
+.concern-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.concern-badge.high {
+  background: #fdf0ef;
+  color: var(--red);
+  border: 1px solid #f9d3cf;
+}
+.concern-badge.medium {
+  background: #fff8eb;
+  color: var(--amber);
+  border: 1px solid #fde4ba;
+}
+.concern-badge.low {
+  background: #eefaf4;
+  color: var(--green);
+  border: 1px solid #c4eed9;
+}
+.clause-quote-box {
+  background: #fbfcfe;
+  border: 1px solid #e3eaf3;
+  border-left: 3px solid #94a3b8;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: #334155;
+  line-height: 1.55;
+}
+.clause-quote-label {
+  display: block;
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.clause-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+@media(max-width: 768px) {
+  .clause-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.clause-detail-item {
+  background: var(--pale);
+  border-radius: 8px;
+  padding: 14px;
+}
+.clause-detail-item strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.clause-detail-item p {
+  font-size: 0.84rem;
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+}
+.clause-action-box {
+  background: #f0f6ff;
+  border: 1px solid #cbe0fe;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+.clause-action-box strong {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--blue);
+  margin-bottom: 4px;
+}
+.clause-action-box p {
+  font-size: 0.85rem;
+  color: var(--navy);
+  margin: 0;
+}
+.clause-legal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* Internet Legal Search Tool in Legal Section */
+.internet-law-search-box {
+  background: #f0f6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 18px;
+  margin-bottom: 16px;
+}
+.internet-law-search-box h4 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--navy);
+}
+.internet-law-search-box p {
+  font-size: 0.82rem;
+  margin: 0 0 10px;
+}
+.search-law-row {
+  display: flex;
+  gap: 8px;
+}
+.search-law-row input {
+  flex: 1;
+  margin-bottom: 0;
+  padding: 10px 12px;
+}
+.search-law-row button {
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.legal-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--blue);
+  text-decoration: none;
+}
+.legal-card-link:hover {
+  text-decoration: underline;
+}
+
