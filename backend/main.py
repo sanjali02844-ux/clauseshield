@@ -788,12 +788,29 @@ def analyze_with_gemini(
         print(f"[Warning] Gemini API call failed: {e}. Falling back to Rule Engine.")
         return None
 
+from fastapi.responses import FileResponse
+
 # -------------------------------------------------------------
 # API Endpoints
 # -------------------------------------------------------------
 
+_frontend_dir = Path(__file__).resolve().parent.parent
+
 @app.get("/")
 def root():
+    index_file = _frontend_dir / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return {
+        "service": "ClauseShield AI Backend",
+        "status": "online",
+        "version": "2.0.0",
+        "supported_file_types": [".pdf", ".docx", ".txt"],
+        "docs": "/docs"
+    }
+
+@app.get("/api")
+def api_status():
     return {
         "service": "ClauseShield AI Backend",
         "status": "online",

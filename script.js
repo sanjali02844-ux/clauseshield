@@ -1266,3 +1266,1244 @@ window.addEventListener('DOMContentLoaded', () => {
   // Render baseline laws in disclosure
   renderDynamicLaws();
 });
+
+
+// ==============================================================================
+// CLAUSESHIELD LEGAL ASSISTANCE PLATFORM INTEGRATION MODULE
+// ==============================================================================
+
+let activeVideoConsultation = null;
+let currentBookingContext = { lawyer: null, issue: null, initiatedBy: 'tenant' };
+
+// ------------------------------------------------------------------------------
+// Navigation & User Session Management
+// ------------------------------------------------------------------------------
+
+function updateNavUserState() {
+  const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+  const authNavBtn = $('authNavBtn');
+  const userMenuWrapper = $('userMenuWrapper');
+  const navUserName = $('navUserName');
+  const navUserRole = $('navUserRole');
+  const navUserAvatar = $('navUserAvatar');
+  const navDashboardLink = $('navDashboardLink');
+
+  if (user) {
+    if (authNavBtn) authNavBtn.style.display = 'none';
+    if (userMenuWrapper) userMenuWrapper.style.display = 'inline-flex';
+    if (navUserName) navUserName.textContent = user.full_name || 'My Account';
+    if (navUserAvatar && user.avatar_url) navUserAvatar.src = user.avatar_url;
+
+    if (navUserRole) {
+      navUserRole.textContent = user.role.toUpperCase();
+      navUserRole.className = `user-role-badge badge-${user.role}`;
+    }
+
+    if (navDashboardLink) {
+      if (user.role === 'tenant') navDashboardLink.href = '#tenant-dashboard';
+      else if (user.role === 'lawyer') navDashboardLink.href = '#lawyer-dashboard';
+      else if (user.role === 'admin') navDashboardLink.href = '#admin-dashboard';
+    }
+
+    // Refresh whichever dashboard corresponds to the user role
+    if (user.role === 'tenant') loadTenantDashboard();
+    else if (user.role === 'lawyer') loadLawyerDashboard();
+    else if (user.role === 'admin') loadAdminDashboard();
+  } else {
+    if (authNavBtn) authNavBtn.style.display = 'inline-block';
+    if (userMenuWrapper) userMenuWrapper.style.display = 'none';
+    hideAllDashboards();
+  }
+}
+
+function hideAllDashboards() {
+  const td = $('tenant-dashboard');
+  const ld = $('lawyer-dashboard');
+  const ad = $('admin-dashboard');
+  if (td) td.style.display = 'none';
+  if (ld) ld.style.display = 'none';
+  if (ad) ad.style.display = 'none';
+}
+
+function handleHashNavigation() {
+  const hash = window.location.hash || '#home';
+  const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+
+  hideAllDashboards();
+
+  if (hash === '#tenant-dashboard') {
+    if (user && user.role === 'tenant') {
+      const td = $('tenant-dashboard');
+      if (td) td.style.display = 'block';
+      loadTenantDashboard();
+    } else {
+      toast('Please log in as a Tenant to access this dashboard.');
+      openModal('authModal');
+    }
+  } else if (hash === '#lawyer-dashboard') {
+    if (user && user.role === 'lawyer') {
+      const ld = $('lawyer-dashboard');
+      if (ld) ld.style.display = 'block';
+      loadLawyerDashboard();
+    } else {
+      toast('Please log in as a Lawyer to access the Advocate Portal.');
+      openModal('authModal');
+    }
+  } else if (hash === '#admin-dashboard') {
+    if (user && user.role === 'admin') {
+      const ad = $('admin-dashboard');
+      if (ad) ad.style.display = 'block';
+      loadAdminDashboard();
+    } else {
+      toast('Administrative access requires administrator credentials.');
+      openModal('authModal');
+    }
+  }
+}
+
+window.addEventListener('hashchange', handleHashNavigation);
+
+// User Menu Dropdown Toggle
+const userPill = $('userPill');
+const userDropdown = $('userDropdown');
+
+if (userPill && userDropdown) {
+  userPill.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userDropdown.classList.toggle('show');
+  });
+
+  document.addEventListener('click', () => {
+    userDropdown.classList.remove('show');
+  });
+}
+
+// Log Out Handler
+const logoutBtn = $('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    ClauseShieldDB.auth.signOut();
+    toast('Logged out successfully.');
+    updateNavUserState();
+    window.location.hash = '#home';
+  });
+}
+
+// ------------------------------------------------------------------------------
+// Generic Modal Management
+// ------------------------------------------------------------------------------
+
+function openModal(modalId) {
+  const el = $(modalId);
+  if (el) el.classList.add('open');
+}
+
+function closeModal(modalId) {
+  const el = $(modalId);
+  if (el) {
+    el.classList.remove('open');
+    // If closing video call modal, ensure iframe is cleaned up
+    if (modalId === 'videoCallModal') {
+      const container = $('videoContainer');
+      if (container) container.innerHTML = '';
+      activeVideoConsultation = null;
+    }
+  }
+}
+
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.getAttribute('data-close');
+    closeModal(target);
+  });
+});
+
+document.querySelectorAll('.cs-modal-backdrop').forEach(backdrop => {
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) {
+      closeModal(backdrop.id);
+    }
+  });
+});
+
+// Auth Modal Trigger
+const authNavBtn = $('authNavBtn');
+if (authNavBtn) {
+  authNavBtn.addEventListener('click', () => openModal('authModal'));
+}
+
+// ------------------------------------------------------------------------------
+// Auth Modal Tabs & Submission Handlers
+// ------------------------------------------------------------------------------
+
+let activeAuthRole = 'tenant';
+let activeAuthMode = 'login'; // 'login' or 'register'
+
+const authTypeBtns = document.querySelectorAll('.auth-type-btn');
+authTypeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    authTypeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeAuthRole = btn.getAttribute('data-type');
+    updateAuthModalView();
+  });
+});
+
+const showLoginBtn = $('showLoginBtn');
+const showRegisterBtn = $('showRegisterBtn');
+
+if (showLoginBtn && showRegisterBtn) {
+  showLoginBtn.addEventListener('click', () => {
+    activeAuthMode = 'login';
+    showLoginBtn.classList.add('active');
+    showRegisterBtn.classList.remove('active');
+    updateAuthModalView();
+  });
+
+  showRegisterBtn.addEventListener('click', () => {
+    activeAuthMode = 'register';
+    showRegisterBtn.classList.add('active');
+    showLoginBtn.classList.remove('active');
+    updateAuthModalView();
+  });
+}
+
+function updateAuthModalView() {
+  const signInForm = $('signInForm');
+  const tenantRegisterForm = $('tenantRegisterForm');
+  const lawyerRegisterForm = $('lawyerRegisterForm');
+  const authModalTitle = $('authModalTitle');
+
+  if (activeAuthRole === 'admin') {
+    // Admin is login-only
+    if (showRegisterBtn) showRegisterBtn.style.display = 'none';
+    activeAuthMode = 'login';
+    if (showLoginBtn) showLoginBtn.classList.add('active');
+    if (authModalTitle) authModalTitle.textContent = 'Administrator Portal Login';
+  } else {
+    if (showRegisterBtn) showRegisterBtn.style.display = 'inline-block';
+    if (authModalTitle) {
+      authModalTitle.textContent = activeAuthRole === 'lawyer' ? 'Advocate Portal' : 'Tenant Support Portal';
+    }
+  }
+
+  if (activeAuthMode === 'login') {
+    if (signInForm) signInForm.style.display = 'block';
+    if (tenantRegisterForm) tenantRegisterForm.style.display = 'none';
+    if (lawyerRegisterForm) lawyerRegisterForm.style.display = 'none';
+  } else {
+    if (signInForm) signInForm.style.display = 'none';
+    if (activeAuthRole === 'tenant') {
+      if (tenantRegisterForm) tenantRegisterForm.style.display = 'block';
+      if (lawyerRegisterForm) lawyerRegisterForm.style.display = 'none';
+    } else if (activeAuthRole === 'lawyer') {
+      if (tenantRegisterForm) tenantRegisterForm.style.display = 'none';
+      if (lawyerRegisterForm) lawyerRegisterForm.style.display = 'block';
+    }
+  }
+}
+
+// Quick demo login shortcuts
+document.querySelectorAll('.quick-login-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const email = link.getAttribute('data-email');
+    const pass = link.getAttribute('data-pass');
+    $('loginEmail').value = email;
+    $('loginPassword').value = pass;
+    $('signInForm').dispatchEvent(new Event('submit'));
+  });
+});
+
+// Sign In Form Submit
+const signInForm = $('signInForm');
+if (signInForm) {
+  signInForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('loginEmail').value.trim();
+    const password = $('loginPassword').value;
+
+    try {
+      const user = await ClauseShieldDB.auth.signIn({ email, password });
+      toast(`✓ Welcome back, ${user.full_name}!`);
+      closeModal('authModal');
+      updateNavUserState();
+
+      // Navigate to appropriate dashboard
+      if (user.role === 'tenant') window.location.hash = '#tenant-dashboard';
+      else if (user.role === 'lawyer') window.location.hash = '#lawyer-dashboard';
+      else if (user.role === 'admin') window.location.hash = '#admin-dashboard';
+    } catch (err) {
+      toast(err.message || 'Login failed. Please check credentials.');
+    }
+  });
+}
+
+// Tenant Register Form Submit
+const tenantRegisterForm = $('tenantRegisterForm');
+if (tenantRegisterForm) {
+  tenantRegisterForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const full_name = $('tenantFullName').value.trim();
+    const email = $('tenantRegEmail').value.trim();
+    const phone = $('tenantRegPhone').value.trim();
+    const password = $('tenantRegPassword').value;
+
+    try {
+      const user = await ClauseShieldDB.auth.signUp({
+        email,
+        password,
+        full_name,
+        phone,
+        role: 'tenant'
+      });
+      toast(`✓ Account created! Welcome, ${user.full_name}`);
+      closeModal('authModal');
+      updateNavUserState();
+      window.location.hash = '#tenant-dashboard';
+    } catch (err) {
+      toast(err.message || 'Registration failed.');
+    }
+  });
+}
+
+// Lawyer Register Form Submit
+const lawyerRegisterForm = $('lawyerRegisterForm');
+if (lawyerRegisterForm) {
+  lawyerRegisterForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const full_name = $('lawyerFullName').value.trim();
+    const email = $('lawyerRegEmail').value.trim();
+    const phone = $('lawyerRegPhone').value.trim();
+    const password = $('lawyerRegPassword').value;
+
+    const lawyerDetails = {
+      bar_council_number: $('lawyerBarNumber').value.trim(),
+      state_bar_council: $('lawyerStateBar').value,
+      specialisation: $('lawyerSpecialty').value,
+      years_experience: Number($('lawyerExperience').value) || 1,
+      bio: $('lawyerBio').value.trim(),
+      consultation_fee: Number($('lawyerFee').value) || 500,
+      availability: $('lawyerAvailability').value.trim(),
+      document_name: 'bar_council_id_document.pdf'
+    };
+
+    try {
+      const user = await ClauseShieldDB.auth.signUp({
+        email,
+        password,
+        full_name,
+        phone,
+        role: 'lawyer',
+        lawyerDetails
+      });
+      toast(`✓ Application submitted! Your credentials are now pending administrative verification.`);
+      closeModal('authModal');
+      updateNavUserState();
+      window.location.hash = '#lawyer-dashboard';
+    } catch (err) {
+      toast(err.message || 'Lawyer registration failed.');
+    }
+  });
+}
+
+// ------------------------------------------------------------------------------
+// "Post Your Legal Issue" Submission Form
+// ------------------------------------------------------------------------------
+
+const tenantPostIssueForm = $('tenantPostIssueForm');
+if (tenantPostIssueForm) {
+  tenantPostIssueForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = ClauseShieldDB.auth.getCurrentUser();
+
+    if (!user) {
+      toast('Please log in or create a Tenant Account to post your issue.');
+      openModal('authModal');
+      return;
+    }
+
+    if (user.role !== 'tenant') {
+      toast('Only tenant accounts can submit legal issues. Please switch to a tenant account.');
+      return;
+    }
+
+    const title = $('issueTitle').value.trim();
+    const category = $('issueCategory').value;
+    const state = $('issueState').value;
+    const city = $('issueCity').value.trim();
+    const amount_in_dispute = Number($('issueAmount').value) || 0;
+    const incident_date = $('issueDate').value;
+    const preferred_method = $('issueMethod').value;
+    const description = $('issueDescription').value.trim();
+    const preferred_time = $('issueTime').value;
+
+    try {
+      const newIssue = await ClauseShieldDB.issues.create({
+        tenant_id: user.id,
+        title,
+        category,
+        city,
+        state,
+        description,
+        amount_in_dispute,
+        incident_date,
+        preferred_method,
+        preferred_time,
+        document_attachment_url: 'supporting_evidence_bundle.pdf'
+      });
+
+      toast(`✓ Legal issue posted! Case Ref: ${newIssue.issue_reference}`);
+      tenantPostIssueForm.reset();
+      loadTenantDashboard();
+      window.location.hash = '#tenant-dashboard';
+    } catch (err) {
+      toast(err.message || 'Error posting issue.');
+    }
+  });
+}
+
+// ------------------------------------------------------------------------------
+// "Find a Lawyer" Directory Module
+// ------------------------------------------------------------------------------
+
+async function loadLawyerDirectory() {
+  const container = $('lawyersGrid');
+  if (!container) return;
+
+  const search = $('lawyerDirectorySearch') ? $('lawyerDirectorySearch').value : '';
+  const specialty = $('lawyerDirectorySpecialty') ? $('lawyerDirectorySpecialty').value : 'all';
+  const state = $('lawyerDirectoryState') ? $('lawyerDirectoryState').value : 'all';
+
+  const lawyers = await ClauseShieldDB.lawyers.getVerified({
+    specialisation: specialty,
+    state: state,
+    search: search
+  });
+
+  if (lawyers.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:40px 20px;background:#f8faff;border-radius:14px;border:1px dashed var(--line);">
+        <p style="font-size:1.1rem;color:var(--navy);font-weight:700;margin-bottom:8px;">No verified advocates found matching your filter criteria.</p>
+        <p class="fine">Try clearing your search keyword or selecting "All Specialties".</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = lawyers.map(l => `
+    <article class="lawyer-card">
+      <div class="lawyer-head">
+        <img src="${escapeHTML(l.avatar_url)}" alt="${escapeHTML(l.full_name)}" class="lawyer-avatar">
+        <div class="lawyer-head-info">
+          <h3 class="lawyer-name">${escapeHTML(l.full_name)} <span class="verified-icon" title="Bar Council Verified">✓</span></h3>
+          <span class="lawyer-bar">${escapeHTML(l.bar_council_number)} · ${escapeHTML(l.state_bar_council)}</span>
+          <div class="lawyer-specialty">${escapeHTML(l.specialisation)}</div>
+          <span class="badge-verified">✓ Bar Council Verified</span>
+        </div>
+      </div>
+      <div class="lawyer-bio">${escapeHTML(l.bio)}</div>
+      <div class="lawyer-meta-row">
+        <div>
+          <span class="fine">Experience</span>
+          <strong style="display:block;color:var(--navy);">${l.years_experience} Years</strong>
+        </div>
+        <div>
+          <span class="fine">Availability</span>
+          <strong style="display:block;font-size:.78rem;color:var(--muted);">${escapeHTML(l.availability)}</strong>
+        </div>
+        <div style="text-align:right;">
+          <span class="fine">Consultation Fee</span>
+          <div class="lawyer-fee">${formatINR(l.consultation_fee)}</div>
+        </div>
+      </div>
+      <div class="lawyer-actions">
+        <button type="button" class="btn primary book-lawyer-btn" data-lawyer-id="${l.user_id}">Book Video Consultation</button>
+      </div>
+    </article>
+  `).join('');
+
+  container.querySelectorAll('.book-lawyer-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lawyerId = btn.getAttribute('data-lawyer-id');
+      const lawyer = lawyers.find(item => item.user_id === lawyerId);
+      if (lawyer) openConsultationBooking(lawyer);
+    });
+  });
+}
+
+if ($('lawyerDirectorySearch')) $('lawyerDirectorySearch').addEventListener('input', loadLawyerDirectory);
+if ($('lawyerDirectorySpecialty')) $('lawyerDirectorySpecialty').addEventListener('change', loadLawyerDirectory);
+if ($('lawyerDirectoryState')) $('lawyerDirectoryState').addEventListener('change', loadLawyerDirectory);
+
+// ------------------------------------------------------------------------------
+// Tenant Dashboard Module
+// ------------------------------------------------------------------------------
+
+async function loadTenantDashboard() {
+  const user = ClauseShieldDB.auth.getCurrentUser();
+  if (!user || user.role !== 'tenant') return;
+
+  const [issues, consultations, requests, payments] = await Promise.all([
+    ClauseShieldDB.issues.getByTenant(user.id),
+    ClauseShieldDB.consultations.getByUser(user.id, 'tenant'),
+    ClauseShieldDB.consultationRequests.getByTenant(user.id),
+    ClauseShieldDB.payments.getByUser(user.id)
+  ]);
+
+  if ($('tenantMetricIssues')) $('tenantMetricIssues').textContent = issues.length;
+  if ($('tenantMetricRequests')) $('tenantMetricRequests').textContent = requests.filter(r => r.status === 'pending').length;
+  if ($('tenantMetricMeetings')) $('tenantMetricMeetings').textContent = consultations.filter(c => c.status === 'scheduled').length;
+
+  // Render Tenant Issues Cards
+  const issuesContainer = $('tenantIssuesList');
+  if (issuesContainer) {
+    if (issues.length === 0) {
+      issuesContainer.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:40px;background:#fff;border-radius:14px;border:1px dashed var(--line);">
+          <p style="font-size:1.05rem;color:var(--navy);font-weight:700;">You haven't posted any legal issues yet.</p>
+          <a href="#post-issue" class="btn primary" style="margin-top:12px;">+ Post Your Legal Issue</a>
+        </div>
+      `;
+    } else {
+      issuesContainer.innerHTML = issues.map(iss => `
+        <div class="issue-card">
+          <div class="issue-card-header">
+            <span class="issue-ref">${escapeHTML(iss.issue_reference)}</span>
+            <span class="status-pill status-${iss.status}">${iss.status.replace('_', ' ')}</span>
+          </div>
+          <h3 class="issue-title">${escapeHTML(iss.title)}</h3>
+          <div class="issue-location">📍 ${escapeHTML(iss.city)}, ${escapeHTML(iss.state)}</div>
+          <div class="issue-desc">${escapeHTML(iss.description)}</div>
+          <div class="issue-meta-box">
+            <span>Dispute Amount: <strong class="issue-dispute-amt">${formatINR(iss.amount_in_dispute)}</strong></span>
+            <span>Date: ${iss.incident_date || 'Recent'}</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:auto;">
+            <button type="button" class="btn secondary view-issue-btn" data-issue-id="${iss.id}" style="flex:1;padding:8px 12px;font-size:.84rem;">View Details</button>
+            ${(iss.status === 'open' || iss.status === 'consultation_requested') ? `
+              <button type="button" class="btn secondary withdraw-issue-btn" data-issue-id="${iss.id}" style="color:var(--red);padding:8px 12px;font-size:.84rem;">Withdraw</button>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      issuesContainer.querySelectorAll('.view-issue-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const issId = btn.getAttribute('data-issue-id');
+          const issue = await ClauseShieldDB.issues.getById(issId);
+          if (issue) openIssueDetailsModal(issue);
+        });
+      });
+
+      issuesContainer.querySelectorAll('.withdraw-issue-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (confirm('Are you sure you want to withdraw this legal issue?')) {
+            const issId = btn.getAttribute('data-issue-id');
+            await ClauseShieldDB.issues.withdraw(issId, user.id);
+            toast('Issue withdrawn.');
+            loadTenantDashboard();
+          }
+        });
+      });
+    }
+  }
+
+  // Render Consultations Table
+  const consultTable = $('tenantConsultationsTable');
+  if (consultTable) {
+    if (consultations.length === 0) {
+      consultTable.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;">No video consultations scheduled yet.</td></tr>`;
+    } else {
+      consultTable.innerHTML = consultations.map(c => `
+        <tr>
+          <td>
+            <strong>${escapeHTML(c.lawyer_name)}</strong>
+            <div class="fine">${escapeHTML(c.bar_council_number || '')}</div>
+          </td>
+          <td>${escapeHTML(c.issue_title || 'Tenancy Matter')}</td>
+          <td>${new Date(c.scheduled_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</td>
+          <td><span class="status-pill status-${c.status}">${c.status}</span></td>
+          <td>
+            ${c.status === 'scheduled' || c.status === 'in_progress' ? `
+              <button type="button" class="btn primary join-video-btn" data-cst-id="${c.id}" style="padding:6px 14px;font-size:.82rem;">Join Video Call</button>
+            ` : `<span class="fine">Session Completed</span>`}
+          </td>
+        </tr>
+      `).join('');
+
+      consultTable.querySelectorAll('.join-video-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const cId = btn.getAttribute('data-cst-id');
+          const cst = await ClauseShieldDB.consultations.getById(cId);
+          if (cst) launchVideoCall(cst);
+        });
+      });
+    }
+  }
+
+  // Render Consultation Offers Table
+  const offersTable = $('tenantOffersTable');
+  if (offersTable) {
+    const pendingOffers = requests.filter(r => r.status === 'pending');
+    if (pendingOffers.length === 0) {
+      offersTable.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;">No consultation offers pending at this time.</td></tr>`;
+    } else {
+      offersTable.innerHTML = pendingOffers.map(req => `
+        <tr>
+          <td>
+            <strong>${escapeHTML(req.lawyer_name)}</strong>
+            <div class="fine">${escapeHTML(req.bar_council_number || '')}</div>
+          </td>
+          <td>${escapeHTML(req.issue_title)}</td>
+          <td>${new Date(req.proposed_date).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</td>
+          <td style="max-width:240px;font-size:.82rem;">${escapeHTML(req.note || 'Ready to provide legal counsel.')}</td>
+          <td><strong>${formatINR(req.consultation_fee)}</strong></td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn primary accept-offer-btn" data-req-id="${req.id}" style="padding:6px 12px;font-size:.8rem;">Accept</button>
+              <button type="button" class="btn secondary decline-offer-btn" data-req-id="${req.id}" style="padding:6px 12px;font-size:.8rem;">Decline</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      offersTable.querySelectorAll('.accept-offer-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const reqId = btn.getAttribute('data-req-id');
+          await ClauseShieldDB.consultationRequests.accept(reqId);
+          toast('✓ Consultation accepted! Video room created.');
+          loadTenantDashboard();
+        });
+      });
+
+      offersTable.querySelectorAll('.decline-offer-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const reqId = btn.getAttribute('data-req-id');
+          await ClauseShieldDB.consultationRequests.decline(reqId);
+          toast('Offer declined.');
+          loadTenantDashboard();
+        });
+      });
+    }
+  }
+
+  // Render Demonstration Payment Receipts
+  const paymentsTable = $('tenantPaymentsTable');
+  if (paymentsTable) {
+    if (payments.length === 0) {
+      paymentsTable.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;">No demonstration payment records found.</td></tr>`;
+    } else {
+      paymentsTable.innerHTML = payments.map(p => `
+        <tr>
+          <td><code>${escapeHTML(p.transaction_reference)}</code></td>
+          <td>${escapeHTML(p.lawyer_name)}</td>
+          <td><strong>${formatINR(p.gross_amount)}</strong></td>
+          <td><span class="status-pill status-accepted">Demo Processed</span></td>
+          <td><span class="fine">BCI Demonstration</span></td>
+          <td>${new Date(p.created_at).toLocaleDateString()}</td>
+        </tr>
+      `).join('');
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------
+// Lawyer Dashboard & Public Case Board Module
+// ------------------------------------------------------------------------------
+
+async function loadLawyerDashboard() {
+  const user = ClauseShieldDB.auth.getCurrentUser();
+  if (!user || user.role !== 'lawyer') return;
+
+  const lawyerProfile = await ClauseShieldDB.lawyers.getByUserId(user.id);
+  const isVerified = lawyerProfile && lawyerProfile.verification_status === 'verified';
+
+  // Verification status banner and badge
+  const banner = $('lawyerVerificationBanner');
+  const badge = $('lawyerStatusBadge');
+  const bannerText = $('lawyerVerificationText');
+
+  if (isVerified) {
+    if (banner) banner.style.display = 'none';
+    if (badge) {
+      badge.textContent = '✓ Bar Council Verified';
+      badge.className = 'badge-verified';
+    }
+  } else {
+    if (banner) {
+      banner.style.display = 'flex';
+      bannerText.innerHTML = `
+        <strong>Application Under Review · Pending Bar Council Verification:</strong>
+        Your advocate profile is pending verification by our administrative directorate. Once your Bar Council enrolment credentials are verified, you will be able to accept cases and offer consultations.
+      `;
+    }
+    if (badge) {
+      badge.textContent = 'Verification Pending';
+      badge.className = 'badge-pending';
+    }
+  }
+
+  // Fetch Lawyer Cases & Consultations
+  const search = $('lawyerCaseSearch') ? $('lawyerCaseSearch').value : '';
+  const category = $('lawyerCaseCategoryFilter') ? $('lawyerCaseCategoryFilter').value : 'all';
+  const state = $('lawyerCaseStateFilter') ? $('lawyerCaseStateFilter').value : 'all';
+  const status = $('lawyerCaseStatusFilter') ? $('lawyerCaseStatusFilter').value : 'all';
+
+  const [availableCases, consultations, payments] = await Promise.all([
+    ClauseShieldDB.issues.getAllAvailable({ category, state, search, status }),
+    ClauseShieldDB.consultations.getByUser(user.id, 'lawyer'),
+    ClauseShieldDB.payments.getByUser(user.id)
+  ]);
+
+  if ($('lawyerMetricAvailableCases')) $('lawyerMetricAvailableCases').textContent = availableCases.length;
+  if ($('lawyerMetricConsultations')) $('lawyerMetricConsultations').textContent = consultations.length;
+
+  const totalLawyerNet = payments.reduce((acc, p) => acc + (Number(p.lawyer_share) || 0), 0);
+  const totalLawyerGross = payments.reduce((acc, p) => acc + (Number(p.gross_amount) || 0), 0);
+  const totalPlatformCut = payments.reduce((acc, p) => acc + (Number(p.platform_fee) || 0), 0);
+
+  if ($('lawyerMetricEarnings')) $('lawyerMetricEarnings').textContent = formatINR(totalLawyerNet);
+  if ($('lawyerLedgerGross')) $('lawyerLedgerGross').textContent = formatINR(totalLawyerGross);
+  if ($('lawyerLedgerPlatform')) $('lawyerLedgerPlatform').textContent = formatINR(totalPlatformCut);
+  if ($('lawyerLedgerNet')) $('lawyerLedgerNet').textContent = formatINR(totalLawyerNet);
+
+  // Render Available Cases Grid
+  const casesContainer = $('lawyerAvailableCasesGrid');
+  if (casesContainer) {
+    if (availableCases.length === 0) {
+      casesContainer.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:40px;background:#fff;border-radius:14px;border:1px dashed var(--line);">
+          <p style="font-size:1.05rem;color:var(--navy);font-weight:700;">No tenant issues match your current filters.</p>
+        </div>
+      `;
+    } else {
+      casesContainer.innerHTML = availableCases.map(iss => {
+        const isAssignedToOther = iss.assigned_lawyer_id && iss.assigned_lawyer_id !== user.id;
+        const canOffer = isVerified && !isAssignedToOther && iss.status !== 'completed' && iss.status !== 'withdrawn';
+
+        return `
+          <div class="issue-card">
+            <div class="issue-card-header">
+              <span class="issue-ref">${escapeHTML(iss.issue_reference)}</span>
+              <span class="status-pill status-${iss.status}">${iss.status.replace('_', ' ')}</span>
+            </div>
+            <h3 class="issue-title">${escapeHTML(iss.title)}</h3>
+            <div class="issue-location">📍 ${escapeHTML(iss.city)}, ${escapeHTML(iss.state)}</div>
+            <div class="issue-desc">${escapeHTML(iss.description)}</div>
+            <div class="issue-meta-box">
+              <span>Dispute: <strong class="issue-dispute-amt">${formatINR(iss.amount_in_dispute)}</strong></span>
+              <span>Pref: ${iss.preferred_method === 'video_call' ? '📹 Video Call' : '📞 Call'}</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:auto;">
+              <button type="button" class="btn secondary lawyer-view-btn" data-issue-id="${iss.id}" style="flex:1;padding:8px 12px;font-size:.84rem;">View Details</button>
+              ${canOffer ? `
+                <button type="button" class="btn primary lawyer-offer-btn" data-issue-id="${iss.id}" style="flex:1;padding:8px 12px;font-size:.84rem;">Offer Consultation</button>
+              ` : isAssignedToOther ? `
+                <button type="button" class="btn secondary" disabled title="Assigned to another advocate" style="flex:1;opacity:.6;padding:8px 12px;font-size:.84rem;">Assigned</button>
+              ` : !isVerified ? `
+                <button type="button" class="btn secondary" disabled title="Advocate verification required" style="flex:1;opacity:.6;padding:8px 12px;font-size:.84rem;">Pending Verification</button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      casesContainer.querySelectorAll('.lawyer-view-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const issId = btn.getAttribute('data-issue-id');
+          const issue = await ClauseShieldDB.issues.getById(issId);
+          if (issue) openIssueDetailsModal(issue);
+        });
+      });
+
+      casesContainer.querySelectorAll('.lawyer-offer-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const issId = btn.getAttribute('data-issue-id');
+          const issue = await ClauseShieldDB.issues.getById(issId);
+          if (issue && lawyerProfile) {
+            openConsultationBooking(lawyerProfile, issue, 'lawyer');
+          }
+        });
+      });
+    }
+  }
+
+  // Render Lawyer Consultations Table
+  const consultTable = $('lawyerConsultationsTable');
+  if (consultTable) {
+    if (consultations.length === 0) {
+      consultTable.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;">No client consultations assigned yet.</td></tr>`;
+    } else {
+      consultTable.innerHTML = consultations.map(c => `
+        <tr>
+          <td><strong>${escapeHTML(c.tenant_name)}</strong></td>
+          <td>${escapeHTML(c.issue_title || 'Tenancy Matter')}</td>
+          <td>${new Date(c.scheduled_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</td>
+          <td><span class="status-pill status-${c.status}">${c.status}</span></td>
+          <td>
+            ${c.status === 'scheduled' || c.status === 'in_progress' ? `
+              <button type="button" class="btn primary join-video-btn" data-cst-id="${c.id}" style="padding:6px 14px;font-size:.82rem;">Join Video Call</button>
+            ` : `<span class="fine">Session Completed</span>`}
+          </td>
+        </tr>
+      `).join('');
+
+      consultTable.querySelectorAll('.join-video-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const cId = btn.getAttribute('data-cst-id');
+          const cst = await ClauseShieldDB.consultations.getById(cId);
+          if (cst) launchVideoCall(cst);
+        });
+      });
+    }
+  }
+
+  // Render Lawyer Ledger Table
+  const ledgerTable = $('lawyerLedgerTable');
+  if (ledgerTable) {
+    if (payments.length === 0) {
+      ledgerTable.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;">No demonstration transactions recorded.</td></tr>`;
+    } else {
+      ledgerTable.innerHTML = payments.map(p => `
+        <tr>
+          <td><code>${escapeHTML(p.transaction_reference)}</code></td>
+          <td>${escapeHTML(p.tenant_name)}</td>
+          <td>${formatINR(p.gross_amount)}</td>
+          <td style="color:var(--green);font-weight:700;">${formatINR(p.lawyer_share)}</td>
+          <td class="fine">${formatINR(p.platform_fee)}</td>
+          <td><span class="status-pill status-accepted">Demo Processed</span></td>
+          <td>${new Date(p.created_at).toLocaleDateString()}</td>
+        </tr>
+      `).join('');
+    }
+  }
+}
+
+if ($('lawyerCaseSearch')) $('lawyerCaseSearch').addEventListener('input', loadLawyerDashboard);
+if ($('lawyerCaseCategoryFilter')) $('lawyerCaseCategoryFilter').addEventListener('change', loadLawyerDashboard);
+if ($('lawyerCaseStateFilter')) $('lawyerCaseStateFilter').addEventListener('change', loadLawyerDashboard);
+if ($('lawyerCaseStatusFilter')) $('lawyerCaseStatusFilter').addEventListener('change', loadLawyerDashboard);
+
+// ------------------------------------------------------------------------------
+// Admin Dashboard Directorate Module
+// ------------------------------------------------------------------------------
+
+async function loadAdminDashboard() {
+  const user = ClauseShieldDB.auth.getCurrentUser();
+  if (!user || user.role !== 'admin') return;
+
+  const [metrics, pendingLawyers, allUsers, allIssues, consultations, payments, settings] = await Promise.all([
+    ClauseShieldDB.admin.getMetrics(),
+    ClauseShieldDB.lawyers.getPending(),
+    ClauseShieldDB.admin.getAllUsers(),
+    ClauseShieldDB.issues.getAllAvailable({}),
+    ClauseShieldDB.consultations.getByUser('admin', 'admin'),
+    ClauseShieldDB.payments.getAll(),
+    ClauseShieldDB.admin.getSettings()
+  ]);
+
+  if ($('adminMetricTenants')) $('adminMetricTenants').textContent = metrics.totalTenants;
+  if ($('adminMetricLawyers')) $('adminMetricLawyers').textContent = metrics.totalLawyers;
+  if ($('adminMetricPending')) $('adminMetricPending').textContent = metrics.pendingLawyers;
+  if ($('adminMetricVerified')) $('adminMetricVerified').textContent = metrics.verifiedLawyers;
+  if ($('adminMetricIssues')) $('adminMetricIssues').textContent = metrics.totalIssues;
+  if ($('adminMetricActiveConsultations')) $('adminMetricActiveConsultations').textContent = metrics.activeConsultations;
+
+  // Render Lawyer Verifications Table
+  const verificationsTable = $('adminLawyerVerificationsTable');
+  if (verificationsTable) {
+    if (pendingLawyers.length === 0) {
+      verificationsTable.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--green);font-weight:700;">✓ No pending advocate applications. All advocates reviewed!</td></tr>`;
+    } else {
+      verificationsTable.innerHTML = pendingLawyers.map(lp => `
+        <tr>
+          <td>
+            <strong>${escapeHTML(lp.full_name)}</strong>
+            <div class="fine">${escapeHTML(lp.email)}</div>
+          </td>
+          <td><code>${escapeHTML(lp.bar_council_number)}</code></td>
+          <td>${escapeHTML(lp.state_bar_council)}</td>
+          <td>${escapeHTML(lp.specialisation)}</td>
+          <td>${lp.years_experience} Years</td>
+          <td>${formatINR(lp.consultation_fee)}</td>
+          <td>
+            <a href="javascript:void(0)" class="fine" onclick="toast('Inspection preview: ${escapeHTML(lp.document_url)}')">📄 View Document</a>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn primary approve-lawyer-btn" data-lawyer-id="${lp.id}" style="padding:6px 12px;font-size:.8rem;background:var(--green);">✓ Verify</button>
+              <button type="button" class="btn secondary reject-lawyer-btn" data-lawyer-id="${lp.id}" style="padding:6px 12px;font-size:.8rem;color:var(--red);">✕ Reject</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      verificationsTable.querySelectorAll('.approve-lawyer-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const lpId = btn.getAttribute('data-lawyer-id');
+          await ClauseShieldDB.lawyers.verify(lpId, user.id);
+          toast('✓ Advocate verified! Profile is now active on public directory.');
+          loadAdminDashboard();
+          loadLawyerDirectory();
+        });
+      });
+
+      verificationsTable.querySelectorAll('.reject-lawyer-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const lpId = btn.getAttribute('data-lawyer-id');
+          const reason = prompt('Please enter the reason for rejection:', 'Bar Council credentials could not be verified.');
+          if (reason) {
+            await ClauseShieldDB.lawyers.reject(lpId, reason, user.id);
+            toast('Advocate application rejected.');
+            loadAdminDashboard();
+          }
+        });
+      });
+    }
+  }
+
+  // Render All Users Table
+  const usersTable = $('adminUsersTable');
+  if (usersTable) {
+    usersTable.innerHTML = allUsers.map(u => `
+      <tr>
+        <td><strong>${escapeHTML(u.full_name)}</strong></td>
+        <td>${escapeHTML(u.email)}</td>
+        <td>${escapeHTML(u.phone || '—')}</td>
+        <td><span class="user-role-badge badge-${u.role}">${u.role}</span></td>
+        <td>${u.role === 'lawyer' ? `<span class="badge-${u.verification_status}">${u.verification_status}</span>` : 'Active'}</td>
+        <td>${new Date(u.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Render All Issues Table
+  const issuesTable = $('adminIssuesTable');
+  if (issuesTable) {
+    issuesTable.innerHTML = allIssues.map(iss => `
+      <tr>
+        <td><code>${escapeHTML(iss.issue_reference)}</code></td>
+        <td>${escapeHTML(iss.title)}</td>
+        <td><span class="status-pill status-${iss.status}">${iss.category.replace('_', ' ')}</span></td>
+        <td>${escapeHTML(iss.city)}, ${escapeHTML(iss.state)}</td>
+        <td>${formatINR(iss.amount_in_dispute)}</td>
+        <td><span class="status-pill status-${iss.status}">${iss.status}</span></td>
+        <td>${new Date(iss.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Render Consultations Table
+  const adminConsultTable = $('adminConsultationsTable');
+  if (adminConsultTable) {
+    const consultationsAll = await ClauseShieldDB.consultations.getByUser('admin', 'admin');
+    adminConsultTable.innerHTML = consultationsAll.map(c => `
+      <tr>
+        <td><code>${c.id}</code></td>
+        <td>${escapeHTML(c.tenant_name)}</td>
+        <td>${escapeHTML(c.lawyer_name)}</td>
+        <td>${new Date(c.scheduled_at).toLocaleString()}</td>
+        <td><span class="status-pill status-${c.status}">${c.status}</span></td>
+        <td><small>${escapeHTML(c.meeting_room_id)}</small></td>
+      </tr>
+    `).join('');
+  }
+
+  // Render Payments Ledger Table
+  const adminPaymentsTable = $('adminPaymentsTable');
+  if (adminPaymentsTable) {
+    adminPaymentsTable.innerHTML = payments.map(p => `
+      <tr>
+        <td><code>${escapeHTML(p.transaction_reference)}</code></td>
+        <td>${escapeHTML(p.tenant_name)}</td>
+        <td>${escapeHTML(p.lawyer_name)}</td>
+        <td><strong>${formatINR(p.gross_amount)}</strong></td>
+        <td>${formatINR(p.lawyer_share)}</td>
+        <td style="color:var(--blue);font-weight:700;">${formatINR(p.platform_fee)}</td>
+        <td><span class="status-pill status-accepted">Demo Processed</span></td>
+        <td>${new Date(p.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Populate Admin Settings Form
+  if ($('cfgDefaultFee')) $('cfgDefaultFee').value = settings.default_fee || 500;
+  if ($('cfgPlatformPct')) $('cfgPlatformPct').value = settings.platform_commission_pct || 10;
+  if ($('cfgLawyerPct')) $('cfgLawyerPct').value = settings.lawyer_share_pct || 90;
+}
+
+// Admin Settings Form Submit
+const adminSettingsForm = $('adminSettingsForm');
+if (adminSettingsForm) {
+  adminSettingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const default_fee = Number($('cfgDefaultFee').value) || 500;
+    const platform_commission_pct = Number($('cfgPlatformPct').value) || 10;
+    const lawyer_share_pct = Number($('cfgLawyerPct').value) || 90;
+    const compliance_mode = $('cfgComplianceMode').value;
+
+    await ClauseShieldDB.admin.updateSettings({
+      default_fee,
+      platform_commission_pct,
+      lawyer_share_pct,
+      compliance_mode
+    });
+    toast('✓ Platform fee parameters updated successfully.');
+  });
+}
+
+// ------------------------------------------------------------------------------
+// Video Consultation System (Jitsi WebRTC Integration)
+// ------------------------------------------------------------------------------
+
+function launchVideoCall(consultation) {
+  const user = ClauseShieldDB.auth.getCurrentUser();
+  if (!user) {
+    toast('Please log in to join video consultation.');
+    openModal('authModal');
+    return;
+  }
+
+  // Strict authorization check: Only assigned tenant or lawyer can access meeting
+  if (user.id !== consultation.tenant_id && user.id !== consultation.lawyer_id && user.role !== 'admin') {
+    toast('Access denied: You are not an authorized participant for this legal consultation.');
+    return;
+  }
+
+  activeVideoConsultation = consultation;
+
+  if ($('videoCaseRef')) $('videoCaseRef').textContent = consultation.meeting_room_id;
+  if ($('videoCaseTitle')) $('videoCaseTitle').textContent = consultation.issue_title || 'Legal Consultation';
+  if ($('videoCaseLocation')) $('videoCaseLocation').textContent = consultation.issue_category || 'Tenancy Matter';
+  if ($('videoCaseAmount')) $('videoCaseAmount').textContent = 'Confidential';
+
+  // Build secure Jitsi Meet iframe
+  const container = $('videoContainer');
+  if (container) {
+    const roomName = encodeURIComponent(consultation.meeting_room_id.replace(/[^a-zA-Z0-9]/g, '_'));
+    const displayName = encodeURIComponent(user.full_name);
+    
+    container.innerHTML = `
+      <iframe 
+        src="https://meet.jit.si/${roomName}#config.prejoinPageEnabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=false&userInfo.displayName=%22${displayName}%22"
+        allow="camera; microphone; fullscreen; display-capture; autoplay"
+        title="ClauseShield Confidential Legal Video Consultation">
+      </iframe>
+    `;
+  }
+
+  openModal('videoCallModal');
+}
+
+// End Consultation Button
+const endVideoCallBtn = $('endVideoCallBtn');
+if (endVideoCallBtn) {
+  endVideoCallBtn.addEventListener('click', async () => {
+    if (!activeVideoConsultation) return;
+
+    if (confirm('Conclude this legal consultation session?')) {
+      const notes = prompt('Enter consultation closing remarks or advice summary (Optional):', 'Consultation successfully completed.');
+      await ClauseShieldDB.consultations.endCall(activeVideoConsultation.id, notes);
+      toast('✓ Consultation ended and marked completed.');
+      closeModal('videoCallModal');
+      updateNavUserState();
+    }
+  });
+}
+
+// ------------------------------------------------------------------------------
+// Consultation Booking & Offer Modal Flow
+// ------------------------------------------------------------------------------
+
+function openConsultationBooking(lawyer, issue = null, initiatedBy = 'tenant') {
+  currentBookingContext = { lawyer, issue, initiatedBy };
+
+  const fee = Number(lawyer.consultation_fee) || 500;
+  const platformFee = Math.round(fee * 0.10);
+  const lawyerShare = fee - platformFee;
+
+  if ($('consultLawyerName')) $('consultLawyerName').textContent = lawyer.full_name || 'Advocate';
+  if ($('consultLawyerMeta')) $('consultLawyerMeta').textContent = `${lawyer.bar_council_number || ''} · ${lawyer.specialisation || 'Tenancy Law'}`;
+  if ($('consultFeeDisplay')) $('consultFeeDisplay').textContent = formatINR(fee);
+
+  if ($('breakdownConsultFee')) $('breakdownConsultFee').textContent = formatINR(fee);
+  if ($('breakdownLawyerShare')) $('breakdownLawyerShare').textContent = formatINR(lawyerShare);
+  if ($('breakdownPlatformFee')) $('breakdownPlatformFee').textContent = formatINR(platformFee);
+  if ($('breakdownTotalPayable')) $('breakdownTotalPayable').textContent = formatINR(fee);
+
+  // Default to tomorrow 6:00 PM
+  const tomorrow = new Date(Date.now() + 86400000);
+  tomorrow.setHours(18, 0, 0, 0);
+  const dateInput = $('consultPreferredDate');
+  if (dateInput) {
+    dateInput.value = tomorrow.toISOString().slice(0, 16);
+  }
+
+  openModal('consultationModal');
+}
+
+const consultationBookingForm = $('consultationBookingForm');
+if (consultationBookingForm) {
+  consultationBookingForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = ClauseShieldDB.auth.getCurrentUser();
+
+    if (!user) {
+      toast('Please log in to schedule a consultation.');
+      openModal('authModal');
+      return;
+    }
+
+    const { lawyer, issue, initiatedBy } = currentBookingContext;
+    const proposedDate = $('consultPreferredDate').value;
+    const note = $('consultUserNote').value.trim();
+
+    try {
+      if (initiatedBy === 'lawyer' && issue) {
+        // Lawyer offering consultation on a tenant's issue
+        await ClauseShieldDB.consultationRequests.create({
+          issue_id: issue.id,
+          tenant_id: issue.tenant_id,
+          lawyer_id: user.id,
+          initiated_by: 'lawyer',
+          note: note || 'I have reviewed your tenancy dispute and am available for an online legal consultation.',
+          proposed_date: proposedDate ? new Date(proposedDate).toISOString() : null
+        });
+        toast('✓ Consultation offer sent to the tenant!');
+      } else {
+        // Tenant booking directly with a verified lawyer
+        const req = await ClauseShieldDB.consultationRequests.create({
+          issue_id: issue ? issue.id : null,
+          tenant_id: user.id,
+          lawyer_id: lawyer.user_id || lawyer.id,
+          initiated_by: 'tenant',
+          note: note,
+          proposed_date: proposedDate ? new Date(proposedDate).toISOString() : null
+        });
+
+        // Automatically accept and generate private video room
+        await ClauseShieldDB.consultationRequests.accept(req.id, req.proposed_date);
+        toast('✓ Consultation scheduled & private video meeting created!');
+      }
+
+      closeModal('consultationModal');
+      updateNavUserState();
+      if (user.role === 'tenant') window.location.hash = '#tenant-dashboard';
+      else if (user.role === 'lawyer') window.location.hash = '#lawyer-dashboard';
+    } catch (err) {
+      toast(err.message || 'Error processing consultation request.');
+    }
+  });
+}
+
+// ------------------------------------------------------------------------------
+// Issue Details Modal
+// ------------------------------------------------------------------------------
+
+function openIssueDetailsModal(issue) {
+  const user = ClauseShieldDB.auth.getCurrentUser();
+
+  if ($('detailRef')) $('detailRef').textContent = issue.issue_reference;
+  if ($('detailStatus')) {
+    const el = $('detailStatus');
+    el.textContent = issue.status.replace('_', ' ');
+    el.className = `status-pill status-${issue.status}`;
+  }
+  if ($('detailHeading')) $('detailHeading').textContent = issue.title;
+  if ($('detailLocation')) $('detailLocation').textContent = `📍 ${issue.city}, ${issue.state}`;
+  if ($('detailAmount')) $('detailAmount').textContent = formatINR(issue.amount_in_dispute);
+  if ($('detailDate')) $('detailDate').textContent = issue.incident_date || 'Not specified';
+  if ($('detailNarrative')) $('detailNarrative').textContent = issue.description;
+
+  const actionsContainer = $('issueDetailActions');
+  if (actionsContainer) {
+    if (user && user.role === 'lawyer' && (issue.status === 'open' || issue.status === 'consultation_requested')) {
+      actionsContainer.innerHTML = `
+        <button type="button" class="btn primary" id="detailOfferBtn" style="flex:1;">Offer Online Consultation</button>
+      `;
+      const offerBtn = $('detailOfferBtn');
+      if (offerBtn) {
+        offerBtn.addEventListener('click', async () => {
+          closeModal('issueDetailsModal');
+          const lawyerProfile = await ClauseShieldDB.lawyers.getByUserId(user.id);
+          if (lawyerProfile) openConsultationBooking(lawyerProfile, issue, 'lawyer');
+        });
+      }
+    } else {
+      actionsContainer.innerHTML = '';
+    }
+  }
+
+  openModal('issueDetailsModal');
+}
+
+// ------------------------------------------------------------------------------
+// Supabase & Backend Configuration Modal
+// ------------------------------------------------------------------------------
+
+const footerSupabaseBtn = $('footerSupabaseBtn');
+const navOpenSupabaseConfig = $('navOpenSupabaseConfig');
+
+if (footerSupabaseBtn) {
+  footerSupabaseBtn.addEventListener('click', () => {
+    const cfg = ClauseShieldDB.getConfig();
+    if ($('sbUrlInput')) $('sbUrlInput').value = cfg.url || '';
+    if ($('sbAnonKeyInput')) $('sbAnonKeyInput').value = cfg.anonKey || '';
+    openModal('supabaseModal');
+  });
+}
+
+if (navOpenSupabaseConfig) {
+  navOpenSupabaseConfig.addEventListener('click', () => {
+    const cfg = ClauseShieldDB.getConfig();
+    if ($('sbUrlInput')) $('sbUrlInput').value = cfg.url || '';
+    if ($('sbAnonKeyInput')) $('sbAnonKeyInput').value = cfg.anonKey || '';
+    openModal('supabaseModal');
+  });
+}
+
+const supabaseConfigForm = $('supabaseConfigForm');
+if (supabaseConfigForm) {
+  supabaseConfigForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const url = $('sbUrlInput').value.trim();
+    const key = $('sbAnonKeyInput').value.trim();
+
+    const res = ClauseShieldDB.setConfig(url, key);
+    if (res.live) {
+      toast('✓ Connected to live Supabase project!');
+    } else {
+      toast('Saved. Running with zero-config local persistent database.');
+    }
+    closeModal('supabaseModal');
+  });
+}
+
+// Dashboard Tabs Switching (Within Tenant, Lawyer, Admin dashboards)
+document.querySelectorAll('.dash-tabs').forEach(tabGroup => {
+  tabGroup.querySelectorAll('.dash-tab').forEach(tabBtn => {
+    tabBtn.addEventListener('click', () => {
+      tabGroup.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+      tabBtn.classList.add('active');
+
+      const targetPaneId = tabBtn.getAttribute('data-tab');
+      const container = tabGroup.closest('.dashboard-container');
+      if (container) {
+        container.querySelectorAll('.dash-pane').forEach(pane => {
+          pane.hidden = pane.id !== targetPaneId;
+        });
+      }
+    });
+  });
+});
+
+// ------------------------------------------------------------------------------
+// Platform Initialization on DOM Ready
+// ------------------------------------------------------------------------------
+
+window.addEventListener('DOMContentLoaded', () => {
+  updateNavUserState();
+  loadLawyerDirectory();
+  handleHashNavigation();
+});

@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ClauseShield helps tenants review rental clauses and prepare clear, evidence-based responses.">
-  <title>ClauseShield | Tenant Support, Made Clear</title>
+  <meta name="description" content="ClauseShield connects tenants facing rental disputes with verified advocates for online legal consultations, lease audits, and evidence-based notice drafting.">
+  <title>ClauseShield | Complete Legal Assistance & Tenant Support Platform</title>
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Supabase Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- PDF & DOCX Parsing Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script>
@@ -15,41 +19,688 @@
   </script>
 </head>
 <body>
+  <!-- ==============================================================================
+       TOP NAVIGATION BAR
+       ============================================================================== -->
   <header class="site-header">
     <a class="brand" href="#home"><span class="brand-mark">C</span><span>ClauseShield</span></a>
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
     <nav id="mainNav">
-      <a href="#home">Home</a><a href="#audit">Audit</a><a href="#calculator">Calculator</a>
-      <a href="#wear">Wear &amp; Tear</a><a href="#about">About</a>
-      <a class="nav-cta" href="#audit">Audit my lease</a>
+      <a href="#home">Home</a>
+      <a href="#know-rights">Know Your Rights</a>
+      <a href="#audit">AI Legal Assistant</a>
+      <a href="#complaint-generator">Generate Complaint</a>
+      <a href="#lawyers">Find a Lawyer</a>
+      <a href="#post-issue">Post an Issue</a>
+      
+      <!-- Guest Action: Login / Sign Up -->
+      <button class="btn primary nav-cta" id="authNavBtn">Login / Sign Up</button>
+      
+      <!-- Authenticated User Menu Dropdown (Initially Hidden) -->
+      <div class="user-menu-wrapper" id="userMenuWrapper" style="display:none;">
+        <div class="user-pill" id="userPill" title="Open profile menu">
+          <img src="https://ui-avatars.com/api/?name=User&background=315ee8&color=fff" alt="User avatar" class="user-avatar-tiny" id="navUserAvatar">
+          <span id="navUserName">My Account</span>
+          <span class="user-role-badge badge-tenant" id="navUserRole">Tenant</span>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="#tenant-dashboard" id="navDashboardLink">📋 Dashboard</a>
+          <a href="javascript:void(0)" id="navOpenSupabaseConfig">⚙️ Supabase Settings</a>
+          <hr>
+          <button type="button" class="logout-btn" id="logoutBtn">🚪 Log Out</button>
+        </div>
+      </div>
     </nav>
   </header>
 
   <main>
+    <!-- ==============================================================================
+         HERO SECTION (PRESERVED)
+         ============================================================================== -->
     <section class="hero section" id="home">
       <div class="hero-copy">
-        <p class="eyebrow">AI-ASSISTED TENANT SUPPORT · INDIA</p>
-        <h1>Don't let confusing rental clauses leave you <span>out of pocket.</span></h1>
-        <p class="lead">Review a lease or move-out message, understand what may need a closer look, and prepare a clear response in minutes.</p>
-        <div class="actions"><a class="btn primary" href="#audit">Audit my lease</a><button class="btn secondary" id="tryDemo">Try a demo scenario</button></div>
-        <p class="fine">Free demo · No lawyer-client relationship · Informational tool, not legal advice</p>
+        <p class="eyebrow">LEGAL ASSISTANCE &amp; TENANT RIGHTS · INDIA</p>
+        <h1>Connect with verified lawyers for <span>real tenant protection.</span></h1>
+        <p class="lead">Audit your lease, post your rental dispute to verified advocates, and receive confidential online video consultations from licensed legal professionals.</p>
+        <div class="actions">
+          <a class="btn primary" href="#post-issue">Post Your Legal Issue</a>
+          <a class="btn secondary" href="#lawyers">Find a Lawyer</a>
+          <button class="btn secondary" id="tryDemo">Try Demo Lease Audit</button>
+        </div>
+        <p class="fine">Licensed advocates · Encrypted WebRTC video calls · Comprehensive tenancy support across Indian states</p>
       </div>
       <div class="hero-preview">
         <div class="preview-top"><span class="dot"></span><span>sample_lease.pdf</span><span class="risk-pill">Risk 72/100</span></div>
         <div class="document-line"></div><div class="document-line short"></div>
         <div class="clause-box"><strong>CLAUSE 9</strong><p>Tenant shall pay one month's rent as painting charges on vacating.</p><span class="flag">⚑ Review this clause</span></div>
         <div class="document-line"></div><div class="document-line medium"></div>
-        <div class="preview-note">A fixed charge may deserve review. Check the agreement, evidence and applicable state rules.</div>
+        <div class="preview-note">A fixed charge may deserve review. Connect with a verified advocate to protect your security deposit.</div>
       </div>
     </section>
 
+    <!-- STATS COMPACT BAR (PRESERVED) -->
     <section class="stats section compact">
-      <div><strong>01</strong><span>Review a rental clause</span></div><div><strong>02</strong><span>Understand possible concerns</span></div>
-      <div><strong>03</strong><span>Prepare a response</span></div><div><strong>04</strong><span>Keep your records organised</span></div>
+      <div><strong>01</strong><span>Audit rental clauses</span></div>
+      <div><strong>02</strong><span>Post your legal issue</span></div>
+      <div><strong>03</strong><span>Connect with verified advocates</span></div>
+      <div><strong>04</strong><span>Attend video consultations</span></div>
     </section>
 
+    <!-- ==============================================================================
+         TENANT DASHBOARD (ACTIVE WHEN LOGGED IN AS TENANT)
+         ============================================================================== -->
+    <section class="section" id="tenant-dashboard" style="display:none;">
+      <div class="dashboard-container">
+        <div class="dashboard-hero">
+          <div>
+            <h2>Tenant Legal Dashboard</h2>
+            <p id="tenantWelcomeMsg">Welcome back! Manage your legal issues, view consultation requests, and join scheduled video calls with your advocate.</p>
+          </div>
+          <div class="dashboard-hero-action">
+            <a href="#post-issue" class="btn primary">+ Post New Legal Issue</a>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-title">Submitted Issues</div>
+            <div class="metric-value" id="tenantMetricIssues">0</div>
+            <div class="metric-hint">Legal disputes in database</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Consultation Requests</div>
+            <div class="metric-value" id="tenantMetricRequests">0</div>
+            <div class="metric-hint">Lawyer offers &amp; requests</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Active Video Meetings</div>
+            <div class="metric-value" id="tenantMetricMeetings">0</div>
+            <div class="metric-hint">Scheduled or in progress</div>
+          </div>
+        </div>
+
+        <div class="dash-tabs">
+          <button type="button" class="dash-tab active" data-tab="tenant-issues-tab">My Legal Issues</button>
+          <button type="button" class="dash-tab" data-tab="tenant-consultations-tab">Video Consultations</button>
+          <button type="button" class="dash-tab" data-tab="tenant-requests-tab">Consultation Offers</button>
+          <button type="button" class="dash-tab" data-tab="tenant-payments-tab">Demonstration Payment Receipts</button>
+        </div>
+
+        <!-- Tenant Tab 1: Issues -->
+        <div id="tenant-issues-tab" class="dash-pane">
+          <div class="issues-grid" id="tenantIssuesList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Tenant Tab 2: Video Consultations -->
+        <div id="tenant-consultations-tab" class="dash-pane" hidden>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Advocate</th>
+                  <th>Legal Case</th>
+                  <th>Scheduled Time</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tenantConsultationsTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tenant Tab 3: Consultation Offers -->
+        <div id="tenant-requests-tab" class="dash-pane" hidden>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Advocate</th>
+                  <th>Case Topic</th>
+                  <th>Proposed Time</th>
+                  <th>Advocate Note</th>
+                  <th>Fee</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tenantOffersTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tenant Tab 4: Payments -->
+        <div id="tenant-payments-tab" class="dash-pane" hidden>
+          <div class="bci-disclaimer-card">
+            <strong>⚖️ Demonstration Fee Ledger Notice:</strong>
+            As per the Advocates Act, 1961 and Bar Council of India rules, advocates in India are not permitted to share professional fees. All transaction receipts below are demonstration test records for platform workflow verification.
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Advocate</th>
+                  <th>Gross Consultation Fee</th>
+                  <th>Status</th>
+                  <th>Mode</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="tenantPaymentsTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         LAWYER DASHBOARD (ACTIVE WHEN LOGGED IN AS LAWYER)
+         ============================================================================== -->
+    <section class="section" id="lawyer-dashboard" style="display:none;">
+      <div class="dashboard-container">
+        <!-- Verification Alert Banner -->
+        <div id="lawyerVerificationBanner" class="shield-notice" style="margin-bottom:24px;">
+          <span class="shield-icon">🛡️</span>
+          <div id="lawyerVerificationText">
+            <strong>Application Under Review · Pending Bar Council Verification:</strong>
+            Your advocate profile is pending verification by our administrative directorate. Once your Bar Council enrolment credentials are verified, you will be able to accept cases and offer consultations.
+          </div>
+        </div>
+
+        <div class="dashboard-hero">
+          <div>
+            <h2>Advocate Portal &amp; Case Board</h2>
+            <p id="lawyerWelcomeMsg">Welcome Advocate! Review available tenant cases, schedule online video consultations, and manage your legal client roster.</p>
+          </div>
+          <div class="dashboard-hero-action">
+            <span class="badge-pending" id="lawyerStatusBadge">Verification Pending</span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-title">Available Cases</div>
+            <div class="metric-value" id="lawyerMetricAvailableCases">0</div>
+            <div class="metric-hint">Open tenant issues</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">My Consultations</div>
+            <div class="metric-value" id="lawyerMetricConsultations">0</div>
+            <div class="metric-hint">Accepted or scheduled</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Demonstration Earnings</div>
+            <div class="metric-value" id="lawyerMetricEarnings">₹0</div>
+            <div class="metric-hint">Consultation fee ledger</div>
+          </div>
+        </div>
+
+        <div class="dash-tabs">
+          <button type="button" class="dash-tab active" data-tab="lawyer-cases-tab">Available Legal Cases</button>
+          <button type="button" class="dash-tab" data-tab="lawyer-consultations-tab">My Video Consultations</button>
+          <button type="button" class="dash-tab" data-tab="lawyer-earnings-tab">Earnings &amp; Demonstration Ledger</button>
+        </div>
+
+        <!-- Lawyer Tab 1: Available Cases (Public Issue Board) -->
+        <div id="lawyer-cases-tab" class="dash-pane">
+          <div class="shield-notice">
+            <span class="shield-icon">🔒</span>
+            <div>
+              <strong>Tenant Privacy Protected:</strong>
+              Tenant phone numbers, private identity documents, and personal details are strictly masked on the public issue board. You can review dispute summaries and offer consultations based on legal merit.
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <input type="text" id="lawyerCaseSearch" class="filter-search" placeholder="Search by keywords, city, or issue…">
+            <select id="lawyerCaseCategoryFilter" class="filter-select">
+              <option value="all">All Legal Categories</option>
+              <option value="security_deposit">Security Deposit</option>
+              <option value="rent_increase">Rent Increase</option>
+              <option value="eviction">Eviction Notice</option>
+              <option value="rental_agreement">Rental Agreement</option>
+              <option value="maintenance">Maintenance &amp; Repairs</option>
+              <option value="landlord_harassment">Landlord Harassment</option>
+              <option value="unfair_charges">Unfair Charges</option>
+              <option value="other">Other Issues</option>
+            </select>
+            <select id="lawyerCaseStateFilter" class="filter-select">
+              <option value="all">All States</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Delhi">Delhi NCR</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Telangana">Telangana</option>
+              <option value="West Bengal">West Bengal</option>
+            </select>
+            <select id="lawyerCaseStatusFilter" class="filter-select">
+              <option value="all">All Statuses</option>
+              <option value="open" selected>Open Only</option>
+              <option value="consultation_requested">Consultation Requested</option>
+              <option value="accepted">Accepted / In Progress</option>
+            </select>
+          </div>
+
+          <div class="issues-grid" id="lawyerAvailableCasesGrid">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Lawyer Tab 2: My Video Consultations -->
+        <div id="lawyer-consultations-tab" class="dash-pane" hidden>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Client Name</th>
+                  <th>Legal Case Reference</th>
+                  <th>Scheduled Date &amp; Time</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="lawyerConsultationsTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Lawyer Tab 3: Earnings & Demonstration Ledger -->
+        <div id="lawyer-earnings-tab" class="dash-pane" hidden>
+          <div class="bci-disclaimer-card">
+            <strong>⚖️ Regulatory Compliance Notice for Advocates:</strong>
+            Under Rule 36, Section IV, Chapter II, Part VI of the Bar Council of India Rules, advocates are strictly prohibited from sharing fees or offering referral commissions to non-advocates. All calculations below reflect a proposed demonstration model for software testing only. Live payment processing remains disabled until official regulatory approval.
+          </div>
+
+          <div class="earnings-grid">
+            <div class="earnings-card">
+              <h4>Total Gross Consultations</h4>
+              <div class="amount" id="lawyerLedgerGross">₹0</div>
+              <small>Calculated from completed demo consultations</small>
+            </div>
+            <div class="earnings-card">
+              <h4>Platform Technology Charge (10%)</h4>
+              <div class="amount" id="lawyerLedgerPlatform">₹0</div>
+              <small>Configurable software licensing charge</small>
+            </div>
+            <div class="earnings-card green">
+              <h4>Net Advocate Payout (90%)</h4>
+              <div class="amount" id="lawyerLedgerNet">₹0</div>
+              <small>Simulated net consultation revenue</small>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Client</th>
+                  <th>Gross Fee</th>
+                  <th>Lawyer Share (90%)</th>
+                  <th>Platform Fee (10%)</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="lawyerLedgerTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         ADMINISTRATOR DASHBOARD (ACTIVE WHEN LOGGED IN AS ADMIN)
+         ============================================================================== -->
+    <section class="section" id="admin-dashboard" style="display:none;">
+      <div class="dashboard-container">
+        <div class="dashboard-hero">
+          <div>
+            <h2>ClauseShield Administrative Directorate</h2>
+            <p>Verify advocate credentials, review reported tenant disputes, manage user accounts, and configure platform parameters.</p>
+          </div>
+          <div class="dashboard-hero-action">
+            <span class="user-role-badge badge-admin">Master Administrator</span>
+          </div>
+        </div>
+
+        <!-- Admin Metrics -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-title">Registered Tenants</div>
+            <div class="metric-value" id="adminMetricTenants">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Registered Advocates</div>
+            <div class="metric-value" id="adminMetricLawyers">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Pending Verifications</div>
+            <div class="metric-value" id="adminMetricPending" style="color:var(--amber);">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Verified Advocates</div>
+            <div class="metric-value" id="adminMetricVerified" style="color:var(--green);">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Total Tenant Issues</div>
+            <div class="metric-value" id="adminMetricIssues">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Active Consultations</div>
+            <div class="metric-value" id="adminMetricActiveConsultations">0</div>
+          </div>
+        </div>
+
+        <div class="dash-tabs">
+          <button type="button" class="dash-tab active" data-tab="admin-verifications-tab">Lawyer Verifications</button>
+          <button type="button" class="dash-tab" data-tab="admin-users-tab">User Accounts</button>
+          <button type="button" class="dash-tab" data-tab="admin-issues-tab">Reported Issues</button>
+          <button type="button" class="dash-tab" data-tab="admin-consultations-tab">Consultations</button>
+          <button type="button" class="dash-tab" data-tab="admin-payments-tab">Financial Ledger</button>
+          <button type="button" class="dash-tab" data-tab="admin-settings-tab">Platform Settings</button>
+        </div>
+
+        <!-- Admin Tab 1: Verifications -->
+        <div id="admin-verifications-tab" class="dash-pane">
+          <div class="section-heading left" style="margin:10px 0 20px;">
+            <h3>Pending Advocate Verification Applications</h3>
+            <p>Carefully verify Bar Council enrolment numbers and state jurisdiction certificates before approving:</p>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Advocate Name</th>
+                  <th>Bar Council Enrolment</th>
+                  <th>State Bar Council</th>
+                  <th>Specialisation</th>
+                  <th>Experience</th>
+                  <th>Fee (₹)</th>
+                  <th>Documents</th>
+                  <th>Verification Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminLawyerVerificationsTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Admin Tab 2: Users -->
+        <div id="admin-users-tab" class="dash-pane" hidden>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Role</th>
+                  <th>Status / Enrolment</th>
+                  <th>Registered Date</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Admin Tab 3: Issues -->
+        <div id="admin-issues-tab" class="dash-pane" hidden>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Dispute (₹)</th>
+                  <th>Status</th>
+                  <th>Submitted</th>
+                </tr>
+              </thead>
+              <tbody id="adminIssuesTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Admin Tab 4: Consultations -->
+        <div id="admin-consultations-tab" class="dash-pane" hidden>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Client</th>
+                  <th>Advocate</th>
+                  <th>Scheduled Time</th>
+                  <th>Status</th>
+                  <th>Room ID</th>
+                </tr>
+              </thead>
+              <tbody id="adminConsultationsTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Admin Tab 5: Payments -->
+        <div id="admin-payments-tab" class="dash-pane" hidden>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Txn Ref</th>
+                  <th>Client</th>
+                  <th>Advocate</th>
+                  <th>Gross Fee</th>
+                  <th>Lawyer Share</th>
+                  <th>Platform Fee</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="adminPaymentsTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Admin Tab 6: Settings -->
+        <div id="admin-settings-tab" class="dash-pane" hidden>
+          <div class="panel" style="max-width:700px;">
+            <h3>Platform Fee &amp; Commission Configuration</h3>
+            <p>Configure demonstration fee parameters and compliance settings:</p>
+            <form id="adminSettingsForm">
+              <label for="cfgDefaultFee">Default Base Consultation Fee (₹)</label>
+              <input type="number" id="cfgDefaultFee" min="100" step="50" value="500">
+
+              <label for="cfgPlatformPct">Platform Technology Service Charge (%)</label>
+              <input type="number" id="cfgPlatformPct" min="0" max="50" step="1" value="10">
+
+              <label for="cfgLawyerPct">Advocate Share (%)</label>
+              <input type="number" id="cfgLawyerPct" min="50" max="100" step="1" value="90">
+
+              <label for="cfgComplianceMode">Regulatory Compliance Enforcement</label>
+              <select id="cfgComplianceMode">
+                <option value="BCI_DEMONSTRATION_MODE" selected>Bar Council of India Rule 36 Compliance (Live payouts disabled)</option>
+                <option value="PILOT_TESTING">Pilot Testing (Demonstration sandbox)</option>
+              </select>
+
+              <button type="submit" class="btn primary">Save Platform Settings</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         "POST YOUR LEGAL ISSUE" SECTION
+         ============================================================================== -->
+    <section class="section" id="post-issue">
+      <div class="section-heading">
+        <p class="eyebrow">STEP 1 · STRUCTURED DISPUTE SUBMISSION</p>
+        <h2>Post Your Legal Issue</h2>
+        <p>Describe your tenancy dispute using our structured intake form. Verified advocates across India can review your situation and offer confidential online legal consultations.</p>
+      </div>
+
+      <div class="panel" style="max-width:960px;margin:auto;">
+        <div class="shield-notice">
+          <span class="shield-icon">🛡️</span>
+          <div>
+            <strong>ClauseShield Confidentiality Guarantee:</strong>
+            Your personal contact numbers and private identity documents are completely shielded. Only licensed, Bar Council-verified advocates will be able to review your legal matter and request a consultation.
+          </div>
+        </div>
+
+        <form id="tenantPostIssueForm">
+          <div class="form-grid">
+            <div class="full-grid-span">
+              <label for="issueTitle">Issue Title *</label>
+              <input id="issueTitle" type="text" placeholder="e.g. Landlord illegally deducting ₹45,000 painting charge and refusing to return deposit" required>
+            </div>
+
+            <div>
+              <label for="issueCategory">Legal Category *</label>
+              <select id="issueCategory" required>
+                <option value="security_deposit">Security Deposit Withholding / Deductions</option>
+                <option value="rent_increase">Arbitrary / Sudden Rent Increase</option>
+                <option value="eviction">Illegal Eviction Notice / Lock-in Penalty</option>
+                <option value="rental_agreement">Unfair Rental Agreement Clause</option>
+                <option value="maintenance">Maintenance &amp; Structural Repairs</option>
+                <option value="landlord_harassment">Landlord Harassment / Utility Disconnection</option>
+                <option value="unfair_charges">Unfair Miscellaneous Charges / Late Fees</option>
+                <option value="other">Other Tenancy Dispute</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="issueState">State / Jurisdiction *</label>
+              <select id="issueState" required>
+                <option value="Maharashtra" selected>Maharashtra (Pune / Mumbai)</option>
+                <option value="Karnataka">Karnataka (Bengaluru)</option>
+                <option value="Delhi">Delhi NCR (Delhi / Gurgaon / Noida)</option>
+                <option value="Tamil Nadu">Tamil Nadu (Chennai)</option>
+                <option value="Telangana">Telangana (Hyderabad)</option>
+                <option value="West Bengal">West Bengal (Kolkata)</option>
+                <option value="Other">Other States</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="issueCity">City / Area *</label>
+              <input id="issueCity" type="text" placeholder="e.g. Pune, Maharashtra" value="Pune, Maharashtra" required>
+            </div>
+
+            <div>
+              <label for="issueAmount">Amount Involved in Dispute (₹) (Optional)</label>
+              <input id="issueAmount" type="number" min="0" placeholder="e.g. 45000">
+            </div>
+
+            <div>
+              <label for="issueDate">Date of Incident / Move-out Date</label>
+              <input id="issueDate" type="date">
+            </div>
+
+            <div>
+              <label for="issueMethod">Preferred Consultation Method</label>
+              <select id="issueMethod">
+                <option value="video_call" selected>Encrypted Video Call (Recommended)</option>
+                <option value="voice_call">Voice Consultation</option>
+                <option value="document_review">Written Agreement Review</option>
+              </select>
+            </div>
+
+            <div class="full-grid-span">
+              <label for="issueDescription">Detailed Description of the Problem *</label>
+              <textarea id="issueDescription" rows="6" placeholder="Provide a chronological description: What does your agreement state? What deductions or actions did the landlord take? Have you received bills or invoices?..." required></textarea>
+            </div>
+
+            <div class="full-grid-span">
+              <label for="issueTime">Preferred Consultation Time</label>
+              <select id="issueTime">
+                <option value="morning">Morning (9:00 AM – 12:00 PM)</option>
+                <option value="afternoon">Afternoon (12:00 PM – 5:00 PM)</option>
+                <option value="evening" selected>Evening (5:00 PM – 9:00 PM)</option>
+                <option value="weekend">Weekend Only</option>
+              </select>
+            </div>
+
+            <div class="full-grid-span">
+              <label for="issueDocuments">Supporting Documents or Photographs (Optional)</label>
+              <input id="issueDocuments" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+              <small class="fine">Agreement copy, notice letters, or move-out photos (stored securely).</small>
+            </div>
+          </div>
+
+          <button type="submit" class="btn primary full" id="submitIssueBtn" style="margin-top:20px;">Submit Legal Issue to Verified Advocates</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         "FIND A LAWYER" DIRECTORY SECTION
+         ============================================================================== -->
+    <section class="section" id="lawyers">
+      <div class="section-heading">
+        <p class="eyebrow">STEP 2 · VERIFIED ADVOCATE DIRECTORY</p>
+        <h2>Find a Verified Tenancy Lawyer</h2>
+        <p>Consult with independent, licensed legal advocates verified with State Bar Councils across India. Book an online video consultation for tailored legal assistance.</p>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="lawyerDirectorySearch" class="filter-search" placeholder="Search by advocate name, specialty, or city…">
+        <select id="lawyerDirectorySpecialty" class="filter-select">
+          <option value="all">All Specialties</option>
+          <option value="Deposit Recovery">Deposit Recovery</option>
+          <option value="Eviction Defense">Eviction Defense</option>
+          <option value="Rental Agreement">Rental Agreement Review</option>
+          <option value="Harassment">Landlord Harassment</option>
+          <option value="Unfair Charges">Unfair Charges</option>
+        </select>
+        <select id="lawyerDirectoryState" class="filter-select">
+          <option value="all">All State Bar Councils</option>
+          <option value="Maharashtra">Maharashtra &amp; Goa</option>
+          <option value="Karnataka">Karnataka</option>
+          <option value="Delhi">Delhi</option>
+        </select>
+      </div>
+
+      <div class="lawyers-grid" id="lawyersGrid">
+        <!-- Dynamically populated from database with verified advocates -->
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         AI LEGAL ASSISTANT & LEASE AUDIT (PRESERVED)
+         ============================================================================== -->
     <section class="section" id="audit">
-      <div class="section-heading"><p class="eyebrow">STEP 1 · TELL US WHAT HAPPENED</p><h2>Start with your rental concern</h2><p>Choose a sample situation or paste the relevant wording. You can edit the details before generating a draft.</p></div>
+      <div class="section-heading">
+        <p class="eyebrow">AI-POWERED LEASE REVIEW</p>
+        <h2>ClauseShield AI Legal Assistant</h2>
+        <p>Audit your rental agreement or move-out notice. Our engine breaks down clauses against Indian tenancy laws and generates clear responses.</p>
+      </div>
       <div class="audit-layout">
         <div class="panel">
           <div class="input-mode-tabs">
@@ -118,6 +769,7 @@
             <div><label for="deposit">Security deposit (₹)</label><input id="deposit" type="number" min="0" placeholder="50000"></div>
             <div class="full-grid-span"><label for="deduction">Amount in dispute (₹)</label><input id="deduction" type="number" min="0" placeholder="25000"></div>
           </div>
+
           <button class="btn primary full" id="runAudit">Review my situation</button>
           
           <div id="loadingIndicator" class="loading-indicator" hidden>
@@ -138,6 +790,9 @@
       </div>
     </section>
 
+    <!-- ==============================================================================
+         RESULTS & COMPLAINT GENERATOR SECTION (PRESERVED)
+         ============================================================================== -->
     <section class="section results-section" id="results" hidden>
       <div class="section-heading"><p class="eyebrow">STEP 2 · YOUR REVIEW</p><h2>Here's what to look at</h2></div>
       <div class="audit-meta-bar">
@@ -171,7 +826,8 @@
         </div>
       </div>
 
-      <div class="panel legal-panel">
+      <!-- Legal Provisions Disclosure (Know Your Rights anchor) -->
+      <div class="panel legal-panel" id="know-rights">
         <button class="disclosure" id="legalToggle" aria-expanded="true">
           <span class="disclosure-title">⚖️ Applicable Indian Legal Provisions &amp; Rights</span>
           <span class="disclosure-badge" id="legalCountBadge">2 Provisions</span>
@@ -183,11 +839,16 @@
           </div>
           <div class="legal-disclaimer">
             <h3>Important Note</h3>
-            <p>These laws help you understand your rights, but the final outcome depends on your rental agreement, evidence, and the tenancy rules applicable in your state. For serious disputes, consult a qualified lawyer.</p>
+            <p>These laws help you understand your rights, but the final outcome depends on your rental agreement, evidence, and the tenancy rules applicable in your state. For serious disputes, consult a verified advocate via our platform.</p>
           </div>
         </div>
       </div>
-      <div class="section-heading left"><p class="eyebrow">STEP 3 · PREPARE A RESPONSE</p><h2>Make your next message clear</h2></div>
+
+      <!-- Response Generator Section (Generate Complaint anchor) -->
+      <div class="section-heading left" id="complaint-generator">
+        <p class="eyebrow">STEP 3 · PREPARE A RESPONSE</p>
+        <h2>Make your next message clear</h2>
+      </div>
       <div class="panel">
         <div class="form-grid">
           <div><label for="landlordName">Landlord's name (optional)</label><input id="landlordName" placeholder="e.g. Mr. Sharma"></div>
@@ -224,6 +885,9 @@
       </div>
     </section>
 
+    <!-- ==============================================================================
+         DISPUTE CALCULATOR SECTION (PRESERVED)
+         ============================================================================== -->
     <section class="section" id="calculator">
       <div class="section-heading"><p class="eyebrow">DISPUTE CALCULATOR</p><h2>Understand the numbers</h2><p>Enter your deposit and the deductions listed by your landlord. This calculator organises amounts; it cannot decide legal liability.</p></div>
       <div class="calc-layout">
@@ -240,6 +904,9 @@
       </div>
     </section>
 
+    <!-- ==============================================================================
+         EVIDENCE ORGANIZER / WEAR & TEAR SECTION (PRESERVED)
+         ============================================================================== -->
     <section class="section" id="wear">
       <div class="section-heading"><p class="eyebrow">EVIDENCE ORGANIZER</p><h2>Normal wear or possible damage?</h2><p>Use this illustrative guide to organise observations before discussing a deduction.</p></div>
       <div class="wear-grid">
@@ -249,16 +916,341 @@
       <div class="panel upload-panel"><h3>Keep your evidence together</h3><p>Choose inspection photos to preview them locally in this browser. They are not uploaded to a server.</p><input id="photoUpload" type="file" accept="image/*" multiple><div class="photo-preview" id="photoPreview"></div></div>
     </section>
 
+    <!-- ==============================================================================
+         ABOUT SECTION (PRESERVED)
+         ============================================================================== -->
     <section class="section about-section" id="about">
-      <div class="section-heading"><p class="eyebrow">ABOUT CLAUSESHIELD</p><h2>Make rental information easier to understand.</h2><p>ClauseShield is a student prototype designed to help tenants organise rental concerns, understand questions to ask, and prepare clearer communications.</p></div>
-      <div class="about-grid"><div><h3>What it aims to do</h3><p>Reduce information gaps by turning dense rental wording into plain-language prompts and practical next steps.</p></div><div><h3>Who it is for</h3><p>Students, first-time renters, working professionals and other tenants who want to keep their rental records organised.</p></div><div><h3>Responsible use</h3><p>Legal outcomes depend on the agreement, evidence, state rules and individual facts. Seek professional advice for legal decisions.</p></div></div>
-      <p class="footer-note">ClauseShield · Team 404 Founders · GNDEC · HackNauts 2.0</p>
+      <div class="section-heading"><p class="eyebrow">ABOUT CLAUSESHIELD</p><h2>Empowering tenants with clear law &amp; verified counsel.</h2><p>ClauseShield bridges the gap between everyday renters and verified legal advocates to protect tenant rights across India.</p></div>
+      <div class="about-grid">
+        <div><h3>What it aims to do</h3><p>Demystify complex rental contracts, prevent unlawful deposit deductions, and provide accessible legal consultations with verified advocates.</p></div>
+        <div><h3>Who it is for</h3><p>Tenants, students, families, and working professionals seeking reliable tenancy rights protection and licensed legal guidance.</p></div>
+        <div><h3>Ethical Compliance</h3><p>Operating strictly in accordance with Bar Council of India standards, ensuring transparency, privacy, and verified legal representation.</p></div>
+      </div>
+      <p class="footer-note">ClauseShield · Legal Technology for Tenant Protection · HackNauts 2.0</p>
     </section>
   </main>
-  <footer><span>© 2026 ClauseShield Prototype</span><span>Informational tool only — not legal advice.</span></footer>
-  <!-- Hidden print-only container for clean A4 formal letter output -->
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 ClauseShield Legal Platform. Informational tools &amp; advocate directory.</span>
+    <div>
+      <a href="javascript:void(0)" id="footerSupabaseBtn" style="color:var(--muted);text-decoration:none;margin-right:16px;">⚙️ Backend / Supabase Config</a>
+      <span>Built for Tenant Empowerment</span>
+    </div>
+  </footer>
+
+  <!-- ==============================================================================
+       MODALS & DIALOGS
+       ============================================================================== -->
+
+  <!-- 1. AUTHENTICATION MODAL -->
+  <div class="cs-modal-backdrop" id="authModal">
+    <div class="cs-modal">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Welcome to ClauseShield</h3>
+        <button type="button" class="modal-close-btn" data-close="authModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-type-selector">
+          <button type="button" class="auth-type-btn active" data-type="tenant">👤 Tenant Account</button>
+          <button type="button" class="auth-type-btn" data-type="lawyer">⚖️ Lawyer Registration</button>
+          <button type="button" class="auth-type-btn" data-type="admin">🛡️ Administrator</button>
+        </div>
+
+        <div class="auth-mode-toggle" id="authModeToggle">
+          <button type="button" class="active" id="showLoginBtn">Sign In</button>
+          <button type="button" id="showRegisterBtn">Create New Account</button>
+        </div>
+
+        <!-- Sign In Form (Common for all roles) -->
+        <form id="signInForm">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" placeholder="your.name@example.com" required>
+
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required>
+
+          <button type="submit" class="btn primary full">Sign In</button>
+          
+          <div style="text-align:center;margin-top:14px;">
+            <small class="fine">Quick Demo Login: 
+              <a href="javascript:void(0)" class="quick-login-link" data-email="tenant@example.com" data-pass="password123">Tenant Demo</a> · 
+              <a href="javascript:void(0)" class="quick-login-link" data-email="rajesh.sharma@advocates.in" data-pass="password123">Lawyer Demo</a> · 
+              <a href="javascript:void(0)" class="quick-login-link" data-email="admin@clauseshield.com" data-pass="password123">Admin Demo</a>
+            </small>
+          </div>
+        </form>
+
+        <!-- Tenant Registration Form -->
+        <form id="tenantRegisterForm" style="display:none;">
+          <label for="tenantFullName">Full Name *</label>
+          <input type="text" id="tenantFullName" placeholder="e.g. Arjun Mehra" required>
+
+          <label for="tenantRegEmail">Email Address *</label>
+          <input type="email" id="tenantRegEmail" placeholder="arjun.mehra@example.com" required>
+
+          <label for="tenantRegPhone">Phone Number *</label>
+          <input type="tel" id="tenantRegPhone" placeholder="+91 98765 43210" required>
+
+          <label for="tenantRegPassword">Password *</label>
+          <input type="password" id="tenantRegPassword" placeholder="Minimum 6 characters" required>
+
+          <button type="submit" class="btn primary full">Register as Tenant</button>
+        </form>
+
+        <!-- Lawyer Registration Form -->
+        <form id="lawyerRegisterForm" style="display:none;">
+          <label for="lawyerFullName">Full Name (Advocate) *</label>
+          <input type="text" id="lawyerFullName" placeholder="e.g. Adv. Rohit Deshmukh" required>
+
+          <div class="form-grid">
+            <div>
+              <label for="lawyerRegEmail">Email Address *</label>
+              <input type="email" id="lawyerRegEmail" placeholder="adv.rohit@example.com" required>
+            </div>
+            <div>
+              <label for="lawyerRegPhone">Phone Number *</label>
+              <input type="tel" id="lawyerRegPhone" placeholder="+91 98200 12345" required>
+            </div>
+          </div>
+
+          <label for="lawyerRegPassword">Password *</label>
+          <input type="password" id="lawyerRegPassword" placeholder="Create secure password" required>
+
+          <div class="form-grid">
+            <div>
+              <label for="lawyerBarNumber">Bar Council Enrolment No. *</label>
+              <input type="text" id="lawyerBarNumber" placeholder="e.g. MAH/5821/2016" required>
+            </div>
+            <div>
+              <label for="lawyerStateBar">State Bar Council *</label>
+              <select id="lawyerStateBar" required>
+                <option value="Bar Council of Maharashtra & Goa">Bar Council of Maharashtra &amp; Goa</option>
+                <option value="Karnataka State Bar Council">Karnataka State Bar Council</option>
+                <option value="Bar Council of Delhi">Bar Council of Delhi</option>
+                <option value="Bar Council of Tamil Nadu">Bar Council of Tamil Nadu</option>
+                <option value="Bar Council of Telangana">Bar Council of Telangana</option>
+                <option value="Bar Council of West Bengal">Bar Council of West Bengal</option>
+                <option value="Other State Bar Council">Other State Bar Council</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label for="lawyerSpecialty">Legal Specialisation *</label>
+              <select id="lawyerSpecialty" required>
+                <option value="Tenancy Disputes & Deposit Recovery">Tenancy Disputes &amp; Deposit Recovery</option>
+                <option value="Rental Agreements & Eviction Defense">Rental Agreements &amp; Eviction Defense</option>
+                <option value="Landlord Harassment & Utility Rights">Landlord Harassment &amp; Utility Rights</option>
+                <option value="Unfair Charges & Move-out Repairs">Unfair Charges &amp; Move-out Repairs</option>
+                <option value="Civil & Consumer Tenancy Law">Civil &amp; Consumer Tenancy Law</option>
+              </select>
+            </div>
+            <div>
+              <label for="lawyerExperience">Years of Experience *</label>
+              <input type="number" id="lawyerExperience" min="1" max="50" value="5" required>
+            </div>
+          </div>
+
+          <label for="lawyerBio">Professional Biography *</label>
+          <textarea id="lawyerBio" rows="3" placeholder="Briefly describe your courts of practice, tenancy litigation experience, and background..." required></textarea>
+
+          <div class="form-grid">
+            <div>
+              <label for="lawyerFee">Consultation Charges (₹) *</label>
+              <input type="number" id="lawyerFee" min="100" step="50" value="500" required>
+            </div>
+            <div>
+              <label for="lawyerAvailability">Availability *</label>
+              <input type="text" id="lawyerAvailability" value="Mon-Fri: 5 PM - 8 PM" required>
+            </div>
+          </div>
+
+          <label for="lawyerDocUpload">Bar Council ID / Certificate Document (PDF/Image) *</label>
+          <input type="file" id="lawyerDocUpload" accept=".pdf,.jpg,.jpeg,.png">
+          <small class="fine">Your credentials remain pending until verified by an administrator. Never shown as verified prematurely.</small>
+
+          <button type="submit" class="btn primary full" style="margin-top:16px;">Submit Application for Advocate Verification</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. VIDEO CONSULTATION MODAL -->
+  <div class="cs-modal-backdrop" id="videoCallModal">
+    <div class="cs-modal wide" style="background:#0b1329;max-width:1050px;">
+      <div class="meeting-top-bar">
+        <div>
+          <h3 id="videoModalTitle">Encrypted Online Legal Consultation</h3>
+          <span style="font-size:.78rem;color:#94a3b8;" id="videoModalSub">Private WebRTC Session · ClauseShield Protected Room</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <button type="button" class="btn secondary" id="endVideoCallBtn" style="background:#b84c48;color:#fff;padding:8px 14px;font-size:.82rem;">End Consultation</button>
+          <button type="button" class="modal-close-btn" data-close="videoCallModal" style="color:#fff;">×</button>
+        </div>
+      </div>
+      <div class="meeting-layout">
+        <div class="video-frame-container" id="videoContainer">
+          <!-- Jitsi WebRTC iframe injected here -->
+        </div>
+        <div class="meeting-sidebar">
+          <h4>Case Summary &amp; Notes</h4>
+          <p><strong>Case Reference:</strong> <span id="videoCaseRef">—</span></p>
+          <p><strong>Dispute Title:</strong> <span id="videoCaseTitle">—</span></p>
+          <p><strong>Location:</strong> <span id="videoCaseLocation">—</span></p>
+          <p><strong>Amount in Dispute:</strong> <span id="videoCaseAmount" style="color:#f87171;">₹0</span></p>
+          <hr style="border:0;border-top:1px solid #23345e;margin:14px 0;">
+          <h4>Consultation Guidelines</h4>
+          <ul>
+            <li>Ensure clear audio and steady internet.</li>
+            <li>Have lease copy and move-out receipts ready.</li>
+            <li>Consultations are strictly confidential between tenant and advocate.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BOOK / OFFER CONSULTATION MODAL (WITH DEMO PAYMENT LEDGER) -->
+  <div class="cs-modal-backdrop" id="consultationModal">
+    <div class="cs-modal">
+      <div class="modal-header">
+        <h3 id="consultModalTitle">Schedule Legal Consultation</h3>
+        <button type="button" class="modal-close-btn" data-close="consultationModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="consultModalLawyerCard" class="lawyer-meta-row" style="margin-bottom:18px;">
+          <div>
+            <strong id="consultLawyerName">Adv. Rajesh Sharma</strong>
+            <div class="fine" id="consultLawyerMeta">Bar Council Verified · Tenancy Disputes</div>
+          </div>
+          <div class="lawyer-fee" id="consultFeeDisplay">₹500</div>
+        </div>
+
+        <!-- Demonstration Fee Breakdown -->
+        <div class="checkout-breakdown">
+          <div class="breakdown-row">
+            <span>Consultation Fee:</span>
+            <span id="breakdownConsultFee">₹500</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Advocate Share (90%):</span>
+            <span id="breakdownLawyerShare">₹450</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Platform Technology Charge (10%):</span>
+            <span id="breakdownPlatformFee">₹50</span>
+          </div>
+          <div class="breakdown-row total">
+            <span>Total Payable:</span>
+            <span id="breakdownTotalPayable">₹500</span>
+          </div>
+        </div>
+
+        <div class="bci-disclaimer-card" style="margin-bottom:18px;">
+          <strong>⚖️ Regulatory &amp; Demonstration Notice:</strong>
+          As per Bar Council of India guidelines, advocate fees cannot be split with non-lawyers. This consultation booking interface uses a simulated demonstration ledger. Live financial processing is disabled.
+        </div>
+
+        <form id="consultationBookingForm">
+          <label for="consultPreferredDate">Select Consultation Date &amp; Time *</label>
+          <input type="datetime-local" id="consultPreferredDate" required>
+
+          <label for="consultUserNote">Notes for the Advocate (Optional)</label>
+          <textarea id="consultUserNote" rows="3" placeholder="Briefly highlight your main question or timeline concern..."></textarea>
+
+          <label>Select Demonstration Payment Method</label>
+          <div class="mock-payment-methods">
+            <div class="mock-method-card selected" data-method="upi">📱 UPI (Demo Mode)</div>
+            <div class="mock-method-card" data-method="card">💳 Net Banking / Card</div>
+          </div>
+
+          <button type="submit" class="btn primary full" id="confirmConsultationBtn">Confirm &amp; Generate Private Video Room</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. ISSUE DETAILS MODAL (FOR LAWYERS & TENANTS) -->
+  <div class="cs-modal-backdrop" id="issueDetailsModal">
+    <div class="cs-modal">
+      <div class="modal-header">
+        <h3 id="issueDetailTitle">Case Details</h3>
+        <button type="button" class="modal-close-btn" data-close="issueDetailsModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="issue-card-header">
+          <span class="issue-ref" id="detailRef">CS-ISS-2026-XXXX</span>
+          <span class="status-pill status-open" id="detailStatus">Open</span>
+        </div>
+        <h3 id="detailHeading" style="margin-top:8px;">Dispute Title</h3>
+        <div class="issue-location" id="detailLocation">📍 Pune, Maharashtra</div>
+        
+        <div class="issue-meta-box">
+          <span>Amount in Dispute: <strong id="detailAmount" class="issue-dispute-amt">₹0</strong></span>
+          <span>Incident: <strong id="detailDate">—</strong></span>
+        </div>
+
+        <label>Detailed Problem Narrative</label>
+        <p id="detailNarrative" style="background:#f8faff;padding:14px;border-radius:10px;font-size:.88rem;line-height:1.6;color:var(--ink);"></p>
+
+        <div class="shield-notice" id="detailPrivacyShield">
+          <span class="shield-icon">🔒</span>
+          <div>
+            <strong>Confidentiality Active:</strong>
+            Tenant direct phone number and private identification documents are shielded. Verified advocates can communicate via scheduled platform video consultations.
+          </div>
+        </div>
+
+        <div id="issueDetailActions" style="display:flex;gap:12px;margin-top:20px;">
+          <!-- Dynamically populated buttons -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. SUPABASE & BACKEND CONFIGURATION MODAL -->
+  <div class="cs-modal-backdrop" id="supabaseModal">
+    <div class="cs-modal">
+      <div class="modal-header">
+        <h3>Supabase &amp; Backend Settings</h3>
+        <button type="button" class="modal-close-btn" data-close="supabaseModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="shield-notice">
+          <span class="shield-icon">⚡</span>
+          <div>
+            <strong>Zero-Config Client DB Active:</strong>
+            ClauseShield comes with an immediate, high-fidelity persistent database for GitHub Pages and local test runs. You can also connect directly to your live Supabase project by entering your credentials below.
+          </div>
+        </div>
+
+        <form id="supabaseConfigForm">
+          <label for="sbUrlInput">Supabase Project URL</label>
+          <input type="url" id="sbUrlInput" placeholder="https://xyzcompany.supabase.co">
+
+          <label for="sbAnonKeyInput">Supabase Anon Public API Key</label>
+          <textarea id="sbAnonKeyInput" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+          <small class="fine">Do not enter your service-role secret key. Only the public anon key is safe in client-side code.</small>
+
+          <button type="submit" class="btn primary full" style="margin-top:16px;">Save &amp; Connect to Supabase</button>
+        </form>
+
+        <hr style="border:0;border-top:1px solid var(--line);margin:20px 0;">
+        <p class="fine">Database tables, indexes, and Row Level Security policies are provided in <code>supabase_schema.sql</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINT-ONLY CONTAINER -->
   <div id="printable-letter" class="printable-letter" aria-hidden="true"></div>
+
+  <!-- TOAST NOTIFICATION -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script src="supabase-client.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
