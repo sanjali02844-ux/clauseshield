@@ -759,6 +759,46 @@
           lawyer_responses: []
         };
 
+        // Live Supabase Cloud Sync
+        if (supabaseInstance) {
+          try {
+            const validCategories = ['security_deposit', 'rent_increase', 'eviction', 'rental_agreement', 'maintenance', 'landlord_harassment', 'unfair_charges', 'other'];
+            let sbCategory = category || 'security_deposit';
+            if (!validCategories.includes(sbCategory)) {
+              if (sbCategory === 'illegal_eviction') sbCategory = 'eviction';
+              else if (sbCategory === 'rent_hike') sbCategory = 'rent_increase';
+              else if (sbCategory === 'harassment') sbCategory = 'landlord_harassment';
+              else sbCategory = 'other';
+            }
+
+            const { data, error } = await supabaseInstance
+              .from('tenant_issues')
+              .insert([{
+                issue_reference: issueRef,
+                title: title.trim(),
+                category: sbCategory,
+                city: city.trim(),
+                state: (state || 'Maharashtra').trim(),
+                description: description.trim(),
+                amount_in_dispute: Number(amount_in_dispute) || 0,
+                incident_date: incident_date || new Date().toISOString().split('T')[0],
+                preferred_method: preferred_method || 'video_call',
+                preferred_time: preferred_time || 'evening',
+                status: 'open'
+              }])
+              .select();
+
+            if (error) {
+              console.warn('ClauseShield: Supabase insert warning:', error);
+            } else if (data && data[0]) {
+              console.log('ClauseShield: Successfully saved complaint to live Supabase!', data[0]);
+              newIssue.id = data[0].id;
+            }
+          } catch (e) {
+            console.warn('ClauseShield: Supabase sync warning, using local storage:', e);
+          }
+        }
+
         issues.unshift(newIssue);
         setStorage(STORAGE_KEYS.TENANT_ISSUES, issues);
         return newIssue;
@@ -791,7 +831,62 @@
 
       // Comprehensive Sorting & Variety Filtering for Free Lawyer Board
       async getAllAvailable({ category = 'all', state = 'all', search = '', status = 'all', urgency = 'all', sort = 'newest' } = {}) {
-        const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
+        let issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
+
+        if (supabaseInstance) {
+          try {
+            const { data, error } = await supabaseInstance
+              .from('tenant_issues')
+              .select('*')
+              .order('created_at', { ascending: false });
+
+            if (!error && data && data.length > 0) {
+              const localMap = new Map();
+              issues.forEach(i => localMap.set(i.issue_reference || i.id, i));
+              const merged = [];
+              const seen = new Set();
+
+              for (const row of data) {
+                const key = row.issue_reference || row.id;
+                seen.add(key);
+                const local = localMap.get(key) || {};
+                merged.push({
+                  ...local,
+                  id: row.id,
+                  issue_reference: row.issue_reference,
+                  tenant_id: row.tenant_id || local.tenant_id || 'usr_guest_tenant',
+                  tenant_name: local.tenant_name || 'Tenant (Shielded)',
+                  title: row.title,
+                  category: row.category,
+                  variety_label: this.getVarietyLabel(row.category),
+                  city: row.city,
+                  state: row.state,
+                  description: row.description,
+                  amount_in_dispute: Number(row.amount_in_dispute) || 0,
+                  incident_date: row.incident_date || local.incident_date,
+                  urgency: local.urgency || 'urgent',
+                  relief_requested: local.relief_requested || 'Statutory refund and dispute resolution',
+                  preferred_method: row.preferred_method || 'video_call',
+                  preferred_time: row.preferred_time || 'evening',
+                  status: row.status || 'open',
+                  created_at: row.created_at,
+                  lawyer_responses: local.lawyer_responses || []
+                });
+              }
+
+              for (const loc of issues) {
+                const key = loc.issue_reference || loc.id;
+                if (!seen.has(key)) {
+                  merged.push(loc);
+                }
+              }
+
+              issues = merged;
+            }
+          } catch (e) {
+            console.warn('ClauseShield: Could not fetch from Supabase, using local fallback:', e);
+          }
+        }
 
         // Filter step
         let filtered = issues.filter(item => {
@@ -932,6 +1027,18 @@ c/o ClauseShield Legal Assistance Directorate
           issues[idx].assigned_lawyer_id = assignedLawyerId;
         }
         setStorage(STORAGE_KEYS.TENANT_ISSUES, issues);
+
+        if (supabaseInstance) {
+          try {
+            await supabaseInstance
+              .from('tenant_issues')
+              .update({ status: status })
+              .or(`id.eq.${issueId},issue_reference.eq.${issueId}`);
+          } catch (e) {
+            console.warn('ClauseShield: Supabase updateStatus error:', e);
+          }
+        }
+
         return issues[idx];
       },
 
@@ -942,6 +1049,18 @@ c/o ClauseShield Legal Assistance Directorate
 
         issues[idx].status = 'withdrawn';
         setStorage(STORAGE_KEYS.TENANT_ISSUES, issues);
+
+        if (supabaseInstance) {
+          try {
+            await supabaseInstance
+              .from('tenant_issues')
+              .update({ status: 'withdrawn' })
+              .or(`id.eq.${issueId},issue_reference.eq.${issueId}`);
+          } catch (e) {
+            console.warn('ClauseShield: Supabase withdraw error:', e);
+          }
+        }
+
         return true;
       }
     },
