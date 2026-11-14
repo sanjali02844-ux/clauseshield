@@ -52,22 +52,6 @@
       <div class="section-heading"><p class="eyebrow">STEP 1 · TELL US WHAT HAPPENED</p><h2>Start with your rental concern</h2><p>Choose a sample situation or paste the relevant wording. You can edit the details before generating a draft.</p></div>
       <div class="audit-layout">
         <div class="panel">
-          <div class="ai-status-bar">
-            <div class="status-indicator">
-              <span class="status-pulse" id="backendPulse"></span>
-              <span id="backendStatusText">Engine: Ready (Smart Rule Mode)</span>
-            </div>
-            <button type="button" class="api-settings-btn" id="apiSettingsToggle" aria-expanded="false" title="Backend connection settings">⚙️ Backend</button>
-          </div>
-          <div id="apiSettingsPanel" class="api-settings-panel" hidden>
-            <label for="backendUrlInput">FastAPI Backend URL</label>
-            <div class="api-input-group">
-              <input id="backendUrlInput" type="url" placeholder="http://localhost:8000" value="http://localhost:8000">
-              <button type="button" class="btn secondary" id="testApiBtn">Connect</button>
-            </div>
-            <small class="fine">ClauseShield works 100% in-browser offline via our rule engine, and automatically enhances with live Gemini 1.5 Flash when your backend is running.</small>
-          </div>
-
           <div class="input-mode-tabs">
             <button type="button" class="mode-tab active" data-mode="file">📄 Upload Agreement (PDF / DOCX)</button>
             <button type="button" class="mode-tab" data-mode="text">✏️ Type Problem / Clause</button>

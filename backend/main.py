@@ -5,6 +5,8 @@ import urllib.parse
 from typing import List, Optional, Tuple
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from pydantic import BaseModel, Field
 import pypdf
 import docx
@@ -970,3 +972,9 @@ async def audit_clause(
         clauses=analysis.clauses,
         dynamic_laws=analysis.legal_references
     )
+
+# Mount root directory as static files so visiting http://localhost:8000 loads the full website directly
+_frontend_dir = Path(__file__).resolve().parent.parent
+if (_frontend_dir / "index.html").exists():
+    app.mount("/", StaticFiles(directory=str(_frontend_dir), html=True), name="frontend")
+

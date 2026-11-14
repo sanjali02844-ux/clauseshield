@@ -160,7 +160,9 @@ const VERIFIED_LAWS = [
 
 let currentCase = null;
 let backendOnline = false;
-let configuredBackendUrl = localStorage.getItem('clauseshield_backend') || 'http://localhost:8000';
+let configuredBackendUrl = (window.location.origin && window.location.origin.startsWith('http') && !window.location.origin.includes('github.io'))
+  ? window.location.origin
+  : (localStorage.getItem('clauseshield_backend') || 'http://localhost:8000');
 
 // Upload state
 let uploadedFile = null;
@@ -214,39 +216,32 @@ function syncFormalLetter() {
   if (printable) printable.textContent = text;
 }
 
-// Check Backend Health
+// Automatically probe and connect to FastAPI backend in the background
 async function checkBackendStatus() {
-  const pulse = $('backendPulse');
-  const statusText = $('backendStatusText');
-  const inputEl = $('backendUrlInput');
-  if (inputEl) inputEl.value = configuredBackendUrl;
+  const origin = (window.location.origin && window.location.origin.startsWith('http')) ? window.location.origin : '';
+  const candidates = [origin, configuredBackendUrl, 'http://127.0.0.1:8000', 'http://localhost:8000'].filter(Boolean);
+  const seen = new Set();
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch(`${configuredBackendUrl}/health`, { signal: controller.signal });
-    clearTimeout(timeoutId);
-
-    if (res.ok) {
-      const data = await res.json();
-      backendOnline = true;
-      if (pulse) pulse.classList.remove('offline');
-      if (statusText) {
-        statusText.textContent = data.gemini_api_configured
-          ? 'Engine: Live Gemini 1.5 AI Connected'
-          : 'Engine: FastAPI Backend Connected (Rule Mode)';
+  for (const url of candidates) {
+    if (seen.has(url)) continue;
+    seen.add(url);
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      const res = await fetch(`${url}/health`, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        backendOnline = true;
+        configuredBackendUrl = url;
+        return true;
       }
-      return;
+    } catch (e) {
+      // Continue to next candidate
     }
-  } catch (e) {
-    // Backend is offline, fallback is active
   }
 
   backendOnline = false;
-  if (pulse) pulse.classList.add('offline');
-  if (statusText) {
-    statusText.textContent = 'Engine: Smart In-Browser Rule Analyzer (Ready)';
-  }
+  return false;
 }
 
 // -------------------------------------------------------------
@@ -1112,37 +1107,7 @@ if (menuToggle && mainNav) {
   });
 }
 
-// Backend API Settings Modal / Toggle
-const apiSettingsToggle = $('apiSettingsToggle');
-const apiSettingsPanel = $('apiSettingsPanel');
-const testApiBtn = $('testApiBtn');
 
-if (apiSettingsToggle && apiSettingsPanel) {
-  apiSettingsToggle.addEventListener('click', () => {
-    apiSettingsPanel.hidden = !apiSettingsPanel.hidden;
-    apiSettingsToggle.setAttribute('aria-expanded', String(!apiSettingsPanel.hidden));
-  });
-}
-
-if (testApiBtn) {
-  testApiBtn.addEventListener('click', async () => {
-    const url = $('backendUrlInput').value.trim().replace(/\/+$/, '');
-    if (!url) {
-      toast('Please enter a valid backend URL.');
-      return;
-    }
-    configuredBackendUrl = url;
-    localStorage.setItem('clauseshield_backend', url);
-    toast('Testing connection...');
-    await checkBackendStatus();
-    if (backendOnline) {
-      toast('✓ Connected to Backend successfully!');
-      if (apiSettingsPanel) apiSettingsPanel.hidden = true;
-    } else {
-      toast('Could not connect to backend. Falling back to local rule engine.');
-    }
-  });
-}
 
 // Legal References disclosure toggle
 if ($('legalToggle')) {
