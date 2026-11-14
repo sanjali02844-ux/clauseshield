@@ -434,3 +434,153 @@
   text-decoration: underline;
 }
 
+
+/* ==============================================================================
+   CLAUSESHIELD LEGAL ASSISTANCE PLATFORM ENHANCEMENTS
+   ============================================================================== */
+
+/* Navigation User Pill & Dropdown */
+.user-menu-wrapper{position:relative;display:inline-flex;align-items:center}
+.user-pill{display:flex;align-items:center;gap:10px;background:#f0f4fd;border:1px solid #d0ddfb;padding:6px 14px;border-radius:24px;cursor:pointer;font-weight:700;font-size:.86rem;color:var(--navy);transition:.2s}
+.user-pill:hover{background:#e2ecfc}
+.user-avatar-tiny{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid var(--blue)}
+.user-role-badge{font-size:.7rem;text-transform:uppercase;padding:2px 7px;border-radius:10px;font-weight:800;letter-spacing:.04em}
+.badge-tenant{background:#e8f0fe;color:var(--blue)}
+.badge-lawyer{background:#e6f6ee;color:var(--green)}
+.badge-admin{background:#fdf2e9;color:#b45309}
+
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:240px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 15px 40px rgba(16,29,53,.12);padding:8px 0;z-index:100;display:none}
+.user-dropdown.show{display:block}
+.user-dropdown a,.user-dropdown button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 18px;text-decoration:none;color:var(--ink);font-size:.88rem;font-weight:600;background:none;border:none;text-align:left;cursor:pointer;transition:.15s}
+.user-dropdown a:hover,.user-dropdown button:hover{background:#f4f7fc;color:var(--blue)}
+.user-dropdown hr{border:0;border-top:1px solid var(--line);margin:6px 0}
+.logout-btn{color:var(--red)!important}
+
+/* Section Header Badges & Subtitles */
+.badge-verified{display:inline-flex;align-items:center;gap:4px;background:#e6f6ee;color:var(--green);border:1px solid #bcead4;padding:3px 9px;border-radius:12px;font-size:.74rem;font-weight:700}
+.badge-pending{display:inline-flex;align-items:center;gap:4px;background:#fef7e7;color:#b47a24;border:1px solid #f9dfa6;padding:3px 9px;border-radius:12px;font-size:.74rem;font-weight:700}
+.badge-rejected{display:inline-flex;align-items:center;gap:4px;background:#fcebe9;color:var(--red);border:1px solid #f8c9c4;padding:3px 9px;border-radius:12px;font-size:.74rem;font-weight:700}
+
+/* Status Badges for Issues and Consultations */
+.status-pill{display:inline-block;padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:700;text-transform:capitalize}
+.status-open{background:#e8f0fe;color:var(--blue)}
+.status-consultation_requested,.status-pending{background:#fef7e7;color:#b47a24}
+.status-accepted,.status-scheduled{background:#e6f6ee;color:var(--green)}
+.status-completed{background:#e9f5fe;color:#0369a1}
+.status-withdrawn,.status-cancelled{background:#f1f3f7;color:var(--muted)}
+
+/* Search & Filter Bar */
+.filter-bar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px;align-items:center;background:#f8faff;padding:16px 20px;border:1px solid var(--line);border-radius:14px}
+.filter-search{flex:1;min-width:240px;margin-bottom:0!important;padding:10px 14px!important}
+.filter-select{width:auto!important;min-width:180px;margin-bottom:0!important;padding:10px 14px!important}
+
+/* Lawyer Cards Grid ("Find a Lawyer") */
+.lawyers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:24px;margin-top:20px}
+.lawyer-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;box-shadow:0 8px 25px rgba(27,49,80,.05);transition:.25s;position:relative}
+.lawyer-card:hover{transform:translateY(-3px);border-color:#b9ceff;box-shadow:0 15px 35px rgba(49,94,232,.1)}
+.lawyer-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}
+.lawyer-avatar{width:70px;height:70px;border-radius:14px;object-fit:cover;border:2px solid #e1e7f0}
+.lawyer-head-info{flex:1}
+.lawyer-name{font-size:1.18rem;font-weight:800;color:var(--navy);margin:0 0 4px}
+.lawyer-bar{font-size:.78rem;color:var(--muted);margin-bottom:6px;display:block}
+.lawyer-specialty{font-size:.85rem;font-weight:700;color:var(--blue);margin-bottom:8px}
+.lawyer-bio{font-size:.84rem;color:#55637a;line-height:1.55;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.lawyer-meta-row{display:flex;justify-content:space-between;align-items:center;background:#f8faff;padding:10px 14px;border-radius:10px;margin-bottom:16px;font-size:.83rem}
+.lawyer-fee{font-weight:800;color:var(--green);font-size:1rem}
+.lawyer-actions{display:flex;gap:10px}
+.lawyer-actions .btn{flex:1;padding:10px 14px;font-size:.88rem}
+
+/* Tenant Legal Issue Cards & Public Board */
+.issues-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:22px}
+.issue-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;box-shadow:0 6px 20px rgba(27,49,80,.04);transition:.2s}
+.issue-card:hover{border-color:#c8d7fd}
+.issue-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px}
+.issue-ref{font-size:.72rem;font-weight:800;letter-spacing:.06em;color:var(--muted)}
+.issue-title{font-size:1.06rem;font-weight:800;color:var(--navy);margin:0 0 10px;line-height:1.35}
+.issue-location{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted);margin-bottom:10px}
+.issue-desc{font-size:.84rem;color:#566479;line-height:1.5;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.issue-meta-box{background:#f8faff;border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:.82rem}
+.issue-dispute-amt{font-weight:800;color:#c0392b}
+
+/* Privacy Shield Callout */
+.shield-notice{display:flex;gap:14px;align-items:center;background:#f3f7fe;border:1px solid #d3e1fa;border-left:4px solid var(--blue);padding:14px 18px;border-radius:10px;margin-bottom:24px;font-size:.84rem;color:#35445d}
+.shield-icon{font-size:1.5rem}
+
+/* Dashboards Layout & Metrics */
+.dashboard-container{max-width:1300px;margin:0 auto;padding-top:20px}
+.dashboard-hero{background:linear-gradient(135deg,#101d35,#1d3557);color:#fff;border-radius:18px;padding:32px 36px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.dashboard-hero h2{color:#fff;font-size:1.85rem;margin:0 0 6px}
+.dashboard-hero p{color:#cbd5e1;margin:0;font-size:.95rem}
+.dashboard-hero-action{display:flex;gap:12px}
+
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:32px}
+.metric-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 4px 16px rgba(27,49,80,.04)}
+.metric-title{font-size:.76rem;font-weight:800;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.metric-value{font:800 2rem Manrope;color:var(--navy);margin-bottom:4px}
+.metric-hint{font-size:.78rem;color:var(--muted)}
+
+/* Dashboard Tabs Navigation */
+.dash-tabs{display:flex;gap:10px;border-bottom:1px solid var(--line);margin-bottom:26px;overflow-x:auto}
+.dash-tab{padding:12px 18px;font:700 .92rem 'DM Sans';border:0;background:none;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:.2s}
+.dash-tab:hover{color:var(--blue)}
+.dash-tab.active{color:var(--blue);border-color:var(--blue)}
+
+/* Data Tables */
+.table-responsive{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:26px}
+.data-table{width:100%;border-collapse:collapse;font-size:.86rem;text-align:left}
+.data-table th{background:#f8faff;padding:14px 18px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--line);white-space:nowrap}
+.data-table td{padding:14px 18px;border-bottom:1px solid var(--line);color:#475569;vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#fafcff}
+
+/* Earnings & Demonstration Ledger Cards */
+.earnings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:28px}
+.earnings-card{background:linear-gradient(135deg,#fafbff,#f0f4fd);border:1px solid #dbe5f7;border-radius:14px;padding:24px}
+.earnings-card h4{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 10px}
+.earnings-card .amount{font:800 2.2rem Manrope;color:var(--navy);margin-bottom:6px}
+.earnings-card.green .amount{color:var(--green)}
+.bci-disclaimer-card{background:#fff9eb;border:1px solid #fae4b5;border-left:4px solid #b47a24;padding:16px 20px;border-radius:10px;font-size:.83rem;color:#785317;line-height:1.55;margin-bottom:28px}
+
+/* Consultation & Video Meeting Container */
+.video-meeting-screen{background:#0b1329;color:#fff;border-radius:18px;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.4);margin-top:20px}
+.meeting-top-bar{padding:16px 24px;display:flex;justify-content:space-between;align-items:center;background:#131e3d;border-bottom:1px solid #23345e}
+.meeting-top-bar h3{margin:0;color:#fff;font-size:1.15rem}
+.meeting-layout{display:grid;grid-template-columns:1fr 340px;min-height:550px}
+@media(max-width:960px){.meeting-layout{grid-template-columns:1fr}}
+.video-frame-container{background:#000;position:relative;display:flex;align-items:center;justify-content:center}
+.video-frame-container iframe{width:100%;height:100%;min-height:550px;border:none}
+.meeting-sidebar{background:#111b36;padding:22px;border-left:1px solid #23345e;overflow-y:auto;max-height:550px}
+.meeting-sidebar h4{color:#e2e8f0;font-size:.94rem;margin:0 0 12px;border-bottom:1px solid #23345e;padding-bottom:8px}
+.meeting-sidebar p,.meeting-sidebar li{font-size:.83rem;color:#94a3b8;line-height:1.5}
+
+/* Modals & Dialogs */
+.cs-modal-backdrop{position:fixed;inset:0;background:rgba(12,20,38,.65);backdrop-filter:blur(5px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.cs-modal-backdrop.open{display:flex}
+.cs-modal{background:#fff;border-radius:18px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 70px rgba(0,0,0,.25);position:relative;animation:modalIn .2s ease-out}
+.cs-modal.wide{max-width:880px}
+@keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-header{padding:22px 28px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:2}
+.modal-header h3{margin:0;font-size:1.35rem;color:var(--navy)}
+.modal-close-btn{border:none;background:none;font-size:1.6rem;color:var(--muted);cursor:pointer;line-height:1;padding:4px}
+.modal-close-btn:hover{color:var(--navy)}
+.modal-body{padding:26px 28px}
+.modal-footer{padding:18px 28px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:12px;background:#fbfcfe;border-radius:0 0 18px 18px}
+
+/* Auth Modal Tabs */
+.auth-type-selector{display:flex;gap:8px;background:#edf2fc;padding:5px;border-radius:10px;margin-bottom:20px}
+.auth-type-btn{flex:1;border:none;background:none;padding:10px;border-radius:8px;font:700 .86rem 'DM Sans';color:var(--muted);cursor:pointer;transition:.2s}
+.auth-type-btn.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.auth-mode-toggle{display:flex;justify-content:center;gap:16px;margin-bottom:18px;font-size:.88rem}
+.auth-mode-toggle button{background:none;border:none;font-weight:700;color:var(--muted);cursor:pointer;padding-bottom:4px;border-bottom:2px solid transparent}
+.auth-mode-toggle button.active{color:var(--blue);border-color:var(--blue)}
+
+/* Demonstration Checkout Card */
+.checkout-breakdown{background:#f8faff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:22px}
+.breakdown-row{display:flex;justify-content:space-between;padding:8px 0;font-size:.88rem;color:#475569}
+.breakdown-row.total{border-top:1px dashed #cbd5e1;margin-top:8px;padding-top:12px;font-weight:800;color:var(--navy);font-size:1.05rem}
+.mock-payment-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.mock-method-card{border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-size:.84rem;font-weight:700;transition:.2s}
+.mock-method-card.selected{border-color:var(--blue);background:#edf3ff;color:var(--blue)}
+
+/* Verified Badge in Lawyer Card */
+.verified-icon{color:var(--green);font-weight:bold;margin-left:4px}

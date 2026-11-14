@@ -968,7 +968,11 @@ $('runAudit').addEventListener('click', async () => {
 
   let auditResult = null;
 
-  // 1. Attempt Backend AI Analysis if backend is online
+  // 1. Attempt Backend AI Analysis automatically
+  if (!backendOnline) {
+    await checkBackendStatus();
+  }
+
   if (backendOnline) {
     try {
       const formData = new FormData();
