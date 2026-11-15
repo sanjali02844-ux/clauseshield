@@ -1053,6 +1053,36 @@
 
         setStorage('clauseshield_tenant_issues', issues);
 
+        // Sync scheduled consultation into clauseshield_consultations so tenant immediately sees video consultation and can join
+        try {
+          const tenantId = issue.tenant_id || 'usr_guest_tenant';
+          const consultationsKey = 'clauseshield_consultations';
+          const existingConsultations = getStorage(consultationsKey, []);
+          const roomId = `CS-MEET-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+          const newConsultation = {
+            id: generateId('cst'),
+            issue_id: issue.id,
+            issue_title: issue.title,
+            issue_reference: issue.issue_reference,
+            tenant_id: tenantId,
+            lawyer_id: advocateId,
+            lawyer_name: advProfile.full_name || 'Advocate',
+            bar_council_number: advProfile.bar_council_number || 'Enrolled Advocate',
+            scheduled_at: issue.scheduled_consultation_at,
+            duration_minutes: duration_minutes || 30,
+            meeting_room_id: roomId,
+            meeting_url: `https://meet.jit.si/ClauseShield_Legal_${roomId}`,
+            status: 'scheduled',
+            consultation_fee: fee,
+            consultation_notes: adviceText,
+            created_at: new Date().toISOString()
+          };
+          existingConsultations.unshift(newConsultation);
+          setStorage(consultationsKey, existingConsultations);
+        } catch (syncErr) {
+          console.warn('Consultation sync note:', syncErr);
+        }
+
         // Also sync status update to Supabase cloud if available
         if (window.ClauseShieldDB && ClauseShieldDB.issues && typeof ClauseShieldDB.issues.updateStatus === 'function') {
           ClauseShieldDB.issues.updateStatus(issueId, 'accepted', advocateId).catch(err => {
@@ -2809,6 +2839,10 @@ Advocate for the Tenant`;
                   <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm btn-toggle-advice" data-issue-id="${g.id}">
                     <span>💬 Post Quick Advice</span>
                   </button>
+
+                  <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm btn-view-grievance-details" data-issue-id="${g.id}">
+                    <span>🔍 View Case Details</span>
+                  </button>
                 </div>
 
                 <div style="font-size:0.8rem;color:#64748b;">
@@ -2830,6 +2864,16 @@ Advocate for the Tenant`;
         }).join('');
 
         // Attach action handlers
+        container.querySelectorAll('.btn-view-grievance-details').forEach(b => {
+          b.addEventListener('click', () => {
+            const issueId = b.getAttribute('data-issue-id');
+            const issue = AdvocateDB.grievances.getById(issueId, user.id);
+            if (issue && typeof window.openIssueDetailsModal === 'function') {
+              window.openIssueDetailsModal(issue);
+            }
+          });
+        });
+
         container.querySelectorAll('.btn-accept-grievance').forEach(b => {
           b.addEventListener('click', () => {
             const issueId = b.getAttribute('data-issue-id');

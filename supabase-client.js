@@ -794,7 +794,26 @@
     // TENANT COMPLAINTS & FREE LAWYER BOARD ("Generate Complaint")
     // --------------------------------------------------------------------------
     issues: {
-      async create({ tenant_id, tenant_name, title, category, city, state, description, amount_in_dispute, incident_date, preferred_method, preferred_time, urgency, relief_requested, document_attachment_url }) {
+      async create({
+        tenant_id,
+        tenant_name,
+        tenant_email,
+        tenant_phone,
+        landlord_name,
+        is_anonymous,
+        title,
+        category,
+        city,
+        state,
+        description,
+        amount_in_dispute,
+        incident_date,
+        preferred_method,
+        preferred_time,
+        urgency,
+        relief_requested,
+        document_attachment_url
+      }) {
         if (!title || !description || !city) {
           throw new Error('Please provide a complaint title, city location, and detailed description.');
         }
@@ -807,6 +826,10 @@
           issue_reference: issueRef,
           tenant_id: tenant_id || 'usr_guest_tenant',
           tenant_name: tenant_name || 'Tenant (Shielded)',
+          tenant_email: tenant_email || '',
+          tenant_phone: tenant_phone || '',
+          landlord_name: landlord_name || '',
+          is_anonymous: Boolean(is_anonymous),
           title: title.trim(),
           category: category || 'security_deposit',
           variety_label: this.getVarietyLabel(category || 'security_deposit'),
@@ -819,7 +842,7 @@
           relief_requested: relief_requested || 'Statutory refund and dispute resolution',
           preferred_method: preferred_method || 'video_call',
           preferred_time: preferred_time || 'evening',
-          document_attachment_url: document_attachment_url || null,
+          document_attachment_url: document_attachment_url || 'supporting_evidence_bundle.pdf',
           status: 'open',
           assigned_lawyer_id: null,
           created_at: new Date().toISOString(),

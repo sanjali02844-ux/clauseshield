@@ -3301,36 +3301,106 @@
 
   <!-- 4. ISSUE DETAILS MODAL (FOR LAWYERS & TENANTS) -->
   <div class="cs-modal-backdrop" id="issueDetailsModal">
-    <div class="cs-modal">
+    <div class="cs-modal wide" style="max-width:740px;">
       <div class="modal-header">
-        <h3 id="issueDetailTitle">Case Details</h3>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+            <span class="issue-ref" id="detailRef">CS-ISS-2026-XXXX</span>
+            <span class="status-pill status-open" id="detailStatus">Open</span>
+            <span class="badge-variety" id="detailCategoryBadge" style="font-size:0.75rem;padding:2px 8px;border-radius:20px;background:#e0f2fe;color:#0369a1;font-weight:700;">Deposit Dispute</span>
+            <span class="badge-urgency" id="detailUrgencyBadge" style="font-size:0.75rem;padding:2px 8px;border-radius:20px;font-weight:700;">URGENT</span>
+          </div>
+          <h3 id="issueDetailTitle" style="margin:0;font-size:1.25rem;font-weight:800;color:var(--navy);">Case Details &amp; Legal Grievance</h3>
+        </div>
         <button type="button" class="modal-close-btn" data-close="issueDetailsModal">×</button>
       </div>
-      <div class="modal-body">
-        <div class="issue-card-header">
-          <span class="issue-ref" id="detailRef">CS-ISS-2026-XXXX</span>
-          <span class="status-pill status-open" id="detailStatus">Open</span>
-        </div>
-        <h3 id="detailHeading" style="margin-top:8px;">Dispute Title</h3>
-        <div class="issue-location" id="detailLocation">📍 Pune, Maharashtra</div>
-        
-        <div class="issue-meta-box">
-          <span>Amount in Dispute: <strong id="detailAmount" class="issue-dispute-amt">₹0</strong></span>
-          <span>Incident: <strong id="detailDate">—</strong></span>
-        </div>
+      <div class="modal-body" style="padding:22px 26px;">
+        <!-- Dispute Title & Location -->
+        <h3 id="detailHeading" style="margin:0 0 6px;font-size:1.18rem;font-weight:700;color:#0f172a;line-height:1.4;">Dispute Title</h3>
+        <div class="issue-location" id="detailLocation" style="font-size:0.86rem;color:#64748b;margin-bottom:16px;">📍 Pune, Maharashtra</div>
 
-        <label>Detailed Problem Narrative</label>
-        <p id="detailNarrative" style="background:#f8faff;padding:14px;border-radius:10px;font-size:.88rem;line-height:1.6;color:var(--ink);"></p>
-
-        <div class="shield-notice" id="detailPrivacyShield">
-          <span class="shield-icon">🔒</span>
-          <div>
-            <strong>Confidentiality Active:</strong>
-            Tenant direct phone number and private identification documents are shielded. Verified advocates can communicate via scheduled platform video consultations.
+        <!-- Key Parameters Grid -->
+        <div class="detail-grid-cards" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:12px;margin-bottom:18px;">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;border-radius:10px;">
+            <span style="display:block;font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;">Dispute Amount</span>
+            <strong id="detailAmount" class="issue-dispute-amt" style="font-size:1.1rem;color:#b91c1c;">₹0</strong>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;border-radius:10px;">
+            <span style="display:block;font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;">Incident Date</span>
+            <strong id="detailDate" style="font-size:0.92rem;color:#0f172a;">—</strong>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;border-radius:10px;" id="detailLandlordBox">
+            <span style="display:block;font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;">Opposing Landlord</span>
+            <strong id="detailLandlord" style="font-size:0.92rem;color:#0f172a;">—</strong>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;border-radius:10px;">
+            <span style="display:block;font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;">Assistance Mode</span>
+            <strong id="detailPrefMode" style="font-size:0.92rem;color:#2563eb;">📹 Video Call</strong>
           </div>
         </div>
 
-        <div id="issueDetailActions" style="display:flex;gap:12px;margin-top:20px;">
+        <!-- Tenant Intake Profile (Visible to Tenant & Verified Advocates) -->
+        <div id="detailTenantContactCard" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+            <span style="font-size:0.75rem;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:0.5px;">👤 Tenant Intake Profile</span>
+            <span id="detailPrivacyBadge" style="font-size:0.72rem;padding:2px 8px;border-radius:20px;background:#e0f2fe;color:#0284c7;font-weight:700;">🔒 Shielded from Public</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:18px;font-size:0.86rem;color:#0f172a;">
+            <div><strong>Name:</strong> <span id="detailTenantName">—</span></div>
+            <div><strong>Email:</strong> <span id="detailTenantEmail">—</span></div>
+            <div><strong>Phone / WhatsApp:</strong> <span id="detailTenantPhone">—</span></div>
+          </div>
+        </div>
+
+        <!-- Detailed Problem Narrative -->
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;text-transform:uppercase;margin-bottom:6px;">📝 Detailed Problem Narrative &amp; Chronological Facts</label>
+          <div id="detailNarrative" style="background:#f8fafc;border:1px solid #e2e8f0;padding:14px 16px;border-radius:10px;font-size:0.88rem;line-height:1.65;color:#1e293b;white-space:pre-line;"></div>
+        </div>
+
+        <!-- Relief Demanded -->
+        <div id="detailReliefBox" style="margin-bottom:16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;">
+          <label style="display:block;font-size:0.78rem;font-weight:700;color:#166534;text-transform:uppercase;margin-bottom:4px;">🎯 Relief &amp; Resolution Demanded</label>
+          <div id="detailRelief" style="font-size:0.88rem;color:#14532d;line-height:1.5;">—</div>
+        </div>
+
+        <!-- Statutory Law Reference Callout -->
+        <div id="detailStatutoryBox" style="margin-bottom:16px;background:#fefce8;border:1px solid #fef08a;border-radius:10px;padding:12px 16px;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;color:#854d0e;text-transform:uppercase;margin-bottom:4px;">
+            <span>⚖️ Applicable Indian Tenancy Statutory Doctrine</span>
+          </div>
+          <div id="detailStatutoryText" style="font-size:0.85rem;color:#713f12;line-height:1.5;">Section 108(m) Transfer of Property Act, 1882 — Reasonable wear and tear is statutory exempt from deductions.</div>
+        </div>
+
+        <!-- Attached Documents / Evidence -->
+        <div style="margin-bottom:18px;">
+          <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;text-transform:uppercase;margin-bottom:6px;">📎 Uploaded Case Documents &amp; Evidence Bundle</label>
+          <div id="detailDocumentsList" style="display:flex;flex-wrap:wrap;gap:10px;">
+            <!-- Render attached documents or notice draft link -->
+          </div>
+        </div>
+
+        <!-- Verified Advocates & Video Consultation Offers Thread -->
+        <div id="detailLawyerOffersSection" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <label style="font-size:0.82rem;font-weight:700;color:#0f172a;text-transform:uppercase;">⚖️ Advocate Legal Opinions &amp; Video Consultation Offers (<span id="detailResponsesCount">0</span>)</label>
+          </div>
+          <div id="detailResponsesList" style="display:flex;flex-direction:column;gap:10px;">
+            <!-- Dynamically populated lawyer opinions / consultation offers -->
+          </div>
+        </div>
+
+        <!-- Privacy Shield Notice -->
+        <div class="shield-notice" id="detailPrivacyShield" style="margin-bottom:18px;">
+          <span class="shield-icon">🛡️</span>
+          <div>
+            <strong>Confidentiality Active:</strong>
+            Tenant direct phone number and private identification documents are shielded from unverified public viewers. Verified advocates can communicate via scheduled platform video consultations.
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="issueDetailActions" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0;">
           <!-- Dynamically populated buttons -->
         </div>
       </div>
