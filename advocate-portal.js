@@ -1190,6 +1190,7 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
 
   // Expose on global window object
   window.ClauseShieldAdvocateDB = AdvocateDB;
+  window.AdvocateDB = AdvocateDB;
 
 
   // ============================================================================

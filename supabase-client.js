@@ -1093,7 +1093,11 @@
 
       async getByTenant(tenantId) {
         const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
-        return issues.filter(i => i.tenant_id === tenantId);
+        return tenantId ? issues.filter(i => i.tenant_id === tenantId) : issues;
+      },
+
+      async getAll() {
+        return getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
       },
 
       async getById(issueId) {
@@ -1880,6 +1884,8 @@ c/o ClauseShield Legal Assistance Directorate
     ClauseShieldDB.audits = window.ClauseShieldAdvocateDB.audits;
     ClauseShieldDB.rebuttals = window.ClauseShieldAdvocateDB.rebuttals;
   }
+
+  ClauseShieldDB.tenantIssues = ClauseShieldDB.issues;
 
   // Expose on global window object
   window.ClauseShieldDB = ClauseShieldDB;
