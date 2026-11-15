@@ -235,6 +235,11 @@
             <div class="metric-hint">Legal disputes in database</div>
           </div>
           <div class="metric-card">
+            <div class="metric-title">Evidence &amp; Photos</div>
+            <div class="metric-value" id="tenantMetricEvidence">0</div>
+            <div class="metric-hint">Photographic proof &amp; files</div>
+          </div>
+          <div class="metric-card">
             <div class="metric-title">Consultation Requests</div>
             <div class="metric-value" id="tenantMetricRequests">0</div>
             <div class="metric-hint">Lawyer offers &amp; requests</div>
@@ -248,6 +253,7 @@
 
         <div class="dash-tabs">
           <button type="button" class="dash-tab active" data-tab="tenant-issues-tab">My Legal Issues</button>
+          <button type="button" class="dash-tab" data-tab="tenant-evidence-tab">📸 Evidence &amp; Photo Vault</button>
           <button type="button" class="dash-tab" data-tab="tenant-consultations-tab">Video Consultations</button>
           <button type="button" class="dash-tab" data-tab="tenant-requests-tab">Consultation Offers</button>
           <button type="button" class="dash-tab" data-tab="tenant-payments-tab">Demonstration Payment Receipts</button>
@@ -323,6 +329,36 @@
                 <!-- Dynamically populated -->
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Tenant Tab 5: Evidence & Photo Vault -->
+        <div id="tenant-evidence-tab" class="dash-pane" hidden>
+          <div class="evidence-vault-header">
+            <div>
+              <h3 style="font-size:1.18rem;margin:0 0 6px;color:var(--navy);">📸 Dispute Evidence &amp; Inspection Photo Vault</h3>
+              <p class="fine" style="margin:0;max-width:720px;">All photographic evidence, handover logs, deduction invoices, and lease attachments created across your tenancy matters. Click any image or document to inspect in high resolution.</p>
+            </div>
+            <div class="evidence-vault-actions">
+              <label class="btn primary" for="vaultPhotoUpload" style="cursor:pointer;margin:0;display:inline-flex;align-items:center;gap:6px;">
+                <span>+ Upload Evidence Photos</span>
+              </label>
+              <input id="vaultPhotoUpload" type="file" accept="image/*,.pdf,.doc,.docx" multiple style="display:none;">
+            </div>
+          </div>
+
+          <div class="evidence-filter-bar" style="margin:18px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#f8fafc;padding:12px 16px;border-radius:12px;border:1px solid var(--line);">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span class="fine" style="font-weight:700;color:var(--navy);">Filter by Dispute Case:</span>
+              <select id="vaultIssueFilter" class="form-select" style="min-width:240px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:0.85rem;">
+                <option value="all">All Linked Legal Matters</option>
+              </select>
+            </div>
+            <span class="fine" id="vaultItemCount" style="font-weight:600;color:var(--blue);">0 evidence items stored</span>
+          </div>
+
+          <div class="evidence-grid" id="tenantEvidenceGrid">
+            <!-- Dynamically populated evidence cards -->
           </div>
         </div>
       </div>
@@ -776,8 +812,9 @@
 
             <div class="full-grid-span">
               <label for="issueDocuments">Supporting Documents or Photographs (Optional)</label>
-              <input id="issueDocuments" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
-              <small class="fine">Agreement copy, notice letters, or move-out photos (stored securely).</small>
+              <input id="issueDocuments" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp" multiple>
+              <div id="issueDocsPreview" class="upload-preview-container" style="display:none;margin-top:10px;"></div>
+              <small class="fine">Agreement copy, notice letters, or move-out photos (stored securely with instant client preview).</small>
             </div>
           </div>
 
@@ -863,15 +900,61 @@
           </div>
 
           <div id="textInputContainer" hidden>
-            <label for="scenario">Choose a demo scenario</label>
-            <select id="scenario">
+            <div class="user-text-mode-header">
+              <div class="user-text-mode-title-row">
+                <span class="ai-chip-badge">✨ AI Real-Time Legal Refiner</span>
+                <span class="user-text-mode-hint">Write freely in your own words. Only content written by you is analyzed, corrected, and refined into formal legal grounds behind the scenes.</span>
+              </div>
+            </div>
+
+            <!-- Preserved for backward compatibility with scenario selectors -->
+            <select id="scenario" style="display:none;" aria-label="Demo scenario selector">
               <option value="">Select a situation…</option>
               <option value="painting">One-month painting deduction</option>
               <option value="lockin">Early move-out / lock-in penalty</option>
               <option value="deposit">Large advance security deposit</option>
             </select>
-            <label for="messageInput">Or type your rental problem / paste lease clause</label>
-            <textarea id="messageInput" rows="5" placeholder="Example: Landlord is deducting 1 month rent for painting and cutting electricity supply..."></textarea>
+
+            <div class="user-textarea-wrapper">
+              <div class="user-textarea-header-bar">
+                <label for="messageInput" class="user-textarea-label">
+                  <strong>Type Your Dispute, Landlord Issue, or Paste Problematic Clause:</strong>
+                </label>
+                <span class="refine-indicator" id="aiRefineLiveBadge">
+                  <span class="pulse-dot"></span> AI Behind-the-Scenes Active
+                </span>
+              </div>
+              <textarea id="messageInput" rows="6" class="user-legal-textarea" placeholder="Type your situation freely in your own words (e.g. 'My landlord is deducting ₹45,000 from my deposit for repainting and deep cleaning after I lived there for 2 years, and threatening to cut my electricity and lock me out if I ask for bills')..."></textarea>
+              
+              <!-- Real-time Behind-the-Scenes Refinement Bar & Drawer -->
+              <div id="aiLiveRefinementBar" class="ai-live-refinement-bar" style="display:none;">
+                <div class="ai-live-bar-header">
+                  <div class="ai-live-bar-title">
+                    <span class="ai-icon-sparkle">⚡</span>
+                    <span id="aiLiveStatusText">Refined behind the scenes: Legal claims &amp; Constitutional protections anchored</span>
+                  </div>
+                  <button type="button" class="ai-toggle-btn" id="btnToggleLiveRefinement">
+                    <span id="aiToggleText">View AI-Refined Statement ▾</span>
+                  </button>
+                </div>
+                <div id="aiLiveRefinedBox" class="ai-live-refined-box" style="display:none;">
+                  <div class="ai-refined-section-label">AI Behind-the-Scenes Legal Articulation:</div>
+                  <div id="aiLiveRefinedText" class="ai-live-refined-text"></div>
+                  <div class="ai-matched-badges-row" id="aiLiveMatchedBadges"></div>
+                </div>
+              </div>
+
+              <!-- Quick Topic Suggestion Pills -->
+              <div class="quick-topic-pills">
+                <span class="quick-topic-label">Quick topics:</span>
+                <button type="button" class="topic-pill" data-topic="painting">🎨 Painting Deductions</button>
+                <button type="button" class="topic-pill" data-topic="deposit">💰 Deposit Withholding</button>
+                <button type="button" class="topic-pill" data-topic="utility">⚡ Electricity / Water Cutoff</button>
+                <button type="button" class="topic-pill" data-topic="eviction">🚪 Illegal Eviction / Lockout</button>
+                <button type="button" class="topic-pill" data-topic="lockin">🔒 Lock-in Exit Penalty</button>
+                <button type="button" class="topic-pill" data-topic="privacy">👁️ Landlord Trespass / Privacy</button>
+              </div>
+            </div>
           </div>
 
           <div class="form-grid">
@@ -930,6 +1013,31 @@
         <strong>📍 State Legal Context:</strong>
         <p id="stateAlertText"></p>
       </div>
+
+      <!-- AI Behind-the-Scenes Refinement & Legal Translation Card -->
+      <div id="aiRefinementResultCard" class="ai-refinement-result-card" hidden>
+        <div class="ai-refine-card-header">
+          <div class="ai-refine-badge-group">
+            <span class="ai-badge-gradient">✨ AI Behind-the-Scenes Legal Refinement</span>
+            <span class="constitution-badge">🏛️ Latest Constitutional &amp; Statutory Grounding</span>
+          </div>
+          <button type="button" class="btn-copy-refined" id="btnCopyRefinedStatement">📋 Copy Refined Legal Statement</button>
+        </div>
+        <div class="ai-refine-comparison">
+          <div class="ai-refine-col user-orig-col">
+            <span class="refine-col-label">Your Input (User Note):</span>
+            <div id="resultUserOriginalText" class="refine-box-orig"></div>
+          </div>
+          <div class="ai-refine-col ai-refined-col">
+            <span class="refine-col-label">AI-Refined Formal Legal Formulation:</span>
+            <div id="resultAiRefinedText" class="refine-box-refined"></div>
+          </div>
+        </div>
+        <div class="ai-protections-row">
+          <span class="ai-protections-label">Applicable Constitutional &amp; Latest Enacted Protections:</span>
+          <div id="resultConstitutionalPills" class="constitutional-pills-wrap"></div>
+        </div>
+      </div>
       <div class="result-grid">
         <div class="panel verdict-panel"><span class="status" id="riskLabel">NEEDS REVIEW</span><h3 id="verdictTitle">This clause may need a closer look.</h3><p id="verdictReason"></p><div class="money" id="moneyValue">₹0</div><small>Amount entered for review — not a guaranteed recovery</small></div>
         <div class="panel"><h3>Suggested next steps</h3><ul id="nextSteps"><li>Keep a copy of your agreement.</li><li>Ask for an itemised explanation and supporting bills.</li><li>Compare the wording with applicable state rules.</li></ul><div class="risk-meter"><div id="riskBar"></div></div><small>Illustrative concern indicator: <b id="riskScore">—</b>/100</small></div>
@@ -955,6 +1063,7 @@
 
       <!-- Legal Provisions Disclosure (Know Your Rights anchor) -->
       <div class="panel legal-panel" id="audit-legal-provisions">
+        <div id="know-rights"></div>
         <button class="disclosure" id="legalToggle" aria-expanded="true">
           <span class="disclosure-title">⚖️ Applicable Indian Legal Provisions &amp; Rights</span>
           <span class="disclosure-badge" id="legalCountBadge">2 Provisions</span>
@@ -967,6 +1076,47 @@
           <div class="legal-disclaimer">
             <h3>Important Note</h3>
             <p>These laws help you understand your rights, but the final outcome depends on your rental agreement, evidence, and the tenancy rules applicable in your state. For serious disputes, consult a verified advocate via our platform.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Response Generator Section (Step 3: WhatsApp & Formal Notice) -->
+      <div class="section-heading left" style="margin-top: 36px; margin-bottom: 16px;">
+        <p class="eyebrow">STEP 3 · PREPARE A RESPONSE</p>
+        <h2>Make your next message clear</h2>
+        <p>Instant tailored WhatsApp and formal statutory letter ready to send to your landlord citing applicable legal standards:</p>
+      </div>
+      <div class="panel">
+        <div class="form-grid">
+          <div><label for="landlordName">Landlord's name (optional)</label><input id="landlordName" placeholder="e.g. Mr. Sharma"></div>
+          <div><label for="deadline">Reply timeline (days)</label><input id="deadline" type="number" min="1" value="7"></div>
+        </div>
+        <div class="tabs"><button type="button" class="tab active" data-tab="whatsapp">WhatsApp message</button><button type="button" class="tab" data-tab="formal">Formal letter</button></div>
+        <div id="whatsappPane">
+          <label for="whatsappText">Editable message</label>
+          <textarea id="whatsappText" rows="7"></textarea>
+          <div class="actions">
+            <button type="button" class="btn primary" id="copyMessage">Copy text</button>
+            <a class="btn secondary" id="whatsappLink" target="_blank" rel="noopener">Open WhatsApp</a>
+          </div>
+        </div>
+        <div id="formalPane" hidden>
+          <div class="formal-layout">
+            <div class="formal-editor-side">
+              <label for="formalText">Editable formal letter <small>(Edit text below or print directly)</small></label>
+              <textarea id="formalText" rows="13"></textarea>
+            </div>
+            <div class="formal-preview-side">
+              <div class="preview-header">
+                <span><strong>Formal Letter Preview</strong> (Print-Ready)</span>
+                <span class="preview-badge">A4 Standard Format</span>
+              </div>
+              <div id="formalPreview" class="letter-sheet-preview"></div>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn primary" id="printLetter">Print / Save as PDF</button>
+            <button type="button" class="btn secondary" id="copyLetter">Copy letter</button>
           </div>
         </div>
       </div>
@@ -1395,7 +1545,19 @@
         <article class="wear-card"><span class="wear-icon">✓</span><h3>Often ordinary wear</h3><ul><li>Minor nail or screw holes</li><li>Faded paint from ordinary use</li><li>Light floor scuffs</li><li>Loose handles from regular use</li></ul></article>
         <article class="wear-card"><span class="wear-icon caution">!</span><h3>May need evidence</h3><ul><li>Large holes or broken walls</li><li>Cracked tiles or broken fixtures</li><li>Burns or significant stains</li><li>Missing inventory items</li></ul></article>
       </div>
-      <div class="panel upload-panel"><h3>Keep your evidence together</h3><p>Choose inspection photos to preview them locally in this browser. They are not uploaded to a server.</p><input id="photoUpload" type="file" accept="image/*" multiple><div class="photo-preview" id="photoPreview"></div></div>
+      <div class="panel upload-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h3 style="margin:0 0 4px;">Keep your evidence together</h3>
+            <p style="margin:0;" class="fine">Choose inspection photos to preview them in full resolution or save directly to your Personal Dashboard Evidence Vault.</p>
+          </div>
+          <button type="button" class="btn secondary" id="btnSaveWearPhotosToVault" style="display:none;font-size:0.84rem;">
+            💾 Save to Personal Dashboard Vault
+          </button>
+        </div>
+        <input id="photoUpload" type="file" accept="image/*" multiple style="margin-top:14px;">
+        <div class="photo-preview" id="photoPreview"></div>
+      </div>
     </section>
 
     <!-- ==============================================================================
@@ -3376,9 +3538,18 @@
 
         <!-- Attached Documents / Evidence -->
         <div style="margin-bottom:18px;">
-          <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;text-transform:uppercase;margin-bottom:6px;">📎 Uploaded Case Documents &amp; Evidence Bundle</label>
-          <div id="detailDocumentsList" style="display:flex;flex-wrap:wrap;gap:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;text-transform:uppercase;margin:0;">📎 Uploaded Case Documents &amp; Evidence Bundle</label>
+            <span class="fine" id="detailEvidenceCount" style="font-size:0.75rem;color:#64748b;">0 files attached</span>
+          </div>
+          <div id="detailDocumentsList" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;">
             <!-- Render attached documents or notice draft link -->
+          </div>
+          <!-- Photographic Evidence Strip -->
+          <div class="issue-evidence-wrapper" id="detailEvidenceWrapper">
+            <div id="detailEvidenceList" class="detail-evidence-grid">
+              <!-- Dynamically populated thumbnails and files -->
+            </div>
           </div>
         </div>
 
@@ -3405,6 +3576,37 @@
         <div id="issueDetailActions" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0;">
           <!-- Dynamically populated buttons -->
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. EVIDENCE & DOCUMENT LIGHTBOX VIEWER MODAL -->
+  <div class="cs-modal-backdrop" id="evidenceViewerModal">
+    <div class="cs-modal wide evidence-lightbox-modal">
+      <div class="modal-header" style="padding:16px 24px;">
+        <div style="display:flex;align-items:center;gap:12px;overflow:hidden;">
+          <span class="evidence-modal-icon" id="evidenceModalIcon" style="font-size:1.5rem;">📸</span>
+          <div style="overflow:hidden;">
+            <h3 id="evidenceModalTitle" style="font-size:1.15rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Inspection Evidence Photo</h3>
+            <div class="fine" id="evidenceModalSubtitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Case Ref: CS-CMP-2026-7819 · Move-Out Inspection</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <button type="button" class="btn secondary" id="btnZoomInEvidence" title="Zoom In" style="padding:6px 11px;font-size:0.85rem;">🔍 +</button>
+          <button type="button" class="btn secondary" id="btnZoomOutEvidence" title="Zoom Out" style="padding:6px 11px;font-size:0.85rem;">🔍 -</button>
+          <button type="button" class="btn secondary" id="btnResetZoomEvidence" title="Reset Zoom" style="padding:6px 11px;font-size:0.85rem;">↺ Reset</button>
+          <button type="button" class="btn secondary" id="btnDownloadEvidence" title="Download" style="padding:6px 12px;font-size:0.85rem;">⬇️ Download</button>
+          <button type="button" class="modal-close-btn" data-close="evidenceViewerModal">×</button>
+        </div>
+      </div>
+      <div class="modal-body" style="padding:0;background:#090d16;min-height:440px;max-height:72vh;overflow:auto;position:relative;display:flex;align-items:center;justify-content:center;">
+        <div id="evidenceDisplayStage" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:24px;transition:transform 0.15s ease;">
+          <!-- Dynamically populated: Image / PDF preview / Zip gallery unpacker -->
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;background:#fff;padding:14px 24px;">
+        <div class="fine" id="evidenceModalMeta">Timestamp: 28 Oct 2026, 14:30 IST · Verified SHA-256 Hash Encrypted</div>
+        <button type="button" class="btn secondary" data-close="evidenceViewerModal">Close Viewer</button>
       </div>
     </div>
   </div>

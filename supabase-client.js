@@ -187,6 +187,35 @@
       preferred_time: 'evening',
       relief_requested: 'Full refund of ₹55,000 deposit along with 18% statutory interest as per Karnataka Rent Act.',
       document_attachment_url: 'move_out_handover_photos.zip',
+      evidence_files: [
+        {
+          id: 'evd_001_1',
+          name: 'Move_Out_Handover_Living_Room.jpg',
+          type: 'image/jpeg',
+          size: 2450000,
+          url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
+          caption: 'Living room move-out handover: Zero structural damage, clean natural wear.',
+          uploaded_at: '2026-10-28T16:20:00Z'
+        },
+        {
+          id: 'evd_001_2',
+          name: 'Landlord_Handwritten_Deduction_Slip.png',
+          type: 'image/png',
+          size: 890000,
+          url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80',
+          caption: 'Landlord arbitrary quotation: Rs. 40,000 repainting & Rs. 15,000 deep cleaning without GST bill.',
+          uploaded_at: '2026-10-29T10:15:00Z'
+        },
+        {
+          id: 'evd_001_3',
+          name: 'Handover_Keys_Inspection_Log.jpg',
+          type: 'image/jpeg',
+          size: 1720000,
+          url: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=1200&q=80',
+          caption: 'Keys returned to building society manager on 28th October 2026.',
+          uploaded_at: '2026-10-28T17:00:00Z'
+        }
+      ],
       status: 'under_review',
       assigned_lawyer_id: 'usr_lawyer_rajesh',
       created_at: new Date('2026-11-01T14:30:00Z').toISOString(),
@@ -221,6 +250,26 @@
       preferred_time: 'afternoon',
       relief_requested: 'Immediate restraint / injunction against unlawful lockout and protection of peaceful possession.',
       document_attachment_url: 'registered_lease_agreement.pdf',
+      evidence_files: [
+        {
+          id: 'evd_002_1',
+          name: 'Registered_Lease_Agreement_Clause12.pdf',
+          type: 'application/pdf',
+          size: 1420000,
+          url: '',
+          caption: 'Registered Leave & License agreement valid till August 2027 with fixed rent.',
+          uploaded_at: '2026-11-04T12:00:00Z'
+        },
+        {
+          id: 'evd_002_2',
+          name: 'Landlord_WhatsApp_Lockout_Threats.png',
+          type: 'image/png',
+          size: 960000,
+          url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+          caption: 'WhatsApp screenshot: Landlord threatening 48-hr lockout and lock changing.',
+          uploaded_at: '2026-11-04T14:30:00Z'
+        }
+      ],
       status: 'under_review',
       assigned_lawyer_id: 'usr_lawyer_vikram',
       created_at: new Date('2026-11-05T09:15:00Z').toISOString(),
@@ -255,6 +304,26 @@
       preferred_time: 'morning',
       relief_requested: 'Immediate restoration of water and power supply, and penal compensation under Rent Control Act.',
       document_attachment_url: 'utility_disconnection_photos.zip',
+      evidence_files: [
+        {
+          id: 'evd_003_1',
+          name: 'Electricity_Board_Fuse_Tampered.jpg',
+          type: 'image/jpeg',
+          size: 1980000,
+          url: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
+          caption: 'Main distribution box: Landlord removed floor electricity fuse.',
+          uploaded_at: '2026-11-09T18:45:00Z'
+        },
+        {
+          id: 'evd_003_2',
+          name: 'Water_Valve_Padlocked_Photo.jpg',
+          type: 'image/jpeg',
+          size: 1650000,
+          url: 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=1200&q=80',
+          caption: 'External water supply pipe padlocked by building caretaker on landlord instruction.',
+          uploaded_at: '2026-11-09T19:00:00Z'
+        }
+      ],
       status: 'open',
       assigned_lawyer_id: null,
       created_at: new Date('2026-11-10T11:00:00Z').toISOString(),
@@ -289,6 +358,17 @@
       preferred_time: 'evening',
       relief_requested: 'Direct landlord to carry out urgent waterproofing or allow tenant to deduct repair expense from next month rent.',
       document_attachment_url: 'ceiling_leakage_photos.pdf',
+      evidence_files: [
+        {
+          id: 'evd_004_1',
+          name: 'Ceiling_Water_Seepage_Electrical_Hazard.jpg',
+          type: 'image/jpeg',
+          size: 2100000,
+          url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
+          caption: 'Severe ceiling plaster peel and continuous water dripping over bedroom electrical socket.',
+          uploaded_at: '2026-11-01T11:20:00Z'
+        }
+      ],
       status: 'open',
       assigned_lawyer_id: null,
       created_at: new Date('2026-11-06T15:00:00Z').toISOString(),
@@ -312,6 +392,17 @@
       preferred_time: 'evening',
       relief_requested: 'Waiver of lock-in penalty on ground of bona fide employment transfer and full refund of security deposit.',
       document_attachment_url: 'transfer_letter_and_lease.pdf',
+      evidence_files: [
+        {
+          id: 'evd_005_1',
+          name: 'Employer_Relocation_Order.pdf',
+          type: 'application/pdf',
+          size: 1120000,
+          url: '',
+          caption: 'Official corporate transfer letter mandating immediate relocation to Hyderabad campus.',
+          uploaded_at: '2026-11-07T10:00:00Z'
+        }
+      ],
       status: 'under_review',
       assigned_lawyer_id: 'usr_lawyer_priya',
       created_at: new Date('2026-11-08T13:20:00Z').toISOString(),
@@ -346,6 +437,17 @@
       preferred_time: 'morning',
       relief_requested: 'Immediate removal of invasive surveillance camera and binding undertaking against unauthorized trespass.',
       document_attachment_url: 'cctv_placement_photo.jpg',
+      evidence_files: [
+        {
+          id: 'evd_006_1',
+          name: 'CCTV_Surveillance_Pointing_Bedroom.jpg',
+          type: 'image/jpeg',
+          size: 1450000,
+          url: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=1200&q=80',
+          caption: 'Wall camera installed directly opposite master bedroom entry door without consent.',
+          uploaded_at: '2026-11-05T09:10:00Z'
+        }
+      ],
       status: 'open',
       assigned_lawyer_id: null,
       created_at: new Date('2026-11-12T10:00:00Z').toISOString(),
@@ -369,6 +471,17 @@
       preferred_time: 'afternoon',
       relief_requested: 'Restrain landlord from enforcing mid-term hike and enforce fixed rent for entire 11-month tenure.',
       document_attachment_url: 'whatsapp_threat_screenshot.png',
+      evidence_files: [
+        {
+          id: 'evd_007_1',
+          name: 'WhatsApp_Rent_Hike_Ultimatum.png',
+          type: 'image/png',
+          size: 920000,
+          url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+          caption: 'WhatsApp message demanding illegal 30% increase under threat of barrier access revocation.',
+          uploaded_at: '2026-11-12T14:00:00Z'
+        }
+      ],
       status: 'open',
       assigned_lawyer_id: null,
       created_at: new Date('2026-11-13T09:00:00Z').toISOString(),
@@ -392,6 +505,17 @@
       preferred_time: 'afternoon',
       relief_requested: 'Disallow unfair replacement deductions and release ₹38,000 retained from deposit.',
       document_attachment_url: 'kitchen_counter_photos.zip',
+      evidence_files: [
+        {
+          id: 'evd_008_1',
+          name: 'Kitchen_Counter_Inspection.jpg',
+          type: 'image/jpeg',
+          size: 1680000,
+          url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
+          caption: 'Granite countertop surface condition: Normal cosmetic wear, completely intact without fractures.',
+          uploaded_at: '2026-10-30T11:00:00Z'
+        }
+      ],
       status: 'open',
       assigned_lawyer_id: null,
       created_at: new Date('2026-11-04T12:00:00Z').toISOString(),
@@ -454,6 +578,29 @@
     const existingIssues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
     if (!existingIssues || existingIssues.length === 0) {
       setStorage(STORAGE_KEYS.TENANT_ISSUES, SEED_TENANT_ISSUES);
+    } else {
+      let modified = false;
+      existingIssues.forEach(iss => {
+        if (!iss.evidence_files || !iss.evidence_files.length) {
+          const seedMatch = SEED_TENANT_ISSUES.find(s => s.id === iss.id || s.issue_reference === iss.issue_reference);
+          if (seedMatch && seedMatch.evidence_files) {
+            iss.evidence_files = seedMatch.evidence_files;
+            modified = true;
+          } else if (iss.document_attachment_url) {
+            iss.evidence_files = [{
+              id: 'evd_' + Math.random().toString(36).substr(2, 9),
+              name: iss.document_attachment_url,
+              type: iss.document_attachment_url.endsWith('.pdf') ? 'application/pdf' : (iss.document_attachment_url.endsWith('.zip') ? 'archive' : 'image/jpeg'),
+              size: 2150000,
+              url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
+              caption: 'Move-out inspection photographic record',
+              uploaded_at: iss.created_at || new Date().toISOString()
+            }];
+            modified = true;
+          }
+        }
+      });
+      if (modified) setStorage(STORAGE_KEYS.TENANT_ISSUES, existingIssues);
     }
 
     // 4. Consultation Requests
@@ -812,7 +959,8 @@
         preferred_time,
         urgency,
         relief_requested,
-        document_attachment_url
+        document_attachment_url,
+        evidence_files
       }) {
         if (!title || !description || !city) {
           throw new Error('Please provide a complaint title, city location, and detailed description.');
@@ -820,6 +968,19 @@
 
         const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
         const issueRef = generateIssueRef();
+
+        let initialEvidence = Array.isArray(evidence_files) ? evidence_files : [];
+        if (initialEvidence.length === 0 && document_attachment_url) {
+          initialEvidence = [{
+            id: generateId('evd'),
+            name: document_attachment_url,
+            type: document_attachment_url.endsWith('.pdf') ? 'application/pdf' : (document_attachment_url.endsWith('.zip') ? 'archive' : 'image/jpeg'),
+            size: 2150000,
+            url: document_attachment_url.endsWith('.pdf') ? '' : 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
+            caption: 'Inspection evidence documentation',
+            uploaded_at: new Date().toISOString()
+          }];
+        }
 
         const newIssue = {
           id: generateId('iss'),
@@ -842,7 +1003,8 @@
           relief_requested: relief_requested || 'Statutory refund and dispute resolution',
           preferred_method: preferred_method || 'video_call',
           preferred_time: preferred_time || 'evening',
-          document_attachment_url: document_attachment_url || 'supporting_evidence_bundle.pdf',
+          document_attachment_url: document_attachment_url || (initialEvidence.length > 0 ? initialEvidence[0].name : 'supporting_evidence_bundle.pdf'),
+          evidence_files: initialEvidence,
           status: 'open',
           assigned_lawyer_id: null,
           created_at: new Date().toISOString(),
@@ -892,6 +1054,21 @@
 
         issues.unshift(newIssue);
         setStorage(STORAGE_KEYS.TENANT_ISSUES, issues);
+
+        // Store into personal vault for immediate display in Personal Dashboard Evidence Vault
+        if (initialEvidence.length > 0 && tenant_id) {
+          try {
+            initialEvidence.forEach(ev => {
+              ClauseShieldDB.evidence.add(tenant_id, {
+                ...ev,
+                issue_id: newIssue.id,
+                issue_ref: newIssue.issue_reference,
+                issue_title: newIssue.title
+              });
+            });
+          } catch (_) {}
+        }
+
         return newIssue;
       },
 
@@ -1565,6 +1742,66 @@ c/o ClauseShield Legal Assistance Directorate
             lawyer_name: lawyer.full_name || 'Advocate'
           };
         });
+      }
+    },
+
+    // --------------------------------------------------------------------------
+    // TENANT EVIDENCE & PHOTO VAULT
+    // --------------------------------------------------------------------------
+    evidence: {
+      STORAGE_KEY: 'clauseshield_tenant_evidence_vault',
+
+      async getAll(tenantId) {
+        const vault = getStorage(this.STORAGE_KEY, []);
+        const issues = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
+        const tenantIssues = tenantId ? issues.filter(i => i.tenant_id === tenantId) : issues;
+        
+        const list = [...vault.filter(v => !tenantId || v.tenant_id === tenantId)];
+        
+        tenantIssues.forEach(iss => {
+          if (iss.evidence_files && Array.isArray(iss.evidence_files)) {
+            iss.evidence_files.forEach(ef => {
+              if (!list.some(item => item.id === ef.id || (item.name === ef.name && item.issue_id === iss.id))) {
+                list.push({
+                  ...ef,
+                  tenant_id: iss.tenant_id,
+                  issue_id: iss.id,
+                  issue_ref: iss.issue_reference,
+                  issue_title: iss.title
+                });
+              }
+            });
+          }
+        });
+        return list;
+      },
+
+      async add(tenantId, evidenceItem) {
+        const vault = getStorage(this.STORAGE_KEY, []);
+        const item = {
+          id: evidenceItem.id || generateId('evd'),
+          tenant_id: tenantId || 'usr_guest_tenant',
+          name: evidenceItem.name || 'Inspection_Photo.jpg',
+          type: evidenceItem.type || 'image/jpeg',
+          size: evidenceItem.size || 1048576,
+          dataUrl: evidenceItem.dataUrl || evidenceItem.url || '',
+          url: evidenceItem.url || evidenceItem.dataUrl || '',
+          caption: evidenceItem.caption || '',
+          issue_id: evidenceItem.issue_id || null,
+          issue_ref: evidenceItem.issue_ref || null,
+          issue_title: evidenceItem.issue_title || 'General Tenancy Evidence',
+          uploaded_at: evidenceItem.uploaded_at || new Date().toISOString()
+        };
+        vault.unshift(item);
+        setStorage(this.STORAGE_KEY, vault);
+        return item;
+      },
+
+      async delete(evidenceId) {
+        let vault = getStorage(this.STORAGE_KEY, []);
+        vault = vault.filter(v => v.id !== evidenceId);
+        setStorage(this.STORAGE_KEY, vault);
+        return true;
       }
     },
 

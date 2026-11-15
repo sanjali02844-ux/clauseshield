@@ -13,6 +13,149 @@
 
   const LEGAL_REFERENCES_DATA = [
     // --------------------------------------------------------------------------
+    // 0. CONSTITUTIONAL PROTECTIONS & FUNDAMENTAL RIGHTS (LATEST CONSTITUTION)
+    // --------------------------------------------------------------------------
+    {
+      id: 'ref-const-21',
+      category: 'constitutional_law',
+      category_label: 'Constitutional Protections & Fundamental Rights',
+      act_name: 'Constitution of India, 1950',
+      section: 'Article 21',
+      title: 'Right to Shelter, Dignity, Privacy and Protection of Essential Utilities',
+      short_explanation: 'The Supreme Court has firmly established that the Right to Shelter and basic utilities (electricity, water, sanitation) is an integral part of the Right to Life with dignity under Article 21. Forcible eviction without due process of law or disconnection of utilities is unconstitutional.',
+      jurisdiction: 'Pan-India (Supreme Constitutional Safeguard)',
+      applicability_notes: 'Anchored in Chameli Singh v. State of U.P. (1996) and Shantistar Builders v. N.K. Totame (1990). No lessor, landlord, or local authority can take the law into their own hands to dispossess a tenant or cut off life-sustaining utilities.',
+      official_source_link: 'https://legislative.gov.in/constitution-of-india/',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Article+21+Constitution+right+to+shelter+tenant+eviction',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Supreme Fundamental Right'
+    },
+    {
+      id: 'ref-const-300a',
+      category: 'constitutional_law',
+      category_label: 'Constitutional Protections & Fundamental Rights',
+      act_name: 'Constitution of India, 1950',
+      section: 'Article 300A',
+      title: 'Right to Property & Protection of Lawful Tenant Possessory Rights',
+      short_explanation: 'No person shall be deprived of their property or lawful possession save by authority of law. A tenant inducted into lawful possession holds protected civil rights and cannot be dispossessed or stripped of security deposit funds without lawful decree.',
+      jurisdiction: 'Pan-India (Constitutional Protection)',
+      applicability_notes: 'Under Bishandas v. State of Punjab and Krishna Ram Mahale v. Shobha Venkat Rao (1989), lawful possession cannot be taken with a strong hand or criminal force, even by the title owner, without due process of law.',
+      official_source_link: 'https://legislative.gov.in/constitution-of-india/',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Article+300A+Constitution+lawful+possession+tenant',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Constitutional Right'
+    },
+    {
+      id: 'ref-const-19',
+      category: 'constitutional_law',
+      category_label: 'Constitutional Protections & Fundamental Rights',
+      act_name: 'Constitution of India, 1950',
+      section: 'Article 19(1)(e) & Article 14',
+      title: 'Freedom of Residence & Protection Against Discriminatory Tenancy Restrictions',
+      short_explanation: 'Guarantees freedom to reside and settle anywhere in India. Discriminatory landlord or housing society restrictions (e.g. banning bachelors, dictating religious/dietary habits, arbitrary visitor curfews) are unconstitutional and contrary to public policy.',
+      jurisdiction: 'Pan-India',
+      applicability_notes: 'Applies to discriminatory society bylaws and arbitrary restrictions that violate equality before the law and public policy under Section 23 of the Indian Contract Act.',
+      official_source_link: 'https://legislative.gov.in/constitution-of-india/',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Article+19+1+e+right+to+reside+tenant+discrimination',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Fundamental Freedom'
+    },
+
+    // --------------------------------------------------------------------------
+    // 0B. LATEST CRIMINAL & PROCEDURAL CODES (JULY 1, 2024 ENACTED)
+    // --------------------------------------------------------------------------
+    {
+      id: 'ref-bns-329',
+      category: 'latest_criminal_code',
+      category_label: 'Latest Criminal & Procedural Codes (BNS, BNSS, BSA 2023)',
+      act_name: 'Bharatiya Nyaya Sanhita, 2023',
+      section: 'Section 329(3) & 329(4)',
+      title: 'Criminal House-Trespass & Unlawful Entry into Leased Premises',
+      short_explanation: 'Criminalizes unauthorized entry into rented premises without mandatory statutory notice or using duplicate keys. A landlord who barges in or padlocks premises commits criminal house-trespass punishable with imprisonment.',
+      jurisdiction: 'Pan-India (Replaced IPC 441/448 from July 1, 2024)',
+      applicability_notes: 'Primary defense against landlords who enter premises unannounced, change door locks during tenant absence, or attempt physical lockouts without an eviction decree.',
+      official_source_link: 'https://www.indiacode.nic.in/handle/123456789/20062?sam_handle=123456789/1362',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Bharatiya+Nyaya+Sanhita+Section+329+house+trespass',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Enacted Central Criminal Statute (In Force)'
+    },
+    {
+      id: 'ref-bns-351',
+      category: 'latest_criminal_code',
+      category_label: 'Latest Criminal & Procedural Codes (BNS, BNSS, BSA 2023)',
+      act_name: 'Bharatiya Nyaya Sanhita, 2023',
+      section: 'Section 351(2) & 351(3)',
+      title: 'Criminal Intimidation Against Tenants & Coercive Eviction Threats',
+      short_explanation: 'Threatening a tenant with physical harm, reputational damage, property confiscation, or forceful eviction by hiring bouncers constitutes Criminal Intimidation punishable under Section 351 of BNS 2023.',
+      jurisdiction: 'Pan-India (Replaced IPC 503/506 from July 1, 2024)',
+      applicability_notes: 'Enables direct criminal police complaint and FIR when landlords or brokers use threatening language, aggressive WhatsApp messages, or physical intimidation to force eviction or surrender of deposit.',
+      official_source_link: 'https://www.indiacode.nic.in/handle/123456789/20062?sam_handle=123456789/1362',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Bharatiya+Nyaya+Sanhita+Section+351+criminal+intimidation',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Enacted Central Criminal Statute (In Force)'
+    },
+    {
+      id: 'ref-bns-316',
+      category: 'latest_criminal_code',
+      category_label: 'Latest Criminal & Procedural Codes (BNS, BNSS, BSA 2023)',
+      act_name: 'Bharatiya Nyaya Sanhita, 2023',
+      section: 'Section 316(2)',
+      title: 'Criminal Breach of Trust (Misappropriation of Entrusted Security Deposit)',
+      short_explanation: 'A security deposit is held in a fiduciary trust capacity. Dishonestly withholding, diverting, or refusing to refund deposit funds after keys are returned attracts criminal prosecution for Criminal Breach of Trust.',
+      jurisdiction: 'Pan-India (Replaced IPC 405/406 from July 1, 2024)',
+      applicability_notes: 'Landlords cannot treat security deposits as their private revenue. Arbitrary refusal to refund upon vacant possession gives rise to both civil claims and criminal complaints under Section 316.',
+      official_source_link: 'https://www.indiacode.nic.in/handle/123456789/20062?sam_handle=123456789/1362',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Bharatiya+Nyaya+Sanhita+Section+316+criminal+breach+of+trust+security+deposit',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Enacted Central Criminal Statute (In Force)'
+    },
+    {
+      id: 'ref-bns-324',
+      category: 'latest_criminal_code',
+      category_label: 'Latest Criminal & Procedural Codes (BNS, BNSS, BSA 2023)',
+      act_name: 'Bharatiya Nyaya Sanhita, 2023',
+      section: 'Section 324(1)',
+      title: 'Mischief & Unlawful Disconnection of Essential Utilities',
+      short_explanation: 'Intentionally cutting off electricity cables, tampering with water valves, or sabotaging essential amenities to cause wrongful loss and force a tenant out constitutes the cognizable offense of Mischief under Section 324 of BNS 2023.',
+      jurisdiction: 'Pan-India (Replaced IPC 425/427 from July 1, 2024)',
+      applicability_notes: 'Landlords attempting extrajudicial coercion via utility severance face immediate police intervention under Section 324 BNS alongside State Rent Control remedies.',
+      official_source_link: 'https://www.indiacode.nic.in/handle/123456789/20062?sam_handle=123456789/1362',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Bharatiya+Nyaya+Sanhita+Section+324+mischief+utility+electricity',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Enacted Central Criminal Statute (In Force)'
+    },
+    {
+      id: 'ref-bnss-164',
+      category: 'latest_criminal_code',
+      category_label: 'Latest Criminal & Procedural Codes (BNS, BNSS, BSA 2023)',
+      act_name: 'Bharatiya Nagarik Suraksha Sanhita, 2023',
+      section: 'Section 164',
+      title: 'Executive Magistrate Restraining Orders Against Forcible Dispossession',
+      short_explanation: 'Empowers Executive Magistrates and local police authorities to issue immediate injunctive protection to safeguard a tenant in peaceful possession and restrain lessors from breaching the peace or attempting extrajudicial eviction.',
+      jurisdiction: 'Pan-India (Replaced CrPC 145 from July 1, 2024)',
+      applicability_notes: 'Urgent procedural protection invoked when there is an imminent apprehension of breach of peace or forced lock-out by the landlord or their agents.',
+      official_source_link: 'https://www.indiacode.nic.in/handle/123456789/20063?sam_handle=123456789/1362',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Bharatiya+Nagarik+Suraksha+Sanhita+Section+164+possession+dispute',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Enacted Procedural Code (In Force)'
+    },
+    {
+      id: 'ref-bsa-61',
+      category: 'latest_criminal_code',
+      category_label: 'Latest Criminal & Procedural Codes (BNS, BNSS, BSA 2023)',
+      act_name: 'Bharatiya Sakshya Adhiniyam, 2023',
+      section: 'Section 61 & Section 63',
+      title: 'Admissibility of Electronic Records (WhatsApp, UPI, Email & Video Evidence)',
+      short_explanation: 'Under the modernized evidence act, electronic records including WhatsApp communications, digital bank transaction receipts, emails, and date-stamped handover videos are directly admissible as primary/secondary evidence in court and rent authorities.',
+      jurisdiction: 'Pan-India (Replaced Indian Evidence Act Section 65B from July 1, 2024)',
+      applicability_notes: 'Validates move-out photographic evidence, WhatsApp notice exchanges, and digital deposit transfer proofs without archaic certificate technicalities.',
+      official_source_link: 'https://www.indiacode.nic.in/handle/123456789/20064?sam_handle=123456789/1362',
+      kanoon_search_url: 'https://indiankanoon.org/search/?formInput=Bharatiya+Sakshya+Adhiniyam+Section+61+63+electronic+evidence',
+      last_verified_date: '2026-11-01',
+      statutory_status: 'Enacted Evidence Statute (In Force)'
+    },
+
+    // --------------------------------------------------------------------------
     // 1. CENTRAL LEGISLATION — PROPERTY & CONTRACT LAW
     // --------------------------------------------------------------------------
     {

@@ -1792,7 +1792,19 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
         container.querySelectorAll('.btn-preview-doc').forEach(b => {
           b.addEventListener('click', () => {
             const name = b.getAttribute('data-doc-name');
-            if (typeof window.toast === 'function') window.toast(`Opening document: ${name}`);
+            const docObj = docs.find(d => d.document_name === name) || { document_name: name };
+            if (typeof window.openEvidenceViewer === 'function') {
+              window.openEvidenceViewer({
+                name: docObj.document_name,
+                type: docObj.mime_type || (docObj.document_name.endsWith('.pdf') ? 'application/pdf' : (docObj.document_name.endsWith('.zip') ? 'archive' : 'image/jpeg')),
+                size: docObj.file_size_bytes || 1250000,
+                issue_ref: caseId,
+                uploaded_at: docObj.uploaded_at,
+                caption: `${this.formatDocType(docObj.document_type || 'supporting_evidence')} · Case ${caseId}`
+              });
+            } else if (typeof window.toast === 'function') {
+              window.toast(`Opening document: ${name}`);
+            }
           });
         });
       }
@@ -1985,7 +1997,21 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
         tbody.querySelectorAll('.btn-doc-action').forEach(b => {
           b.addEventListener('click', () => {
             const name = b.getAttribute('data-name');
-            if (typeof window.toast === 'function') window.toast(`Accessing secure file: ${name}`);
+            const docObj = docs.find(d => d.document_name === name) || { document_name: name };
+            const cs = cases.find(c => c.id === docObj.case_id) || {};
+            if (typeof window.openEvidenceViewer === 'function') {
+              window.openEvidenceViewer({
+                name: docObj.document_name,
+                type: docObj.mime_type || (docObj.document_name.endsWith('.pdf') ? 'application/pdf' : (docObj.document_name.endsWith('.zip') ? 'archive' : 'image/jpeg')),
+                size: docObj.file_size_bytes || 1250000,
+                issue_ref: cs.case_reference || 'Chambers Vault',
+                issue_title: cs.title || 'Legal Case File',
+                uploaded_at: docObj.uploaded_at,
+                caption: `${this.formatDocType(docObj.document_type || 'supporting_evidence')} · Attached to ${cs.case_reference || 'Case File'}`
+              });
+            } else if (typeof window.toast === 'function') {
+              window.toast(`Accessing secure file: ${name}`);
+            }
           });
         });
       }
