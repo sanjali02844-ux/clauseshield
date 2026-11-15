@@ -835,6 +835,7 @@
               if (sbCategory === 'illegal_eviction') sbCategory = 'eviction';
               else if (sbCategory === 'rent_hike') sbCategory = 'rent_increase';
               else if (sbCategory === 'harassment') sbCategory = 'landlord_harassment';
+              else if (sbCategory === 'lease_breach') sbCategory = 'rental_agreement';
               else sbCategory = 'other';
             }
 
@@ -875,10 +876,14 @@
         const map = {
           'security_deposit': 'Security Deposit Withholding',
           'illegal_eviction': 'Illegal Eviction & Lockout',
+          'eviction': 'Illegal Eviction & Lockout',
           'utility_cutoff': 'Utility Disconnection',
           'harassment': 'Landlord Harassment',
-          'rent_hike': 'Arbitrary Rent Hike',
+          'landlord_harassment': 'Landlord Harassment',
+          'rent_hike': 'Arbitrary Mid-Term Rent Hike',
+          'rent_increase': 'Arbitrary Mid-Term Rent Hike',
           'maintenance': 'Maintenance & Repairs',
+          'rental_agreement': 'Unfair Lease Terms',
           'lease_breach': 'Unfair Lease Terms',
           'unfair_charges': 'Unfair Move-out Charges',
           'other': 'Other Tenancy Dispute'
@@ -935,7 +940,8 @@
                   relief_requested: local.relief_requested || 'Statutory refund and dispute resolution',
                   preferred_method: row.preferred_method || 'video_call',
                   preferred_time: row.preferred_time || 'evening',
-                  status: row.status || 'open',
+                  status: row.status || local.status || 'open',
+                  assigned_lawyer_id: row.assigned_lawyer_id || local.assigned_lawyer_id || null,
                   created_at: row.created_at,
                   lawyer_responses: local.lawyer_responses || []
                 });
@@ -949,6 +955,7 @@
               }
 
               issues = merged;
+              setStorage(STORAGE_KEYS.TENANT_ISSUES, issues);
             }
           } catch (e) {
             console.warn('ClauseShield: Could not fetch from Supabase, using local fallback:', e);
@@ -1036,7 +1043,11 @@
       },
 
       // Generate & Reset Sample Complaints
-      seedSampleComplaints(forceReset = true) {
+      seedSampleComplaints(forceReset = false) {
+        const existing = getStorage(STORAGE_KEYS.TENANT_ISSUES, []);
+        if (!forceReset && existing && existing.length > 0) {
+          return existing;
+        }
         setStorage(STORAGE_KEYS.TENANT_ISSUES, SEED_TENANT_ISSUES);
         return SEED_TENANT_ISSUES;
       },

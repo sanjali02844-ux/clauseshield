@@ -58,6 +58,16 @@
     return `CS-CAS-${yr}-${num}`;
   }
 
+  function normalizeGrievanceCategory(cat) {
+    if (!cat) return '';
+    const c = String(cat).toLowerCase().trim();
+    if (c === 'rent_increase' || c === 'rent_hike') return 'rent_hike';
+    if (c === 'eviction' || c === 'illegal_eviction') return 'illegal_eviction';
+    if (c === 'landlord_harassment' || c === 'harassment') return 'harassment';
+    if (c === 'rental_agreement' || c === 'lease_breach') return 'lease_breach';
+    return c;
+  }
+
   // ----------------------------------------------------------------------------
   // SEED ADVOCATE DATA (Ready for Instant 1-Click Testing)
   // ----------------------------------------------------------------------------
@@ -915,6 +925,17 @@
     // TENANT GRIEVANCES & FREE COMPLAINT BOARD
     // --------------------------------------------------------------------------
     grievances: {
+      async syncLiveIssues() {
+        if (window.ClauseShieldDB && ClauseShieldDB.issues && typeof ClauseShieldDB.issues.getAllAvailable === 'function') {
+          try {
+            await ClauseShieldDB.issues.getAllAvailable({});
+          } catch (e) {
+            console.warn('AdvocateDB syncLiveIssues error:', e);
+          }
+        }
+        return getStorage('clauseshield_tenant_issues', []);
+      },
+
       getAll(advocateId, { search = '', category = 'all', state = 'all', tab = 'available' } = {}) {
         let issues = getStorage('clauseshield_tenant_issues', []);
         if (!issues || issues.length === 0) {
@@ -946,9 +967,10 @@
           enriched = enriched.filter(i => i.is_ignored);
         }
 
-        // Category Filtering
+        // Category Filtering with alias normalization
         if (category !== 'all') {
-          enriched = enriched.filter(i => i.category === category);
+          const normTarget = normalizeGrievanceCategory(category);
+          enriched = enriched.filter(i => normalizeGrievanceCategory(i.category) === normTarget);
         }
 
         // State Filtering
@@ -1030,6 +1052,13 @@
         });
 
         setStorage('clauseshield_tenant_issues', issues);
+
+        // Also sync status update to Supabase cloud if available
+        if (window.ClauseShieldDB && ClauseShieldDB.issues && typeof ClauseShieldDB.issues.updateStatus === 'function') {
+          ClauseShieldDB.issues.updateStatus(issueId, 'accepted', advocateId).catch(err => {
+            console.warn('ClauseShieldDB: Supabase grievance accept sync warning:', err);
+          });
+        }
 
         // Remove from ignored list if previously marked ignored
         this.unignore(issueId, advocateId);
@@ -1327,6 +1356,19 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
       if (bGriev && AdvocateDB.grievances) {
         const gCounts = AdvocateDB.grievances.getCounts(user.id);
         bGriev.textContent = gCounts.available;
+      }
+
+      // Live Supabase sync for grievances so sidebar badge and chamber board are always up to date
+      if (AdvocateDB.grievances && typeof AdvocateDB.grievances.syncLiveIssues === 'function') {
+        AdvocateDB.grievances.syncLiveIssues().then(() => {
+          if (bGriev) {
+            const updatedCounts = AdvocateDB.grievances.getCounts(user.id);
+            bGriev.textContent = updatedCounts.available;
+          }
+          if (this.currentView === 'grievances') {
+            this.renderGrievances(user);
+          }
+        }).catch(() => {});
       }
 
       // 2. Update Active Nav Link
@@ -2628,6 +2670,7 @@ Advocate for the Tenant`;
     // GRIEVANCE BOARD & MINIMAL-FEE CONSULTATION WORKSPACE
     // ==========================================================================
     activeGrievanceTab: 'available',
+    _isGrievanceSyncing: false,
 
     renderGrievances(user) {
       if (!user || !AdvocateDB.grievances) return;
@@ -2636,6 +2679,25 @@ Advocate for the Tenant`;
       const search = document.getElementById('advGrievanceSearchInput') ? document.getElementById('advGrievanceSearchInput').value : '';
       const category = document.getElementById('advGrievanceCategoryFilter') ? document.getElementById('advGrievanceCategoryFilter').value : 'all';
       const state = document.getElementById('advGrievanceStateFilter') ? document.getElementById('advGrievanceStateFilter').value : 'all';
+
+      // 1. Immediately paint UI from cached issues in local storage
+      this._paintGrievances(user, { search, category, state, tab });
+
+      // 2. Perform live sync from Supabase cloud so complaints filed by tenants appear automatically
+      if (!this._isGrievanceSyncing && AdvocateDB.grievances && typeof AdvocateDB.grievances.syncLiveIssues === 'function') {
+        this._isGrievanceSyncing = true;
+        AdvocateDB.grievances.syncLiveIssues().then(() => {
+          this._paintGrievances(user, { search, category, state, tab });
+        }).catch(err => {
+          console.warn('AdvocateUI live grievance sync error:', err);
+        }).finally(() => {
+          this._isGrievanceSyncing = false;
+        });
+      }
+    },
+
+    _paintGrievances(user, { search = '', category = 'all', state = 'all', tab = 'available' } = {}) {
+      if (!user || !AdvocateDB.grievances) return;
 
       const grievances = AdvocateDB.grievances.getAll(user.id, { search, category, state, tab });
       const counts = AdvocateDB.grievances.getCounts(user.id);
@@ -3008,11 +3070,12 @@ Advocate for the Tenant`;
 
       // Tailored Statutory Advice
       let adviceTemplate = '';
-      if (issue.category === 'security_deposit') {
+      const normCat = normalizeGrievanceCategory(issue.category);
+      if (normCat === 'security_deposit') {
         adviceTemplate = `Under Section 108(m) of the Transfer of Property Act, 1882, tenants are statutory exempt from charges arising out of reasonable wear and tear. A landlord cannot make arbitrary painting or deep-cleaning deductions without producing verified GST contractor invoices and demonstrating wilful destruction. We should issue a formal 15-day Demand Notice under Section 106.`;
-      } else if (issue.category === 'lease_breach') {
+      } else if (normCat === 'lease_breach') {
         adviceTemplate = `Under Section 74 of the Indian Contract Act, 1872, liquidated damages or lock-in penalties cannot be punitive in nature (Maula Bux v. Union of India). The landlord must establish actual quantifiable vacancy losses. Having given bona fide notice for your transfer, punitive forfeiture of deposit is void in terrorem.`;
-      } else if (issue.category === 'harassment' || issue.category === 'maintenance') {
+      } else if (normCat === 'harassment' || normCat === 'maintenance') {
         adviceTemplate = `Disconnection of essential water and electricity is prohibited under Indian tenancy law and the Specific Relief Act, 1963. We can file an emergency petition for immediate restoration and restrain unlawful entry into the premises.`;
       } else {
         adviceTemplate = `I have reviewed the facts of your rental dispute. During our video consultation, we will examine your lease agreement, compile an evidence log, and draft a formal statutory response to your landlord.`;
