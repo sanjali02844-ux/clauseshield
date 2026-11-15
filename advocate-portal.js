@@ -3292,6 +3292,15 @@ Advocate for the Tenant`;
     }
   };
 
+  AdvocateUI.switchView = function(view) {
+    const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+    return AdvocateUI.renderWorkspace(user, view);
+  };
+  AdvocateUI.openOfferModal = function(issueId) {
+    const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+    return AdvocateUI.openOfferConsultationModal(issueId, user);
+  };
+
   window.ClauseShieldAdvocateUI = AdvocateUI;
   window.AdvocatePortal = AdvocateUI;
   window.openAdvocateCase = function(caseId) {

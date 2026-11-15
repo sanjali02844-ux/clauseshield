@@ -6,3 +6,4 @@ __pycache__/
 env/
 venv/
 *.log
+.edge_test_profile/

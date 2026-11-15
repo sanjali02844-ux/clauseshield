@@ -3895,3 +3895,536 @@
   padding: 0 2px;
 }
 
+
+
+/* ==============================================================================
+   CLAUSESHIELD AI LEGAL ASSISTANT — REAL-TIME BEHIND-THE-SCENES REFINER & LAWS
+   ============================================================================== */
+
+.user-text-mode-header {
+  margin-bottom: 14px;
+}
+
+.user-text-mode-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ai-chip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(49, 94, 232, 0.12), rgba(138, 58, 240, 0.15));
+  color: #315ee8;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(49, 94, 232, 0.25);
+}
+
+.user-text-mode-hint {
+  font-size: 0.84rem;
+  color: var(--muted, #66738a);
+  line-height: 1.4;
+}
+
+.user-textarea-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.user-textarea-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.user-textarea-label {
+  font-size: 0.92rem;
+  color: var(--ink, #17233b);
+  margin-bottom: 0;
+}
+
+.refine-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--muted, #66738a);
+  font-weight: 600;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #94a3b8;
+  display: inline-block;
+  transition: all 0.25s ease;
+}
+
+.pulse-dot.active {
+  background: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+  animation: pulseAnim 1.2s infinite ease-in-out;
+}
+
+.pulse-dot.success {
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+@keyframes pulseAnim {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+.user-legal-textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1.5px solid var(--line, #e1e7f0);
+  background: #ffffff;
+  color: var(--ink, #17233b);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  padding: 14px 16px;
+  transition: all 0.2s ease;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.user-legal-textarea:focus {
+  outline: none;
+  border-color: #315ee8;
+  box-shadow: 0 0 0 3px rgba(49, 94, 232, 0.12);
+}
+
+.user-legal-textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* AI Live Behind-the-scenes Preview Bar */
+.ai-live-refinement-bar {
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f8faff, #f4f6fe);
+  border: 1px solid rgba(49, 94, 232, 0.2);
+  padding: 10px 14px;
+  margin-top: 4px;
+  transition: all 0.25s ease;
+}
+
+.ai-live-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ai-live-bar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.ai-icon-sparkle {
+  color: #315ee8;
+}
+
+.ai-toggle-btn {
+  background: none;
+  border: none;
+  color: #315ee8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.ai-toggle-btn:hover {
+  background: rgba(49, 94, 232, 0.08);
+  text-decoration: underline;
+}
+
+.ai-live-refined-box {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(49, 94, 232, 0.2);
+}
+
+.ai-refined-section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.ai-live-refined-text {
+  font-size: 0.84rem;
+  color: #1e293b;
+  line-height: 1.5;
+  white-space: pre-line;
+  background: #ffffff;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.ai-matched-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ai-badge-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.ai-badge-pill.pill-const {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.ai-badge-pill.pill-stat {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+/* Quick Topic Suggestion Pills */
+.quick-topic-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.quick-topic-label {
+  font-size: 0.76rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.topic-pill {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.topic-pill:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+/* AI Refinement Result Card (Shown in Results) */
+.ai-refinement-result-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 4px 16px rgba(49, 94, 232, 0.06);
+  padding: 20px;
+  margin-top: 20px;
+  margin-bottom: 24px;
+}
+
+.ai-refine-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ai-refine-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-badge-gradient {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.constitution-badge {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+
+.btn-copy-refined {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-copy-refined:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.ai-refine-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 768px) {
+  .ai-refine-comparison {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ai-refine-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.refine-col-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+}
+
+.refine-box-orig {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: #334155;
+  line-height: 1.5;
+  min-height: 90px;
+  white-space: pre-wrap;
+}
+
+.refine-box-refined {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: #1e3a8a;
+  line-height: 1.55;
+  min-height: 90px;
+  white-space: pre-wrap;
+}
+
+.ai-protections-row {
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-protections-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #581c87;
+}
+
+.constitutional-pills-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.const-pill {
+  background: #ffffff;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.latest-law-pill {
+  background: #ffffff;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+/* Enriched Legal Cards */
+.legal-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 12px;
+  border: 1.5px solid var(--line, #e1e7f0);
+  background: #ffffff;
+  padding: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.legal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.legal-card.card-constitutional {
+  border-color: #fde68a;
+  background: linear-gradient(180deg, #fffbeb, #ffffff);
+}
+
+.legal-card.card-latest-code {
+  border-color: #ddd6fe;
+  background: linear-gradient(180deg, #faf5ff, #ffffff);
+}
+
+.legal-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.legal-tag.tag-constitutional {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+  font-weight: 700;
+}
+
+.legal-tag.tag-latest-code {
+  background: #ede9fe;
+  color: #5b21b6;
+  border-color: #ddd6fe;
+  font-weight: 700;
+}
+
+.relevance-pill {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.legal-summary-text {
+  font-size: 0.88rem;
+  color: #334155;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.legal-app-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f8fafc;
+  border-left: 3px solid #315ee8;
+  padding: 8px 10px;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.8rem;
+  color: #1e293b;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+.card-constitutional .legal-app-note {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.card-latest-code .legal-app-note {
+  border-left-color: #7c3aed;
+  background: #faf5ff;
+}
+
+.note-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.legal-card-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.legal-card-link {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #315ee8;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legal-card-link:hover {
+  text-decoration: underline;
+}
