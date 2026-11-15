@@ -3707,7 +3707,7 @@ function openIssueDetailsModal(issue) {
 
   // Tenant Profile Card & Privacy Shield
   const isOwner = user && (user.id === issue.tenant_id || user.role === 'tenant');
-  const isAdvocate = user && user.role === 'lawyer';
+  const isAdvocate = user && (user.role === 'advocate' || user.role === 'lawyer');
 
   if ($('detailTenantName')) {
     $('detailTenantName').textContent = issue.tenant_name || (isOwner ? user?.full_name : 'Tenant Client') || 'Tenant (Shielded)';
@@ -3842,7 +3842,7 @@ function openIssueDetailsModal(issue) {
       </button>
     `;
 
-    if (user && user.role === 'lawyer') {
+    if (user && (user.role === 'advocate' || user.role === 'lawyer')) {
       actionButtonsHtml += `
         <button type="button" class="btn primary" id="detailOfferBtn" style="padding:9px 18px;font-size:0.86rem;flex:1;">
           🚀 Offer Video Consultation &amp; Accept
@@ -3884,8 +3884,9 @@ function openIssueDetailsModal(issue) {
     if (offerBtn) {
       offerBtn.addEventListener('click', async () => {
         closeModal('issueDetailsModal');
-        if (window.AdvocatePortal && typeof window.AdvocatePortal.openOfferConsultationModal === 'function') {
-          window.AdvocatePortal.openOfferConsultationModal(issue.id, user);
+        const advUI = window.ClauseShieldAdvocateUI || window.AdvocatePortal;
+        if (advUI && typeof advUI.openOfferConsultationModal === 'function') {
+          advUI.openOfferConsultationModal(issue.id, user);
         } else {
           const lawyerProfile = await ClauseShieldDB.lawyers.getByUserId(user.id);
           if (lawyerProfile) openConsultationBooking(lawyerProfile, issue, 'lawyer');
@@ -3917,6 +3918,9 @@ function openIssueDetailsModal(issue) {
 
   openModal('issueDetailsModal');
 }
+
+// Make openIssueDetailsModal globally accessible to the Advocate Chamber & All Portals
+window.openIssueDetailsModal = openIssueDetailsModal;
 
 // ------------------------------------------------------------------------------
 // Supabase & Backend Configuration Modal

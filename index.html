@@ -1732,35 +1732,6 @@
           </button>
         </div>
 
-        <!-- Cases Table -->
-        <div class="adv-card" id="advCasesTableCard">
-          <div class="adv-table-wrap">
-            <table class="adv-table">
-              <thead>
-                <tr>
-                  <th>Case ID</th>
-                  <th>Case Title</th>
-                  <th>Client</th>
-                  <th>Location</th>
-                  <th>Deposit / Rent</th>
-                  <th>Status</th>
-                  <th>Last Updated</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="advCasesListTbody">
-                <!-- Dynamically Populated -->
-              </tbody>
-            </table>
-          </div>
-          <div id="advCasesEmptyState" class="adv-empty-state" style="display:none;">
-            <div class="adv-empty-icon">📁</div>
-            <h4 class="adv-empty-title">No Cases Found</h4>
-            <p class="adv-empty-desc">Create your first case or adjust your search filters to view active case files.</p>
-            <button type="button" class="adv-btn adv-btn-primary" id="advEmptyCreateCaseBtn">+ Create New Case</button>
-          </div>
-        </div>
-
         <!-- CASE DETAILS DRAWER (Shown when opening a case) -->
         <div class="adv-drawer" id="advCaseDetailsDrawer" style="display:none;">
           <div class="adv-drawer-header">
@@ -1768,6 +1739,7 @@
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
                 <span class="adv-badge adv-badge-info" id="drawerCaseRef">CS-CAS-2026-1049</span>
                 <span class="adv-badge" id="drawerCaseStatusBadge">In Progress</span>
+                <span class="adv-badge adv-badge-info" id="drawerCaseNatureBadge" style="background:#e0e7ff;color:#3730a3;font-weight:600;">Security Deposit Dispute</span>
               </div>
               <h2 style="margin:0;font-size:1.35rem;font-weight:700;color:#0f172a;" id="drawerCaseTitle">Illegal 3-Month Lock-in Deduction &amp; Deposit Withholding</h2>
             </div>
@@ -1849,7 +1821,37 @@
             </div>
           </div>
         </div>
-      </section>
+
+        <!-- Cases Table -->
+        <div class="adv-card" id="advCasesTableCard">
+          <div class="adv-table-wrap">
+            <table class="adv-table">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Case Title</th>
+                  <th>Client</th>
+                  <th>Location</th>
+                  <th>Deposit / Rent</th>
+                  <th>Status</th>
+                  <th>Last Updated</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="advCasesListTbody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+          <div id="advCasesEmptyState" class="adv-empty-state" style="display:none;">
+            <div class="adv-empty-icon">📁</div>
+            <h4 class="adv-empty-title">No Cases Found</h4>
+            <p class="adv-empty-desc">Create your first case or adjust your search filters to view active case files.</p>
+            <button type="button" class="adv-btn adv-btn-primary" id="advEmptyCreateCaseBtn">+ Create New Case</button>
+          </div>
+        </div>
+
+        </section>
 
       <!-- VIEW 3: CLIENT MANAGEMENT -->
       <section class="adv-view-content" id="advViewClients" style="display:none;">

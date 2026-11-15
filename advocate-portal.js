@@ -543,9 +543,9 @@
       },
 
       getById(caseId, advocateId) {
-        if (!caseId || !advocateId) return null;
+        if (!caseId) return null;
         const cases = getStorage(ADV_STORAGE_KEYS.CASES, []);
-        const target = cases.find(c => c.id === caseId && c.advocate_id === advocateId);
+        const target = cases.find(c => (c.id === caseId || c.case_reference === caseId) && (!advocateId || c.advocate_id === advocateId));
         if (!target) return null;
 
         // Enrich with client details
@@ -554,14 +554,17 @@
 
         // Enrich with notes and documents counts
         const allNotes = getStorage(ADV_STORAGE_KEYS.NOTES, []);
-        const caseNotes = allNotes.filter(n => n.case_id === caseId && n.advocate_id === advocateId);
+        const caseNotes = allNotes.filter(n => n.case_id === target.id && (!advocateId || n.advocate_id === advocateId));
 
         const allDocs = getStorage(ADV_STORAGE_KEYS.DOCUMENTS, []);
-        const caseDocs = allDocs.filter(d => d.case_id === caseId && d.advocate_id === advocateId);
+        const caseDocs = allDocs.filter(d => d.case_id === target.id && (!advocateId || d.advocate_id === advocateId));
 
         return {
           ...target,
           client,
+          client_name: target.client_name || client.full_name || 'Client',
+          client_phone: target.client_phone || client.phone || '—',
+          client_email: target.client_email || client.email || '—',
           notes: caseNotes,
           documents: caseDocs
         };
@@ -1502,16 +1505,16 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
               <td>${cs.security_deposit_amount ? '₹' + Number(cs.security_deposit_amount).toLocaleString('en-IN') : '—'}</td>
               <td>${this.renderStatusBadge(cs.status)}</td>
               <td>
-                <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm btn-open-case" data-case-id="${cs.id}">Open Case</button>
+                <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm btn-open-case" data-case-id="${cs.id}">📂 View Case</button>
               </td>
             </tr>
           `).join('');
 
           cTable.querySelectorAll('.btn-open-case').forEach(b => {
-            b.addEventListener('click', () => {
+            b.addEventListener('click', (e) => {
+              e.preventDefault();
               const cid = b.getAttribute('data-case-id');
-              window.location.hash = '#advocate/cases';
-              setTimeout(() => this.openCaseDetails(cid, user), 50);
+              this.openCaseDetails(cid, user);
             });
           });
         }
@@ -1569,9 +1572,9 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
       } else {
         if (emptyState) emptyState.style.display = 'none';
         tbody.innerHTML = cases.map(cs => `
-          <tr>
-            <td><code>${this.escape(cs.case_reference)}</code></td>
-            <td><strong>${this.escape(cs.title)}</strong></td>
+          <tr data-case-id="${cs.id}" style="cursor:pointer;" title="Click to view full case details">
+            <td><code class="adv-case-link" style="color:#2563eb;font-weight:700;">${this.escape(cs.case_reference)}</code></td>
+            <td><strong class="adv-case-link" style="color:#0f172a;">${this.escape(cs.title)}</strong></td>
             <td>${this.escape(cs.client_name)}</td>
             <td><small style="color:#64748b;">${this.escape(cs.property_location)}</small></td>
             <td>
@@ -1581,15 +1584,24 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
             <td>${this.renderStatusBadge(cs.status)}</td>
             <td><small style="color:#64748b;">${new Date(cs.updated_at || cs.created_at).toLocaleDateString('en-IN')}</small></td>
             <td>
-              <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm btn-open-case-details" data-case-id="${cs.id}">View Case</button>
+              <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm btn-open-case-details" data-case-id="${cs.id}">📂 View Case</button>
             </td>
           </tr>
         `).join('');
 
-        tbody.querySelectorAll('.btn-open-case-details').forEach(b => {
-          b.addEventListener('click', () => {
-            const cid = b.getAttribute('data-case-id');
-            this.openCaseDetails(cid, user);
+        tbody.querySelectorAll('.btn-open-case-details, .adv-case-link').forEach(b => {
+          b.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const cid = b.getAttribute('data-case-id') || b.closest('tr')?.getAttribute('data-case-id');
+            if (cid) this.openCaseDetails(cid, user);
+          });
+        });
+
+        tbody.querySelectorAll('tr[data-case-id]').forEach(tr => {
+          tr.addEventListener('click', (e) => {
+            if (e.target.closest('button, a, input, select')) return;
+            const cid = tr.getAttribute('data-case-id');
+            if (cid) this.openCaseDetails(cid, user);
           });
         });
       }
@@ -1619,6 +1631,18 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
     },
 
     openCaseDetails(caseId, user) {
+      user = user || (window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null);
+      if (!user) {
+        console.error('No authenticated user session found');
+        return;
+      }
+
+      // Ensure view is switched to 'cases'
+      if (this.currentView !== 'cases') {
+        this.renderWorkspace(user, 'cases');
+      }
+      window.location.hash = '#advocate/cases';
+
       const c = AdvocateDB.cases.getById(caseId, user.id);
       if (!c) {
         if (typeof window.toast === 'function') window.toast('Case not found or unauthorized.');
@@ -1630,21 +1654,39 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
       if (!drawer) return;
 
       drawer.style.display = 'block';
-      drawer.scrollIntoView({ behavior: 'smooth' });
 
-      document.getElementById('drawerCaseRef').textContent = c.case_reference;
-      document.getElementById('drawerCaseStatusBadge').innerHTML = this.renderStatusBadge(c.status);
-      document.getElementById('drawerCaseTitle').textContent = c.title;
+      const refEl = document.getElementById('drawerCaseRef');
+      if (refEl) refEl.textContent = c.case_reference || c.id;
 
-      document.getElementById('drawerClientName').textContent = c.client_name;
-      document.getElementById('drawerClientPhone').textContent = c.client_phone || '—';
-      document.getElementById('drawerClientEmail').textContent = c.client_email || '—';
+      const stBadge = document.getElementById('drawerCaseStatusBadge');
+      if (stBadge) stBadge.innerHTML = this.renderStatusBadge(c.status);
 
-      document.getElementById('drawerPropertyLocation').textContent = c.property_location;
-      document.getElementById('drawerDepositAmount').textContent = Number(c.security_deposit_amount || 0).toLocaleString('en-IN');
-      document.getElementById('drawerRentAmount').textContent = Number(c.rent_amount || 0).toLocaleString('en-IN');
+      const natureBadge = document.getElementById('drawerCaseNatureBadge');
+      if (natureBadge) natureBadge.textContent = this.formatNature(c.nature_of_dispute);
 
-      document.getElementById('drawerDescription').textContent = c.description;
+      const titleEl = document.getElementById('drawerCaseTitle');
+      if (titleEl) titleEl.textContent = c.title || 'Case File';
+
+      const clientNameEl = document.getElementById('drawerClientName');
+      if (clientNameEl) clientNameEl.textContent = c.client_name || 'Client';
+
+      const clientPhoneEl = document.getElementById('drawerClientPhone');
+      if (clientPhoneEl) clientPhoneEl.textContent = c.client_phone || '—';
+
+      const clientEmailEl = document.getElementById('drawerClientEmail');
+      if (clientEmailEl) clientEmailEl.textContent = c.client_email || '—';
+
+      const propLocEl = document.getElementById('drawerPropertyLocation');
+      if (propLocEl) propLocEl.textContent = c.property_location || '—';
+
+      const depAmtEl = document.getElementById('drawerDepositAmount');
+      if (depAmtEl) depAmtEl.textContent = Number(c.security_deposit_amount || 0).toLocaleString('en-IN');
+
+      const rentAmtEl = document.getElementById('drawerRentAmount');
+      if (rentAmtEl) rentAmtEl.textContent = Number(c.rent_amount || 0).toLocaleString('en-IN');
+
+      const descEl = document.getElementById('drawerDescription');
+      if (descEl) descEl.textContent = c.description || 'No detailed case facts or strategies recorded.';
 
       const statusSelect = document.getElementById('drawerStatusSelect');
       if (statusSelect) {
@@ -1667,6 +1709,7 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
       const btnAudit = document.getElementById('drawerBtnAuditLease');
       if (btnAudit) {
         btnAudit.onclick = () => {
+          this.renderWorkspace(user, 'audit');
           window.location.hash = '#advocate/audit';
           setTimeout(() => {
             const auditCaseSel = document.getElementById('advAuditCaseSelect');
@@ -1678,6 +1721,7 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
       const btnRebuttal = document.getElementById('drawerBtnDraftRebuttal');
       if (btnRebuttal) {
         btnRebuttal.onclick = () => {
+          this.renderWorkspace(user, 'rebuttal');
           window.location.hash = '#advocate/rebuttal';
           setTimeout(() => {
             const rebCaseSel = document.getElementById('advRebuttalCaseSelect');
@@ -1700,6 +1744,11 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
           }, 60);
         };
       }
+
+      // Smooth scroll & highlight pulse
+      drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      drawer.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.45)';
+      setTimeout(() => { drawer.style.boxShadow = ''; }, 1200);
     },
 
     renderDrawerNotes(caseId, user) {
@@ -1854,10 +1903,10 @@ Assistance Mode: Video Call Consultation (Agreed Fee: Rs. ${fee})`,
           `).join('');
 
           tbody.querySelectorAll('.btn-open-client-case').forEach(b => {
-            b.addEventListener('click', () => {
+            b.addEventListener('click', (e) => {
+              e.preventDefault();
               const cid = b.getAttribute('data-case-id');
-              window.location.hash = '#advocate/cases';
-              setTimeout(() => this.openCaseDetails(cid, user), 50);
+              this.openCaseDetails(cid, user);
             });
           });
         }
@@ -2804,7 +2853,7 @@ Advocate for the Tenant`;
                   <div style="color:#065f46;font-size:0.86rem;font-weight:600;">
                     ✓ Accepted by You · Online Video Consultation Scheduled (Minimal Fee: ₹${g.consultation_fee !== undefined ? g.consultation_fee : 0})
                   </div>
-                  <a href="#advocate/cases" class="adv-btn adv-btn-secondary adv-btn-sm" style="border-color:#10b981;color:#065f46;">View Case in My Cases &rarr;</a>
+                  <button type="button" class="adv-btn adv-btn-secondary adv-btn-sm btn-open-accepted-case" data-issue-id="${g.id}" style="border-color:#10b981;color:#065f46;font-weight:600;">📂 View Case in My Cases &rarr;</button>
                 </div>
               ` : ''}
 
@@ -2864,6 +2913,21 @@ Advocate for the Tenant`;
         }).join('');
 
         // Attach action handlers
+        container.querySelectorAll('.btn-open-accepted-case').forEach(b => {
+          b.addEventListener('click', () => {
+            const issueId = b.getAttribute('data-issue-id');
+            const cases = AdvocateDB.cases.getAll(user.id);
+            const matched = cases.find(c => c.case_reference === issueId || c.id === issueId || (c.description && c.description.includes(issueId)));
+            if (matched) {
+              this.openCaseDetails(matched.id, user);
+            } else {
+              this.renderWorkspace(user, 'cases');
+              window.location.hash = '#advocate/cases';
+              if (typeof window.toast === 'function') window.toast('Redirecting to active cases...');
+            }
+          });
+        });
+
         container.querySelectorAll('.btn-view-grievance-details').forEach(b => {
           b.addEventListener('click', () => {
             const issueId = b.getAttribute('data-issue-id');
@@ -3203,5 +3267,10 @@ Advocate for the Tenant`;
   };
 
   window.ClauseShieldAdvocateUI = AdvocateUI;
+  window.AdvocatePortal = AdvocateUI;
+  window.openAdvocateCase = function(caseId) {
+    const user = window.ClauseShieldDB ? ClauseShieldDB.auth.getCurrentUser() : null;
+    return AdvocateUI.openCaseDetails(caseId, user);
+  };
 
 })(window);
