@@ -7,3 +7,4 @@ env/
 venv/
 *.log
 .edge_test_profile/
+.edge_test_profile*/
