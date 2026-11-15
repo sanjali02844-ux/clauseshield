@@ -220,7 +220,7 @@ async def test_clauseshield():
             grievance_test = await evaluate("""
                 (() => {
                     ClauseShieldAdvocateUI.switchView('grievances');
-                    const cards = document.querySelectorAll('#advGrievancesList .grievance-board-card');
+                    const cards = document.querySelectorAll('#advGrievanceCardsStream .adv-grievance-card');
                     const countAvail = document.getElementById('advCountAvail') ? document.getElementById('advCountAvail').textContent : '0';
                     return { renderedCards: cards.length, countAvail };
                 })()
@@ -231,9 +231,9 @@ async def test_clauseshield():
             print("[*] Testing Consultation Offer Modal in Advocate Chambers...")
             offer_modal_test = await evaluate("""
                 (() => {
-                    const firstCard = document.querySelector('#advGrievancesList .grievance-board-card');
+                    const firstCard = document.querySelector('#advGrievanceCardsStream .adv-grievance-card');
                     if (!firstCard) return 'NO_CARDS';
-                    const issueId = firstCard.getAttribute('data-issue-id');
+                    const issueId = firstCard.id.replace('gCard_', '');
                     ClauseShieldAdvocateUI.openOfferModal(issueId);
                     const modal = document.getElementById('modalOfferConsultation');
                     const isOpen = modal && modal.style.display === 'flex';
