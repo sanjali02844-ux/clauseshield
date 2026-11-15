@@ -15,7 +15,7 @@ async def test_full_platform():
         "--disable-gpu",
         "--no-first-run",
         "--no-default-browser-check",
-        "--user-data-dir=C:\\Users\\a\\.gemini\\antigravity\scratch\\clauseshield\\.edge_test_profile_2",
+        r"--user-data-dir=C:\Users\a\.gemini\antigravity\scratch\clauseshield\.edge_test_profile_2",
         "about:blank"
     ]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
