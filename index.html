@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ClauseShield connects tenants facing rental disputes with verified advocates for online legal consultations, lease audits, and evidence-based notice drafting.">
   <title>ClauseShield | Complete Legal Assistance & Tenant Support Platform</title>
-  <link rel="stylesheet" href="style.css?v=2.3">
+  <link rel="stylesheet" href="style.css?v=3.0">
   
   <!-- Supabase Client CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -111,12 +111,97 @@
         </div>
         <p class="fine">Licensed advocates · Encrypted WebRTC video calls · Comprehensive tenancy support across Indian states</p>
       </div>
-      <div class="hero-preview">
-        <div class="preview-top"><span class="dot"></span><span>sample_lease.pdf</span><span class="risk-pill">Risk 72/100</span></div>
-        <div class="document-line"></div><div class="document-line short"></div>
-        <div class="clause-box"><strong>CLAUSE 9</strong><p>Tenant shall pay one month's rent as painting charges on vacating.</p><span class="flag">⚑ Review this clause</span></div>
-        <div class="document-line"></div><div class="document-line medium"></div>
-        <div class="preview-note">A fixed charge may deserve review. Connect with a verified advocate to protect your security deposit.</div>
+      <div class="hero-preview" id="heroInteractivePreview" role="region" aria-label="Interactive Lease Clause Scanner Demo">
+        <!-- Top Status & Document Badge -->
+        <div class="preview-top">
+          <div class="preview-doc-meta">
+            <span class="dot live-pulse"></span>
+            <span class="preview-filename">sample_lease.pdf</span>
+            <span class="preview-mode-badge">AI Scanner Demo</span>
+          </div>
+          <span class="risk-pill risk-high" id="heroRiskPill">Risk 72/100 · High Risk</span>
+        </div>
+
+        <!-- 3-Step Project Explainer Banner -->
+        <div class="hero-explainer-bar">
+          <div class="explainer-step">
+            <span class="step-badge">1</span>
+            <div class="step-meta">
+              <strong>Scan Lease</strong>
+              <small>Detect illegal terms</small>
+            </div>
+          </div>
+          <span class="explainer-arrow">→</span>
+          <div class="explainer-step">
+            <span class="step-badge">2</span>
+            <div class="step-meta">
+              <strong>Indian Law Audit</strong>
+              <small>Model Tenancy Act</small>
+            </div>
+          </div>
+          <span class="explainer-arrow">→</span>
+          <div class="explainer-step">
+            <span class="step-badge">3</span>
+            <div class="step-meta">
+              <strong>Advocate Action</strong>
+              <small>Notices &amp; defense</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Scenario Selector (Common Rental Traps) -->
+        <div class="preview-scenario-picker">
+          <div class="picker-label">Test Common Indian Rental Traps:</div>
+          <div class="picker-tabs" role="tablist">
+            <button type="button" class="scenario-pill active" data-scenario="painting" role="tab" aria-selected="true">
+              🎨 Painting Deduction
+            </button>
+            <button type="button" class="scenario-pill" data-scenario="deposit" role="tab" aria-selected="false">
+              💰 10-Mo Deposit
+            </button>
+            <button type="button" class="scenario-pill" data-scenario="lockin" role="tab" aria-selected="false">
+              🔒 Lock-In Forfeiture
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Clause Display Box -->
+        <div class="clause-box" id="heroClauseBox">
+          <div class="clause-header">
+            <strong id="heroClauseNumber">CLAUSE 9 · MOVE-OUT DEDUCTION</strong>
+            <span class="flag" id="heroClauseFlag">⚑ Unreasonable Charge</span>
+          </div>
+          <p id="heroClauseText">Tenant shall pay one month's rent (₹18,000) as mandatory painting charges on vacating the premises, regardless of condition.</p>
+        </div>
+
+        <!-- AI Statutory Defense Note -->
+        <div class="preview-note" id="heroPreviewNote">
+          <div class="note-law-heading">
+            <span class="law-badge-icon">⚖️</span>
+            <div>
+              <strong id="heroLawTitle">Model Tenancy Act &amp; Sec 108(m) TPA 1882</strong>
+              <span class="statutory-tag">Statutory Protection</span>
+            </div>
+          </div>
+          <p id="heroLawText">Normal wear &amp; tear is landlord responsibility. Automatic painting deductions without contractor tax bills &amp; verified damage violate Indian tenancy law.</p>
+        </div>
+
+        <!-- Direct Actions -->
+        <div class="preview-actions-row">
+          <button type="button" class="btn primary preview-audit-btn" id="heroPreviewAuditBtn" data-case="painting">
+            ⚡ Run Audit On This Clause
+          </button>
+          <a class="btn secondary preview-notice-btn" href="#complaint-generator">
+            📝 Draft Rebuttal Notice
+          </a>
+        </div>
+
+        <!-- Quick Trust Signals -->
+        <div class="preview-trust-footer">
+          <span>✓ Real-time Indian Law Citations</span>
+          <span>·</span>
+          <span>Verified Advocate Consultations</span>
+        </div>
       </div>
     </section>
 
@@ -3293,9 +3378,9 @@
 
   <!-- APPLICATION JAVASCRIPT -->
     <!-- ADVOCATE WORKSPACE MODULES -->
-  <script src="legal-references-data.js?v=2.5"></script>
-  <script src="advocate-portal.js?v=2.5"></script>
-  <script src="supabase-client.js?v=2.5"></script>
-  <script src="script.js?v=2.5"></script>
+  <script src="legal-references-data.js?v=3.0"></script>
+  <script src="advocate-portal.js?v=3.0"></script>
+  <script src="supabase-client.js?v=3.0"></script>
+  <script src="script.js?v=3.0"></script>
 </body>
 </html>

@@ -313,6 +313,11 @@ async function handleFileUpload(file) {
 
   if (dropzonePrompt) dropzonePrompt.hidden = true;
   if (fileUploadStatus) fileUploadStatus.hidden = false;
+  const inputEl = $('leaseFileInput');
+  if (inputEl) {
+    inputEl.style.display = 'none';
+    inputEl.style.pointerEvents = 'none';
+  }
   if (fileNameDisplay) fileNameDisplay.textContent = file.name;
   if (filePageDisplay) filePageDisplay.textContent = `Extracting (${formatBytes(file.size)})...`;
 
@@ -905,7 +910,12 @@ if (removeFileBtn) {
     e.stopPropagation();
     uploadedFile = null;
     uploadedFileText = '';
-    if (leaseFileInput) leaseFileInput.value = '';
+    const fileInput = $('leaseFileInput');
+    if (fileInput) {
+      fileInput.value = '';
+      fileInput.style.display = '';
+      fileInput.style.pointerEvents = 'auto';
+    }
     $('dropzonePrompt').hidden = false;
     $('fileUploadStatus').hidden = true;
     if ($('extractedPreviewBox')) $('extractedPreviewBox').hidden = true;
@@ -915,12 +925,20 @@ if (removeFileBtn) {
 
 const togglePreviewBtn = $('togglePreviewTextBtn');
 if (togglePreviewBtn) {
-  togglePreviewBtn.addEventListener('click', () => {
+  togglePreviewBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     const textEl = $('extractedPreviewText');
     if (!textEl) return;
     textEl.hidden = !textEl.hidden;
     togglePreviewBtn.textContent = textEl.hidden ? 'Show Preview' : 'Hide Preview';
   });
+}
+
+const previewTextEl = $('extractedPreviewText');
+if (previewTextEl) {
+  previewTextEl.addEventListener('wheel', e => {
+    e.stopPropagation();
+  }, { passive: true });
 }
 
 // -------------------------------------------------------------
@@ -1094,6 +1112,101 @@ $('scenario').addEventListener('change', e => {
 });
 
 $('tryDemo').addEventListener('click', () => loadCase('painting'));
+
+// ==============================================================================
+// HERO PREVIEW INTERACTIVE SCANNER & PROJECT EXPLAINER CONTROLLER
+// ==============================================================================
+window.loadCase = loadCase;
+
+const HERO_SCENARIOS = {
+  painting: {
+    riskText: 'Risk 72/100 · High Risk',
+    riskClass: 'risk-high',
+    borderClass: '',
+    clauseNum: 'CLAUSE 9 · MOVE-OUT DEDUCTION',
+    clauseFlag: '⚑ Unreasonable Charge',
+    clauseText: "Tenant shall pay one month's rent (₹18,000) as mandatory painting charges on vacating the premises, regardless of condition.",
+    lawTitle: 'Model Tenancy Act & Sec 108(m) TPA 1882',
+    lawText: "Normal wear & tear is landlord responsibility. Automatic painting deductions without contractor tax bills & verified damage violate Indian tenancy law.",
+    caseKey: 'painting',
+    presetKey: 'deposit'
+  },
+  deposit: {
+    riskText: 'Risk 65/100 · Statutory Breach',
+    riskClass: 'risk-medium',
+    borderClass: 'risk-medium-border',
+    clauseNum: 'CLAUSE 4 · SECURITY DEPOSIT CAP',
+    clauseFlag: '⚑ Statutory Limit Exceeded',
+    clauseText: "Tenant agrees to pay 10 months rent (₹2,50,000) as interest-free security deposit prior to taking handover of residential premises.",
+    lawTitle: 'Section 11, Model Tenancy Act, 2021',
+    lawText: "The Model Tenancy Act caps residential security deposits at maximum 2 months' rent. Demanding 10 months locks substantial tenant liquidity unlawfully.",
+    caseKey: 'deposit',
+    presetKey: 'deposit'
+  },
+  lockin: {
+    riskText: 'Risk 82/100 · Critical Penalty',
+    riskClass: 'risk-critical',
+    borderClass: 'risk-critical-border',
+    clauseNum: 'CLAUSE 12 · EARLY VACATION FORFEITURE',
+    clauseFlag: '⚑ Illegal Penalty Clause',
+    clauseText: "If tenant terminates lease before completion of 11 months lock-in period, entire security deposit (₹45,000) shall be unconditionally forfeited with zero refund.",
+    lawTitle: 'Section 74, Indian Contract Act, 1872',
+    lawText: "Security deposit forfeiture cannot be punitive. Landlords can only deduct demonstrable actual loss or unpaid rent, not enforce automatic lump-sum forfeitures.",
+    caseKey: 'lockin',
+    presetKey: 'eviction'
+  }
+};
+
+const heroPills = document.querySelectorAll('.scenario-pill');
+const heroRiskPill = $('heroRiskPill');
+const heroClauseBox = $('heroClauseBox');
+const heroClauseNum = $('heroClauseNumber');
+const heroClauseFlag = $('heroClauseFlag');
+const heroClauseText = $('heroClauseText');
+const heroLawTitle = $('heroLawTitle');
+const heroLawText = $('heroLawText');
+const heroAuditBtn = $('heroPreviewAuditBtn');
+
+if (heroPills.length && heroRiskPill) {
+  heroPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const scenarioKey = pill.getAttribute('data-scenario');
+      const data = HERO_SCENARIOS[scenarioKey];
+      if (!data) return;
+
+      heroPills.forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('aria-selected', 'false');
+      });
+      pill.classList.add('active');
+      pill.setAttribute('aria-selected', 'true');
+
+      heroRiskPill.textContent = data.riskText;
+      heroRiskPill.className = 'risk-pill ' + data.riskClass;
+
+      if (heroClauseBox) {
+        heroClauseBox.className = 'clause-box ' + data.borderClass;
+      }
+      if (heroClauseNum) heroClauseNum.textContent = data.clauseNum;
+      if (heroClauseFlag) heroClauseFlag.textContent = data.clauseFlag;
+      if (heroClauseText) heroClauseText.textContent = data.clauseText;
+      if (heroLawTitle) heroLawTitle.textContent = data.lawTitle;
+      if (heroLawText) heroLawText.textContent = data.lawText;
+
+      if (heroAuditBtn) {
+        heroAuditBtn.setAttribute('data-case', data.caseKey);
+        heroAuditBtn.dataset.case = data.caseKey;
+      }
+    });
+  });
+
+  if (heroAuditBtn) {
+    heroAuditBtn.addEventListener('click', () => {
+      const targetCase = heroAuditBtn.dataset.case || heroAuditBtn.getAttribute('data-case') || 'painting';
+      loadCase(targetCase);
+    });
+  }
+}
 
 // Mobile menu toggle
 const menuToggle = $('menuToggle');
